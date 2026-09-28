@@ -1,0 +1,26 @@
+{
+	"_note": "임시 지도. 월드맵 지도 초안이 정해지면 교체한다. position은 0~100 좌표.",
+	"positions": {
+		"helios": [50, 35],
+		"gate7": [72, 22],
+		"greenhouse": [26, 22],
+		"swapmeet": [52, 58],
+		"undergrid": [24, 62],
+		"red_mesa": [10, 84],
+		"rustbelt": [78, 64],
+		"scrapyard": [74, 90]
+	},
+	"routes": [
+		{ "a": "helios", "b": "gate7", "road": "highway", "days": 1 },
+		{ "a": "helios", "b": "greenhouse", "road": "highway", "days": 1 },
+		{ "a": "helios", "b": "swapmeet", "road": "highway", "days": 2 },
+		{ "a": "gate7", "b": "rustbelt", "road": "wasteland", "days": 3 },
+		{ "a": "greenhouse", "b": "undergrid", "road": "wasteland", "days": 3 },
+		{ "a": "swapmeet", "b": "undergrid", "road": "highway", "days": 2 },
+		{ "a": "swapmeet", "b": "rustbelt", "road": "highway", "days": 2 },
+		{ "a": "swapmeet", "b": "scrapyard", "road": "wasteland", "days": 3 },
+		{ "a": "undergrid", "b": "red_mesa", "road": "wasteland", "days": 2 },
+		{ "a": "rustbelt", "b": "scrapyard", "road": "wasteland", "days": 2 },
+		{ "a": "red_mesa", "b": "scrapyard", "road": "wasteland", "days": 4 }
+	]
+}

@@ -1,0 +1,13 @@
+[
+	{ "id": "cargo_bay", "name": "적재함" },
+	{ "id": "armor_plate", "name": "장갑판" },
+	{ "id": "turret", "name": "터렛" },
+	{ "id": "scanner", "name": "스캐너" },
+	{ "id": "smuggle_compartment", "name": "밀수칸" },
+	{ "id": "smoke_launcher", "name": "연막 발사기" },
+	{ "id": "solar_panel", "name": "태양광 패널" },
+	{ "id": "aux_generator", "name": "보조 발전기" },
+	{ "id": "bike_mount", "name": "오토바이 거치대" },
+	{ "id": "dog_kennel", "name": "개 칸" },
+	{ "id": "bird_cage", "name": "새장" }
+]

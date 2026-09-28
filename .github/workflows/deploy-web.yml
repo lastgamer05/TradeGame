@@ -1,0 +1,81 @@
+name: Deploy web build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: 4.7.2
+  PROJECT_DIR: TradeGame
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-web
+
+      - name: Install Godot and web templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
+          mkdir -p ~/godot
+          curl -fsSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          curl -fsSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          dest=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$dest"
+          unzip -q -j templates.tpz "templates/web_nothreads_release.zip" "templates/web_nothreads_debug.zip" "templates/version.txt" -d "$dest"
+          rm godot.zip templates.tpz
+
+      - name: Download Korean font
+        # 웹에는 시스템 폰트가 없어서 한글 폰트를 빌드에 넣는다 (Nanum Gothic, SIL OFL).
+        run: |
+          mkdir -p "$PROJECT_DIR/assets/fonts"
+          curl -fsSL -o "$PROJECT_DIR/assets/fonts/NanumGothic-Regular.ttf" \
+            https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf
+
+      - name: Import
+        run: ~/godot/godot --headless --path "$PROJECT_DIR" --import
+
+      - name: Test
+        run: ~/godot/godot --headless --path "$PROJECT_DIR" --script res://tests/run_tests.gd
+
+      - name: Export
+        run: |
+          mkdir -p build/web
+          ~/godot/godot --headless --path "$PROJECT_DIR" --export-release "Web" ../build/web/index.html
+          test -f build/web/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

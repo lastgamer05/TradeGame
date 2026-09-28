@@ -1,0 +1,7 @@
+[
+	{ "id": "victor", "name": "승전", "counts_for_ending": true },
+	{ "id": "rebel", "name": "반란", "counts_for_ending": true },
+	{ "id": "displaced", "name": "밀려난", "counts_for_ending": true },
+	{ "id": "lawless", "name": "무법", "counts_for_ending": true },
+	{ "id": "neutral", "name": "중립", "counts_for_ending": false }
+]

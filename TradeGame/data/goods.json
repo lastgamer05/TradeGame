@@ -1,0 +1,28 @@
+[
+	{ "id": "synth_food", "name": "합성식품", "category": "necessity", "base_price": 8 },
+	{ "id": "raw_food", "name": "생식량", "category": "necessity", "base_price": 12 },
+	{ "id": "water", "name": "정수된 물", "category": "necessity", "base_price": 10 },
+	{ "id": "medicine", "name": "의약품", "category": "necessity", "base_price": 30 },
+
+	{ "id": "chip_low", "name": "저급 칩", "category": "tech", "base_price": 15 },
+	{ "id": "chip_military", "name": "군용 칩", "category": "tech", "base_price": 45 },
+	{ "id": "chip_prewar", "name": "전쟁 전 칩", "category": "tech", "base_price": 120 },
+	{ "id": "scrap_electronics", "name": "고물 전자부품", "category": "tech", "base_price": 10 },
+	{ "id": "metal", "name": "금속", "category": "tech", "base_price": 14 },
+	{ "id": "precision_goods", "name": "정밀 공산품", "category": "tech", "base_price": 40 },
+	{ "id": "generator_parts", "name": "발전기 부품", "category": "tech", "base_price": 60 },
+	{ "id": "filter", "name": "필터", "category": "tech", "base_price": 25 },
+	{ "id": "vehicle_module", "name": "차량 모듈", "category": "tech", "base_price": 80 },
+
+	{ "id": "suppressant", "name": "의체 거부반응 억제제", "category": "strategic", "base_price": 70 },
+	{ "id": "weapon_parts", "name": "무기 부품", "category": "strategic", "base_price": 50 },
+	{ "id": "ammo", "name": "탄약", "category": "strategic", "base_price": 20 },
+
+	{ "id": "prewar_data", "name": "전쟁 전 데이터", "category": "info", "base_price": 150, "tradable_buy": false },
+	{ "id": "blueprint", "name": "설계도", "category": "info", "base_price": 200, "tradable_buy": false },
+
+	{ "id": "hacking_tool", "name": "해킹 툴", "category": "contraband", "base_price": 90, "contraband": true },
+	{ "id": "forged_cell", "name": "위조 셀", "category": "contraband", "base_price": 5, "contraband": true },
+	{ "id": "stolen_core", "name": "장물 코어", "category": "contraband", "base_price": 300, "contraband": true },
+	{ "id": "stolen_module", "name": "장물 모듈", "category": "contraband", "base_price": 60, "contraband": true }
+]

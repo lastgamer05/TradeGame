@@ -1,0 +1,74 @@
+[
+	{
+		"id": "helios",
+		"name": "헬리오스",
+		"faction": "victor",
+		"specialties": ["suppressant", "precision_goods"],
+		"demands": ["raw_food", "synth_food", "metal", "prewar_data"],
+		"services": ["genuine_cell_exchange"],
+		"traits": ["high_tariff", "strict_contraband", "genuine_cells_only", "stable_prices"]
+	},
+	{
+		"id": "gate7",
+		"name": "게이트 7",
+		"faction": "victor",
+		"specialties": ["chip_military"],
+		"demands": ["ammo", "raw_food", "synth_food"],
+		"services": ["repair"],
+		"traits": ["licensed_traders_only"]
+	},
+	{
+		"id": "undergrid",
+		"name": "언더그리드",
+		"faction": "rebel",
+		"specialties": ["weapon_parts", "vehicle_module", "hacking_tool"],
+		"demands": ["chip_low", "chip_military", "chip_prewar", "suppressant", "generator_parts", "stolen_core"],
+		"services": ["recycled_cell_exchange"],
+		"traits": ["volatile_prices"]
+	},
+	{
+		"id": "red_mesa",
+		"name": "레드 메사",
+		"faction": "rebel",
+		"specialties": ["ammo"],
+		"demands": ["medicine", "water"],
+		"services": ["mercenary"],
+		"traits": ["refuses_helios_friends"]
+	},
+	{
+		"id": "rustbelt",
+		"name": "러스트벨",
+		"faction": "displaced",
+		"specialties": ["scrap_electronics", "chip_low", "metal"],
+		"demands": ["suppressant", "medicine"],
+		"services": [],
+		"traits": ["barter", "accepts_recycled_cells", "wants_power"]
+	},
+	{
+		"id": "greenhouse",
+		"name": "그린하우스",
+		"faction": "displaced",
+		"specialties": ["raw_food", "water"],
+		"demands": ["generator_parts", "filter"],
+		"services": [],
+		"traits": ["wants_power"]
+	},
+	{
+		"id": "swapmeet",
+		"name": "스왑밋",
+		"faction": "neutral",
+		"specialties": [],
+		"demands": [],
+		"services": ["rumors"],
+		"traits": ["sells_everything", "forged_cells_mixed_in"]
+	},
+	{
+		"id": "scrapyard",
+		"name": "스크랩야드",
+		"faction": "lawless",
+		"specialties": ["stolen_core", "stolen_module"],
+		"demands": ["weapon_parts", "ammo"],
+		"services": [],
+		"traits": ["trade_lowers_all_reputation"]
+	}
+]

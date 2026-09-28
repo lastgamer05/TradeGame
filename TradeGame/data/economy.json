@@ -1,0 +1,35 @@
+{
+	"_note": "모든 수치는 임시 밸런스 값. 가격과 전력은 셀 단위로 저장한다.",
+	"currency": {
+		"cells_per_pack": 10,
+		"cells_per_core": 100
+	},
+	"price_multipliers": {
+		"specialty": 0.6,
+		"demand": 1.6,
+		"normal": 1.0
+	},
+	"market": {
+		"sell_ratio": 0.8,
+		"pressure_per_unit_sold": 0.04,
+		"pressure_per_unit_bought": 0.03,
+		"max_pressure": 0.5,
+		"pressure_decay_per_day": 0.85,
+		"volatility": { "stable": 0.03, "normal": 0.08, "volatile": 0.15 }
+	},
+	"travel": {
+		"power_per_day": { "highway": 3, "wasteland": 6, "collapsed": 2 }
+	},
+	"start": {
+		"city": "greenhouse",
+		"power": 200,
+		"cargo_capacity": 20
+	},
+	"self_discharge_per_day": 0.005,
+	"reputation": {
+		"min": -100,
+		"max": 100,
+		"friendly_threshold": 30,
+		"hostile_threshold": -30
+	}
+}

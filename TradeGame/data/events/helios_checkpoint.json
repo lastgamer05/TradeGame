@@ -1,0 +1,110 @@
+{
+	"id": "helios_checkpoint",
+	"title": "헬리오스 검문소",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway"],
+		"requires": [
+			{ "type": "cargo", "good": "suppressant" }
+		],
+		"weight": 10
+	},
+	"text": "헬리오스 간선도로 검문소에서 병사가 화물칸을 열라고 한다. 짐칸에는 억제제 상자가 있다.",
+	"choices": [
+		{
+			"id": "talk",
+			"text": "서류를 둘러댄다",
+			"check": { "stat": "negotiation", "dc": 15 },
+			"outcomes": {
+				"success": {
+					"text": "병사가 서류를 대충 훑고 손짓한다. 무사히 통과한다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "병사가 서류의 위조 흔적을 찾아낸다. 억제제를 압수당한다.",
+					"effects": [
+						{ "type": "cargo_remove", "good": "suppressant", "amount": "all" },
+						{ "type": "reputation", "city": "helios", "delta": -10 }
+					]
+				}
+			}
+		},
+		{
+			"id": "bribe",
+			"text": "뇌물을 건넨다",
+			"cost": [
+				{ "type": "power", "amount": 10 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 배터리를 주머니에 넣고 바리케이드를 올린다. 다음에도 알아볼 눈치다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "corrupt_soldier" }
+					]
+				}
+			}
+		},
+		{
+			"id": "smuggle_compartment",
+			"text": "숨겨 둔 칸을 믿는다",
+			"requires": [
+				{ "type": "module", "module": "smuggle_compartment" }
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 화물칸을 뒤지지만 밀수칸은 찾지 못한다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "hack_terminal",
+			"text": "검문 단말을 조작한다",
+			"check": { "stat": "hacking", "dc": 13 },
+			"outcomes": {
+				"success": {
+					"text": "단말에 통과 기록이 찍히고, 지난 전과 기록도 함께 사라진다.",
+					"effects": [
+						{ "type": "flag_clear", "flag": "helios_criminal_record" }
+					]
+				},
+				"failure": {
+					"text": "단말이 경보를 울린다. 병사들이 총을 든다.",
+					"effects": [
+						{ "type": "start_combat", "encounter": "helios_checkpoint_guards" }
+					]
+				}
+			}
+		},
+		{
+			"id": "rebel_signal",
+			"text": "동조 병사에게 암호 신호를 보낸다",
+			"requires": [
+				{ "type": "reputation", "city": "undergrid", "min": 30 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사 하나가 고개를 끄덕이고 동료를 다른 쪽으로 부른다. 떠나기 전 쪽지를 건넨다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "rebel_spy_quest_unlocked" }
+					]
+				}
+			}
+		},
+		{
+			"id": "declare",
+			"text": "억제제를 자진 신고한다",
+			"outcomes": {
+				"success": {
+					"text": "병사가 억제제를 거둬 가고 신고 포상금을 쥐여 준다.",
+					"effects": [
+						{ "type": "cargo_remove", "good": "suppressant", "amount": "all" },
+						{ "type": "power", "delta": 5 },
+						{ "type": "reputation", "city": "helios", "delta": 5 },
+						{ "type": "reputation", "city": "rustbelt", "delta": -5 }
+					]
+				}
+			}
+		}
+	]
+}
