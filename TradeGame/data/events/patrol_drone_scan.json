@@ -14,7 +14,7 @@
 		{
 			"id": "jam",
 			"text": "드론 스캔 신호를 교란한다",
-			"check": { "stat": "hacking", "dc": 14 },
+			"check": { "stat": "tech", "dc": 14 },
 			"outcomes": {
 				"success": {
 					"text": "드론 화면에 빈 짐칸이 찍힌다. 드론이 다음 차로 날아간다.",

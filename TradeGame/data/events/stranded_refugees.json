@@ -12,7 +12,7 @@
 		{
 			"id": "repair",
 			"text": "트럭 엔진을 봐 준다",
-			"check": { "stat": "mechanics", "dc": 12 },
+			"check": { "stat": "tech", "dc": 12 },
 			"outcomes": {
 				"success": {
 					"text": "끊어진 냉각 호스를 이어 주자 트럭이 다시 숨을 쉰다. 노인이 고물 부품 한 자루를 억지로 쥐여 준다.",

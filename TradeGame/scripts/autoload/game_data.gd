@@ -11,6 +11,7 @@ var modules: Dictionary = {}
 var events: Dictionary = {}
 var economy: Dictionary = {}
 var politics: Dictionary = {}
+var combat: Dictionary = {}
 ## 도시 간 도로. { a, b, road, days }
 var routes: Array = []
 ## 도시 id -> Vector2 (0~100 지도 좌표)
@@ -36,6 +37,8 @@ func load_all() -> void:
 	economy = econ if econ is Dictionary else {}
 	var pol = _read_json(DATA_DIR + "/politics.json")
 	politics = pol if pol is Dictionary else {}
+	var cmb = _read_json(DATA_DIR + "/combat.json")
+	combat = cmb if cmb is Dictionary else {}
 	var map = _read_json(DATA_DIR + "/routes.json")
 	routes = map.get("routes", []) if map is Dictionary else []
 	positions = {}
@@ -96,6 +99,17 @@ func validate() -> void:
 			if str(p.get("cities")) != "all":
 				for id in p.get("cities", []):
 					_check_ref(where, "prices.cities", id, cities)
+
+	for id in combat.get("encounters", {}):
+		var enc: Dictionary = combat.encounters[id]
+		var where: String = "combat/" + id
+		_check_ref(where, "location", enc.get("location"), combat.get("locations", {}))
+		for kind in enc.get("enemies", {}):
+			_check_ref(where, "enemies", kind, combat.get("enemies", {}))
+		for g in enc.get("loot", {}).get("goods", {}):
+			_check_ref(where, "loot.goods", g, goods)
+	for id in combat.get("enemies", {}):
+		_check_ref("combat/enemies/" + id, "weapon", combat.enemies[id].get("weapon"), combat.get("weapons", {}))
 
 	for ev in events.values():
 		_validate_event(ev)
@@ -171,6 +185,10 @@ func _validate_effect(where: String, eff: Dictionary) -> void:
 	match t:
 		"reputation":
 			_check_ref(where, "effect.city", eff.get("city"), cities)
+		"start_combat":
+			_check_ref(where, "effect.encounter", eff.get("encounter"), combat.get("encounters", {}))
+		"vehicle_damage":
+			_check_ref(where, "effect.part", eff.get("part"), combat.get("car", {}).get("parts", {}))
 		"cargo_add", "cargo_remove":
 			_check_ref(where, "effect.good", eff.get("good"), goods)
 

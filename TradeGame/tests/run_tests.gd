@@ -14,6 +14,9 @@ func _initialize() -> void:
 	test_events()
 	test_trade_effects()
 	test_politics()
+	test_battle_map()
+	test_battle_rules()
+	test_battle_simulation()
 	print("\n%s" % ("ALL PASSED" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -202,6 +205,106 @@ func test_politics() -> void:
 		s.politics.advance_day()
 	s.politics.update_crises()
 	_expect(not s.politics.active.has("rebel_uprising"), "시간이 지나면 세력이 돌아오고 사건이 끝난다")
+	data.free()
+
+
+func test_battle_map() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	var s := GameState.new(data, 10)
+	var ok := true
+	for enc in data.combat.encounters:
+		for i in 10:
+			var b := s.start_battle(enc)
+			if not b._fair():
+				ok = false
+			for u in b.units:
+				if not b._in_bounds(u.pos) or b.tile(u.pos) != Battle.Tile.FLOOR:
+					ok = false
+	_expect(ok, "생성된 맵: 좌우 균형, 탈출 경로, 유닛이 빈 칸에 선다")
+	data.free()
+
+
+func test_battle_rules() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	var s := GameState.new(data, 11)
+	var b := s.start_battle("raider_roadblock")
+	# 빈 맵에서 규칙만 확인한다.
+	for y in b.h:
+		for x in b.w:
+			b.tiles[y][x] = Battle.Tile.FLOOR
+	var me: Dictionary = b.units[0]
+	var foe: Dictionary = b.active_units("enemy")[0]
+	me.pos = Vector2i(5, 12)
+	foe.pos = Vector2i(5, 6)
+	var open := b.hit_chance(me, foe)
+	b.tiles[7][5] = Battle.Tile.HALF
+	var half := b.hit_chance(me, foe)
+	_expect(half < open, "반 엄폐는 명중률을 낮춘다 (%d%% -> %d%%)" % [open, half])
+	b.tiles[7][5] = Battle.Tile.FULL
+	_expect(not b.has_los(me.pos, foe.pos), "완전 엄폐물은 시야를 가린다")
+	b.tiles[7][5] = Battle.Tile.FLOOR
+	foe.hidden = true
+	_expect(b.hit_chance(me, foe) < open, "숨은 적은 맞히기 어렵다")
+	foe.hidden = false
+	var reach := b.reachable(me)
+	_expect(reach.has(Vector2i(5, 7)) and not reach.has(Vector2i(5, 6)), "이동 범위 5칸, 적이 선 칸은 못 간다")
+	_expect(b.move(me, Vector2i(5, 9)) and me.ap == 1, "이동하면 행동력 1 소모")
+	_expect(b.attack(me, foe) and me.ap == 0, "공격하면 턴 종료")
+	# 탑승과 탈출
+	for u in b.active_units("player"):
+		u.pos = b.escape_cells[b.units.find(u)]
+		u.ap = 2
+		_expect(b.board(u), "탈출 구역에서 탑승")
+	b.end_player_turn()
+	_expect(b.result == "escaped", "전원 탑승하면 도주 성공")
+	data.free()
+
+
+func test_battle_simulation() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	# 플레이어가 가장 가까운 적을 쏘기만 하는 전투를 여러 번 끝까지 돌려 본다.
+	var results := {}
+	for seed_value in 20:
+		var s := GameState.new(data, 100 + seed_value)
+		s.cargo_capacity = 40
+		s.add_cargo("raw_food", 10)
+		var enc: String = data.combat.encounters.keys()[seed_value % data.combat.encounters.size()]
+		var b := s.start_battle(enc)
+		var guard := 0
+		while b.result == "" and guard < 60:
+			guard += 1
+			for u in b.active_units("player"):
+				var target := {}
+				for e in b.active_units("enemy"):
+					if b.hit_chance(u, e) > 0:
+						target = e
+						break
+				if not target.is_empty():
+					b.attack(u, target)
+				else:
+					var moves := b.reachable(u)
+					var best: Vector2i = u.pos
+					for c in moves:
+						if c.y < best.y:
+							best = c
+					b.move(u, best)
+					if u.ap > 0 and not b.active_units("enemy").is_empty():
+						for e in b.active_units("enemy"):
+							if b.hit_chance(u, e) > 0:
+								b.attack(u, e)
+								break
+			b.end_player_turn()
+		results[b.result] = results.get(b.result, 0) + 1
+		s.apply_battle(b)
+		if s.power < 0:
+			_expect(false, "전투 뒤 전력이 음수")
+	_expect(not results.has(""), "모든 전투가 끝난다 %s" % results)
 	data.free()
 
 

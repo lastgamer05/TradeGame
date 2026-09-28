@@ -3,6 +3,7 @@ extends Control
 
 const WorldMap := preload("res://scripts/ui/world_map.gd")
 const PoliticsBar := preload("res://scripts/ui/politics_bar.gd")
+const BattleView := preload("res://scripts/combat/battle_view.gd")
 
 const CITY_ART := "res://assets/art/cities/%s.png"
 const GOOD_ICON := "res://assets/icons/goods/%s.png"
@@ -30,6 +31,8 @@ var _modal: VBoxContainer
 var _event_queue: Array = []
 var _politics_bar: Control
 var _crisis_label: Label
+var _vehicle_box: VBoxContainer
+var _battle_view: Control
 
 
 func _ready() -> void:
@@ -137,6 +140,11 @@ func _show_next_event() -> void:
 		_modal_text(c.start_text if news.started else c.end_text)
 		_add_log("[정세] %s %s" % [c.name, "시작" if news.started else "종료"])
 		_modal.add_child(_button("계속", true, _close_modal))
+		return
+	if state.pending_combat != "":
+		var enc := state.pending_combat
+		state.pending_combat = ""
+		_start_battle(enc)
 		return
 	if _event_queue.is_empty():
 		return
@@ -247,9 +255,14 @@ func _build_layout() -> void:
 	map_panel.add_child(_map)
 	var routes_panel := PanelContainer.new()
 	right.add_child(routes_panel)
+	var routes_col := VBoxContainer.new()
+	routes_col.add_theme_constant_override("separation", 6)
+	routes_panel.add_child(routes_col)
+	_vehicle_box = VBoxContainer.new()
+	routes_col.add_child(_vehicle_box)
 	_routes_box = VBoxContainer.new()
 	_routes_box.add_theme_constant_override("separation", 6)
-	routes_panel.add_child(_routes_box)
+	routes_col.add_child(_routes_box)
 
 	var log_panel := PanelContainer.new()
 	root.add_child(log_panel)
@@ -316,6 +329,7 @@ func _refresh() -> void:
 		_goods_names(city.specialties), _goods_names(city.demands), state.reputation[state.city], stat_text]
 	_refresh_market(city)
 	_refresh_routes()
+	_refresh_vehicle()
 	_map.current_city = state.city
 	_politics_bar.politics = state.politics
 	_politics_bar.queue_redraw()
@@ -402,6 +416,49 @@ func _refresh_routes() -> void:
 		var b := _button(text, r.power <= state.power, _on_travel.bind(r.to))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_routes_box.add_child(b)
+
+
+func _refresh_vehicle() -> void:
+	for c in _vehicle_box.get_children():
+		c.queue_free()
+	if state.vehicle_damage.is_empty():
+		return
+	var parts := state.vehicle_damage.keys().map(func(p): return GameData.combat.car.parts[p].name)
+	var l := _label("차량 파손: " + ", ".join(parts))
+	l.add_theme_color_override("font_color", Color(0.9, 0.45, 0.4))
+	_vehicle_box.add_child(l)
+	if state.can_repair_here():
+		_vehicle_box.add_child(_button("정비소에서 수리 · %s" % _fmt_power(state.repair_cost()),
+			state.repair_cost() <= state.power, _on_repair))
+
+
+func _on_repair() -> void:
+	var cost := state.repair_cost()
+	var err := state.repair()
+	_add_log("정비소에서 차를 고쳤다. 전력 -%d셀" % cost if err == "" else err)
+	_refresh()
+
+
+# --- 전투 ---
+
+func _start_battle(encounter_id: String) -> void:
+	var b := state.start_battle(encounter_id)
+	_battle_view = BattleView.new()
+	add_child(_battle_view)
+	_battle_view.setup(b)
+	_battle_view.finished.connect(_on_battle_finished)
+
+
+func _on_battle_finished(b: Battle) -> void:
+	_battle_view.queue_free()
+	_battle_view = null
+	var lines := state.apply_battle(b)
+	_open_modal("전투 결과: %s" % BattleView.RESULT_NAMES.get(b.result, b.result))
+	for line in lines:
+		_modal_text("· " + line, PixelTheme.TEXT_DIM)
+		_add_log("  " + line)
+	_add_log("[전투] %s: %s" % [b.encounter.name, BattleView.RESULT_NAMES.get(b.result, b.result)])
+	_modal.add_child(_button("계속", true, _close_modal))
 
 
 func _on_buy(id: String, qty: int) -> void:

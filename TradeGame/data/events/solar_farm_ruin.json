@@ -12,7 +12,7 @@
 		{
 			"id": "tap_substation",
 			"text": "변전함에 케이블을 물려 충전한다",
-			"check": { "stat": "mechanics", "dc": 14 },
+			"check": { "stat": "tech", "dc": 14 },
 			"outcomes": {
 				"success": {
 					"text": "전압을 맞추자 배터리 게이지가 천천히 오른다. 황무지에서 공짜 전력을 얻는 일은 드물다.",

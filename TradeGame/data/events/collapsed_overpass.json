@@ -12,7 +12,7 @@
 		{
 			"id": "strip_billboard",
 			"text": "광고판을 뜯어 부품을 챙긴다",
-			"check": { "stat": "mechanics", "dc": 13 },
+			"check": { "stat": "tech", "dc": 13 },
 			"outcomes": {
 				"success": {
 					"text": "광고판 뒤 제어 기판이 아직 살아 있다. 조심스럽게 떼어 낸다.",

@@ -20,6 +20,21 @@ func _initialize() -> void:
 		main._event_queue.clear()
 		main._on_buy("suppressant", 2)
 		main._close_modal()
+	elif args.size() > 1 and args[1].begins_with("battle:"):
+		main._close_modal()
+		main._start_battle(args[1].trim_prefix("battle:"))
+		await process_frame
+		var view = main._battle_view
+		var b: Battle = view.battle
+		# 한 턴 진행한 모습: 첫 유닛 앞으로 이동, 턴 종료
+		var u: Dictionary = b.active_units("player")[0]
+		var cells: Array = b.reachable(u).keys()
+		cells.sort_custom(func(a, c): return a.y < c.y)
+		b.move(u, cells[0])
+		b.end_player_turn()
+		view._select_next()
+		view.hover = b.active_units("enemy")[0].pos
+		view._refresh()
 	elif args.size() > 1:
 		main._event_queue.append(root.get_node("GameData").events[args[1]])
 		main._close_modal()

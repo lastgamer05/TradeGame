@@ -23,7 +23,7 @@
 		"faction": "rebel",
 		"specialties": ["weapon_parts", "vehicle_module", "hacking_tool"],
 		"demands": ["chip_low", "chip_military", "chip_prewar", "suppressant", "generator_parts", "stolen_core"],
-		"services": ["recycled_cell_exchange"],
+		"services": ["recycled_cell_exchange", "repair"],
 		"traits": ["volatile_prices"]
 	},
 	{
@@ -41,7 +41,7 @@
 		"faction": "displaced",
 		"specialties": ["scrap_electronics", "chip_low", "metal"],
 		"demands": ["suppressant", "medicine"],
-		"services": [],
+		"services": ["repair"],
 		"traits": ["barter", "accepts_recycled_cells", "wants_power"]
 	},
 	{

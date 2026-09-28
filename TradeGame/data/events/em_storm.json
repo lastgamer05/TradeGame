@@ -32,7 +32,7 @@
 		{
 			"id": "shield",
 			"text": "배선을 뜯어 배터리를 임시로 차폐한다",
-			"check": { "stat": "mechanics", "dc": 14 },
+			"check": { "stat": "tech", "dc": 14 },
 			"outcomes": {
 				"success": {
 					"text": "알루미늄 판을 덧대 배터리함을 감싼다. 폭풍이 지나간 뒤에도 계기판이 멀쩡하다.",
@@ -67,7 +67,7 @@
 		{
 			"id": "salvage_after",
 			"text": "폭풍이 지나간 뒤 타 버린 드론 잔해를 뒤진다",
-			"check": { "stat": "mechanics", "dc": 12 },
+			"check": { "stat": "tech", "dc": 12 },
 			"outcomes": {
 				"success": {
 					"text": "번개를 맞고 떨어진 감시 드론에서 쓸 만한 부품을 뜯어낸다.",

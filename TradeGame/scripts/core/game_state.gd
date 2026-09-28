@@ -27,6 +27,10 @@ var cost_basis: Dictionary = {}
 var last_trade: Dictionary = {}
 ## 아직 화면에 알리지 않은 정세 변화. [{ crisis, started }]
 var pending_news: Array = []
+## 파손된 차량 부위 id -> true. 정비소에서 고친다.
+var vehicle_damage: Dictionary = {}
+## 이벤트가 시작시킨 전투 encounter id. 화면이 전투를 띄우고 비운다.
+var pending_combat: String = ""
 ## 도시 id -> 평판으로 바뀌기 전 누적된 거래 실적
 var _rep_progress: Dictionary = {}
 
@@ -197,6 +201,8 @@ func net_worth() -> int:
 func _advance_day() -> void:
 	day += 1
 	power -= floori(power * float(data.economy.self_discharge_per_day))
+	if vehicle_damage.has("battery"):
+		power = maxi(0, power - int(data.combat.car.battery_leak_per_day))
 	market.advance_day()
 	politics.advance_day()
 	pending_news.append_array(politics.update_crises())
@@ -219,3 +225,100 @@ func _total_sell_income(good_id: String, qty: int) -> int:
 	for i in qty:
 		total += maxi(1, roundi(unit * (1.0 - step * i)))
 	return total
+
+
+# --- 차량과 전투 ---
+
+## 차량 부위 파손. 적재함은 바로 화물 일부를 잃는다. 보여 줄 한 줄을 돌려준다.
+func damage_vehicle(part: String) -> String:
+	var car: Dictionary = data.combat.car
+	var name: String = car.parts[part].name
+	if vehicle_damage.has(part):
+		return "%s이(가) 더 망가졌다" % name
+	vehicle_damage[part] = true
+	match part:
+		"cargo_bay":
+			var lost := 0
+			for good_id in cargo.keys():
+				lost += remove_cargo(good_id, ceili(cargo[good_id] * float(car.cargo_bay_loss)))
+			return "적재함 파손: 화물 %d개를 잃었다" % lost
+		"engine":
+			return "엔진 파손: 전투에서 탈출이 한 턴 늦어진다"
+		"battery":
+			return "배터리 파손: 하루 %d셀씩 전력이 샌다" % int(car.battery_leak_per_day)
+		"module":
+			return "모듈 파손: 수리 전까지 모듈이 작동하지 않는다"
+	return "%s 파손" % name
+
+
+func can_repair_here() -> bool:
+	return "repair" in data.cities[city].services
+
+
+func repair_cost() -> int:
+	var total := 0
+	for part in vehicle_damage:
+		total += int(data.combat.car.parts[part].repair)
+	return total
+
+
+func repair() -> String:
+	if not can_repair_here():
+		return "이 도시에는 정비소가 없다"
+	if vehicle_damage.is_empty():
+		return "고칠 곳이 없다"
+	var cost := repair_cost()
+	if cost > power:
+		return "전력이 모자란다"
+	power -= cost
+	vehicle_damage.clear()
+	return ""
+
+
+## 전투에 나갈 분대. 주인공과 임시 용병.
+func battle_squad() -> Array:
+	var c: Dictionary = data.combat
+	return [
+		{ "name": "나", "hp": int(c.player.hp_base) + int(c.player.hp_per_survival) * int(stats.survival),
+			"focus": stats.focus, "might": stats.might, "weapon": c.player.weapon, "melee_weapon": c.player.melee_weapon },
+		{ "name": c.mercenary.name, "hp": int(c.mercenary.hp), "focus": int(c.mercenary.focus),
+			"might": int(c.mercenary.might), "weapon": c.mercenary.weapon },
+	]
+
+
+func start_battle(encounter_id: String) -> Battle:
+	return Battle.new(data.combat, encounter_id, battle_squad(), int(stats.negotiation), vehicle_damage, rng)
+
+
+## 끝난 전투의 결과를 반영하고 보여 줄 줄들을 돌려준다.
+func apply_battle(b: Battle) -> Array:
+	var lines := []
+	for part in b.car_hits:
+		lines.append(damage_vehicle(part))
+	var loot: Dictionary = b.encounter.loot
+	match b.result:
+		"victory", "surrender":
+			var share := 1.0 if b.result == "victory" else 0.5
+			var p := roundi(rng.randi_range(int(loot.power[0]), int(loot.power[1])) * share)
+			if p > 0:
+				power += p
+				lines.append("전리품: 전력 +%d셀" % p)
+			for good_id in loot.goods:
+				var n := roundi(rng.randi_range(int(loot.goods[good_id][0]), int(loot.goods[good_id][1])) * share)
+				if n > 0:
+					var got := add_cargo(good_id, n)
+					lines.append("전리품: %s +%d%s" % [data.goods[good_id].name, got, "" if got == n else " (짐칸 부족)"])
+		"escaped":
+			lines.append("화물을 지키고 빠져나왔다. 전리품은 없다.")
+		"wiped":
+			var pen: Dictionary = data.combat.wipe_penalty
+			var lost := 0
+			for good_id in cargo.keys():
+				lost += remove_cargo(good_id, ceili(cargo[good_id] * float(pen.cargo_loss)))
+			var pl := floori(power * float(pen.power_loss))
+			power -= pl
+			for i in int(pen.days):
+				_advance_day()
+			lines.append("정신을 잃었다. %d일 뒤 %s에서 깨어났다." % [int(pen.days), data.cities[city].name])
+			lines.append("화물 %d개, 전력 %d셀을 빼앗겼다." % [lost, pl])
+	return lines

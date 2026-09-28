@@ -2,10 +2,10 @@ class_name Defs
 extends RefCounted
 ## 데이터 파일에서 쓰는 고정 식별자 모음. 새 값을 쓰려면 여기에 먼저 추가한다.
 
-const STATS := ["driving", "mechanics", "hacking", "negotiation", "might", "survival"]
+const STATS := ["driving", "tech", "negotiation", "might", "survival", "focus"]
 const STAT_NAMES := {
-	"driving": "운전", "mechanics": "기계", "hacking": "해킹",
-	"negotiation": "교섭", "might": "완력", "survival": "생존",
+	"driving": "운전", "tech": "기술", "negotiation": "교섭",
+	"might": "완력", "survival": "생존", "focus": "집중",
 }
 
 const ROAD_TYPES := ["highway", "wasteland", "collapsed"]

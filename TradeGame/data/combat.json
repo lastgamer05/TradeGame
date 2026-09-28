@@ -1,0 +1,80 @@
+{
+	"_note": "전투 규칙 초안. 모든 수치는 임시 밸런스 값. 판정: d20 + 집중 + 무기 명중 >= 방어 + 엄폐 + 숨기 + 거리 보정.",
+	"grid": { "w": 16, "h": 20 },
+	"ap_per_turn": 2,
+	"move_tiles": 5,
+	"base_defense": 10,
+	"cover_bonus": { "half": 3, "full": 6 },
+	"hide_bonus": 4,
+	"overwatch_penalty": 2,
+	"range_penalty_per_tile": 1,
+	"grenades": 1,
+	"grenade": { "range": 6, "radius": 1, "damage": [4, 6] },
+	"barrel": { "radius": 1, "damage": [4, 6] },
+	"player": { "hp_base": 14, "hp_per_survival": 2, "weapon": "rifle", "melee_weapon": "knife" },
+	"mercenary": { "name": "용병", "hp": 14, "focus": 2, "might": 2, "weapon": "shotgun" },
+	"weapons": {
+		"pistol": { "name": "권총", "range": 6, "damage": [2, 4], "aim": 1 },
+		"rifle": { "name": "소총", "range": 9, "damage": [3, 5], "aim": 0 },
+		"shotgun": { "name": "산탄총", "range": 4, "damage": [4, 7], "aim": 2 },
+		"cannon": { "name": "기관포", "range": 10, "damage": [3, 6], "aim": 0 },
+		"pipe": { "name": "쇠파이프", "range": 1, "damage": [2, 4], "aim": 0, "melee": true },
+		"knife": { "name": "칼", "range": 1, "damage": [2, 4], "aim": 3, "melee": true }
+	},
+	"enemies": {
+		"raider": { "name": "약탈자", "hp": 6, "aim": 0, "weapon": "pistol", "ai": "raider" },
+		"raider_gunner": { "name": "약탈자 저격수", "hp": 5, "aim": 2, "weapon": "rifle", "ai": "raider" },
+		"raider_brute": { "name": "약탈자 돌격대", "hp": 10, "aim": 1, "weapon": "pipe", "ai": "raider" },
+		"guard": { "name": "헬리오스 경비병", "hp": 8, "aim": 1, "weapon": "rifle", "ai": "soldier" },
+		"refugee": { "name": "굶주린 난민", "hp": 4, "aim": 0, "weapon": "pipe", "ai": "raider" },
+		"war_machine": { "name": "떠돌이 전쟁 기계", "hp": 16, "aim": 1, "weapon": "cannon", "ai": "machine", "defense": 11 }
+	},
+	"encounters": {
+		"helios_checkpoint_guards": {
+			"name": "검문소 교전", "location": "checkpoint",
+			"enemies": { "guard": 3 },
+			"loot": { "power": [20, 40], "goods": { "ammo": [2, 4], "chip_military": [0, 2] } },
+			"surrender": true
+		},
+		"raider_roadblock": {
+			"name": "약탈자 매복", "location": "highway",
+			"enemies": { "raider": 2, "raider_gunner": 1, "raider_brute": 1 },
+			"loot": { "power": [10, 30], "goods": { "ammo": [2, 5], "weapon_parts": [1, 2] } },
+			"surrender": true
+		},
+		"refugee_ambush": {
+			"name": "난민 습격", "location": "alley",
+			"enemies": { "refugee": 4 },
+			"loot": { "power": [0, 10], "goods": { "scrap_electronics": [1, 3] } },
+			"surrender": true
+		},
+		"stray_war_machine": {
+			"name": "떠돌이 전쟁 기계", "location": "canyon",
+			"enemies": { "war_machine": 1 },
+			"loot": { "power": [0, 0], "goods": { "generator_parts": [2, 4], "chip_prewar": [0, 1] } },
+			"surrender": false
+		}
+	},
+	"locations": {
+		"highway": { "name": "무너진 고속도로", "half": 14, "full": 8, "barrels": 2 },
+		"checkpoint": { "name": "검문소", "half": 16, "full": 6, "barrels": 1 },
+		"canyon": { "name": "황무지 협곡", "half": 8, "full": 14, "barrels": 0 },
+		"alley": { "name": "도시 외곽 골목", "half": 12, "full": 12, "barrels": 2 },
+		"gas_station": { "name": "폐허 주유소", "half": 12, "full": 8, "barrels": 5 }
+	},
+	"car": {
+		"defense": 8,
+		"shot_chance": 0.2,
+		"raider_shot_chance": 0.35,
+		"parts": {
+			"cargo_bay": { "name": "적재함", "repair": 30 },
+			"engine": { "name": "엔진", "repair": 40 },
+			"battery": { "name": "배터리", "repair": 30 },
+			"module": { "name": "모듈", "repair": 40 }
+		},
+		"cargo_bay_loss": 0.25,
+		"battery_leak_per_day": 5
+	},
+	"surrender": { "dc_base": 10, "dc_per_enemy": 2 },
+	"wipe_penalty": { "cargo_loss": 0.5, "power_loss": 0.3, "days": 2 }
+}

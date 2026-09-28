@@ -12,7 +12,7 @@
 		{
 			"id": "inspect",
 			"text": "셀을 하나 뜯어 전압을 재 본다",
-			"check": { "stat": "mechanics", "dc": 12 },
+			"check": { "stat": "tech", "dc": 12 },
 			"outcomes": {
 				"success": {
 					"text": "전압이 절반도 안 나온다. 위조 셀이다. 상인이 웃으며 도매가라면 다르게 쳐 주겠다고 한다.",

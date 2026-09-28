@@ -12,7 +12,7 @@
 		{
 			"id": "hack",
 			"text": "군용 주파수로 정지 명령을 보낸다",
-			"check": { "stat": "hacking", "dc": 16 },
+			"check": { "stat": "tech", "dc": 16 },
 			"outcomes": {
 				"success": {
 					"text": "조준등이 녹색으로 바뀌고 기계가 무릎을 꿇는다. 정비 패널을 열어 제어 칩을 뽑아낸다.",

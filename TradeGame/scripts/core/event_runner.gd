@@ -167,9 +167,10 @@ static func apply_effect(state: GameState, eff: Dictionary) -> String:
 		"flag_clear":
 			state.flags.erase(eff.flag)
 		"vehicle_damage":
-			return "차량 파손: %s (차량 시스템 미구현)" % eff.get("part", "?")
+			return state.damage_vehicle(eff.part)
 		"start_combat":
-			return "전투 발생: %s (전투 시스템 미구현)" % eff.get("encounter", "?")
+			state.pending_combat = eff.encounter
+			return "전투가 벌어진다: %s" % d.combat.encounters[eff.encounter].name
 		"companion_trust":
 			return "동승자 신뢰 변화 (미구현)"
 	return ""

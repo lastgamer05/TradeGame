@@ -60,7 +60,7 @@
 		{
 			"id": "hack_terminal",
 			"text": "검문 단말을 조작한다",
-			"check": { "stat": "hacking", "dc": 13 },
+			"check": { "stat": "tech", "dc": 13 },
 			"outcomes": {
 				"success": {
 					"text": "단말에 통과 기록이 찍히고, 지난 전과 기록도 함께 사라진다.",
