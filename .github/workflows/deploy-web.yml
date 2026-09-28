@@ -47,13 +47,6 @@ jobs:
           unzip -q -j templates.tpz "templates/web_nothreads_release.zip" "templates/web_nothreads_debug.zip" "templates/version.txt" -d "$dest"
           rm godot.zip templates.tpz
 
-      - name: Download Korean font
-        # 웹에는 시스템 폰트가 없어서 한글 폰트를 빌드에 넣는다 (Nanum Gothic, SIL OFL).
-        run: |
-          mkdir -p "$PROJECT_DIR/assets/fonts"
-          curl -fsSL -o "$PROJECT_DIR/assets/fonts/NanumGothic-Regular.ttf" \
-            https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf
-
       - name: Import
         run: ~/godot/godot --headless --path "$PROJECT_DIR" --import
 

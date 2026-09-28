@@ -8,6 +8,14 @@
 - 원본은 Claude Docs 문서(https://claude.ai/artifact/Wu4G29iTnwik7uW7p2jr8o). 기획이 바뀌면 `docs/design.md`도 같이 갱신한다.
 - 미정 사항은 `docs/design.md` 마지막 "미정 사항" 체크리스트에 있다. 미정 항목에 걸리는 구현은 임의로 정하지 말고 먼저 물어볼 것.
 
+## 아트 방향
+
+- 배경, 도시, 캐릭터 모두 픽셀 아트. 황혼·밤의 폐허 도시, 청록·보라회색 하늘에 주황·호박색 불빛, 녹슨 노점, 늘어진 전선, 폐차.
+- 이미지 생성은 바르코(VARCO) 커스텀 워크플로에서 GPT 이미지 모델을 쓴다.
+- 에셋 출처와 라이선스는 `TradeGame/assets/CREDITS.md`에 기록한다.
+- 생성 원본(고해상도 도시 이미지, 아이콘 시트)은 Godot 프로젝트 밖 `art_src/`에 두고, 게임용은 줄여서 `TradeGame/assets/`에 넣는다 (도시 1280x720, 256색).
+- 폰트는 갈무리11(픽셀 폰트, 원본 12px). 크기는 12의 배수만 쓴다. 공용 테마는 `scripts/ui/pixel_theme.gd`.
+
 ## 엔진
 
 - Godot 4.7.2, GDScript, 렌더러 GL Compatibility. Godot 프로젝트 루트는 `TradeGame/` 하위 폴더다 (`res://` = `TradeGame/TradeGame/`).
@@ -19,8 +27,7 @@
   ```
 
 - 화면 확인: `--headless` 없이 `--script res://tests/screenshot.gd -- <저장경로.png>`로 메인 화면 스크린샷을 저장한다.
-- 배포: `main`에 push하면 `.github/workflows/deploy-web.yml`이 웹 빌드를 만들어 GitHub Pages(https://lastgamer05.github.io/TradeGame/)에 올린다. 한글 폰트(Nanum Gothic)는 CI에서 받아 넣는다. 로컬은 시스템 폰트로 대체된다.
-- 새 `class_name`을 추가한 뒤에는 같은 명령에 `--import`를 붙여 한 번 돌려 클래스 캐시를 갱신한다.
+- 배포: `main`에 push하면 `.github/workflows/deploy-web.yml`이 웹 빌드를 만들어 GitHub Pages(https://lastgamer05.github.io/TradeGame/)에 올린다.- 새 `class_name`을 추가한 뒤에는 같은 명령에 `--import`를 붙여 한 번 돌려 클래스 캐시를 갱신한다.
 - 사용자가 에디터를 열어 둔 상태면 `project.godot`을 직접 고치지 말 것. 에디터가 덮어쓴다.
 
 ## 구조
