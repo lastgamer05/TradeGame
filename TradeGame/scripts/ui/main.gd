@@ -2,6 +2,7 @@ extends Control
 ## 교역 루프 프로토타입 화면. UI는 코드로 만들고, 상태가 바뀔 때마다 통째로 다시 그린다.
 
 const WorldMap := preload("res://scripts/ui/world_map.gd")
+const PoliticsBar := preload("res://scripts/ui/politics_bar.gd")
 
 const CITY_ART := "res://assets/art/cities/%s.png"
 const GOOD_ICON := "res://assets/icons/goods/%s.png"
@@ -27,6 +28,8 @@ var _log_label: Label
 var _overlay: Control
 var _modal: VBoxContainer
 var _event_queue: Array = []
+var _politics_bar: Control
+var _crisis_label: Label
 
 
 func _ready() -> void:
@@ -127,6 +130,14 @@ func _close_modal() -> void:
 
 
 func _show_next_event() -> void:
+	if not state.pending_news.is_empty():
+		var news: Dictionary = state.pending_news.pop_front()
+		var c: Dictionary = news.crisis
+		_open_modal(("정세 변화: %s" if news.started else "정세 변화: %s 종료") % c.name)
+		_modal_text(c.start_text if news.started else c.end_text)
+		_add_log("[정세] %s %s" % [c.name, "시작" if news.started else "종료"])
+		_modal.add_child(_button("계속", true, _close_modal))
+		return
 	if _event_queue.is_empty():
 		return
 	var ev: Dictionary = _event_queue.pop_front()
@@ -199,7 +210,7 @@ func _build_layout() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	left.add_child(scroll)
 	_market_grid = GridContainer.new()
-	_market_grid.columns = 8
+	_market_grid.columns = 9
 	_market_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_market_grid.add_theme_constant_override("h_separation", 12)
 	_market_grid.add_theme_constant_override("v_separation", 6)
@@ -210,12 +221,29 @@ func _build_layout() -> void:
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.add_theme_constant_override("separation", 12)
 	body.add_child(right)
+	var politics_panel := PanelContainer.new()
+	right.add_child(politics_panel)
+	var pbox := VBoxContainer.new()
+	pbox.add_theme_constant_override("separation", 6)
+	politics_panel.add_child(pbox)
+	var prow := HBoxContainer.new()
+	pbox.add_child(prow)
+	var ptitle := _label("진영 정세")
+	ptitle.add_theme_color_override("font_color", PixelTheme.TEXT_DIM)
+	ptitle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	prow.add_child(ptitle)
+	_crisis_label = _label("")
+	prow.add_child(_crisis_label)
+	_politics_bar = PoliticsBar.new()
+	_politics_bar.custom_minimum_size = Vector2(0, 24)
+	pbox.add_child(_politics_bar)
+
 	var map_panel := PanelContainer.new()
 	map_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	right.add_child(map_panel)
 	_map = WorldMap.new()
 	_map.data = GameData
-	_map.custom_minimum_size = Vector2(0, 220)
+	_map.custom_minimum_size = Vector2(0, 150)
 	map_panel.add_child(_map)
 	var routes_panel := PanelContainer.new()
 	right.add_child(routes_panel)
@@ -226,7 +254,7 @@ func _build_layout() -> void:
 	var log_panel := PanelContainer.new()
 	root.add_child(log_panel)
 	_log_label = Label.new()
-	_log_label.custom_minimum_size = Vector2(0, 52)
+	_log_label.custom_minimum_size = Vector2(0, 78)
 	_log_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	_log_label.add_theme_font_size_override("font_size", PixelTheme.SIZE_SMALL * 2)
 	_log_label.add_theme_color_override("font_color", PixelTheme.TEXT_DIM)
@@ -289,15 +317,20 @@ func _refresh() -> void:
 	_refresh_market(city)
 	_refresh_routes()
 	_map.current_city = state.city
+	_politics_bar.politics = state.politics
+	_politics_bar.queue_redraw()
+	var crises := state.politics.active.values().map(func(c): return c.name)
+	_crisis_label.text = ", ".join(crises) if not crises.is_empty() else "큰 사건 없음"
+	_crisis_label.add_theme_color_override("font_color", PixelTheme.ACCENT if not crises.is_empty() else PixelTheme.TEXT_DIM)
 	_map.queue_redraw()
-	_log_label.text = "\n".join(_log.slice(-2))
+	_log_label.text = "\n".join(_log.slice(-3))
 	_check_stranded()
 
 
 func _refresh_market(city: Dictionary) -> void:
 	for c in _market_grid.get_children():
 		c.queue_free()
-	for h in ["", "물품", "살 때", "팔 때", "보유", "", "", ""]:
+	for h in ["", "물품", "시세", "살 때", "팔 때", "보유(평균)", "", "", ""]:
 		var l := _label(h)
 		l.add_theme_color_override("font_color", PixelTheme.TEXT_DIM)
 		_market_grid.add_child(l)
@@ -317,15 +350,41 @@ func _refresh_market(city: Dictionary) -> void:
 			name_label.text += " ▲"
 			name_label.add_theme_color_override("font_color", PixelTheme.ACCENT)
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_label.custom_minimum_size = Vector2(170, 0)
 		name_label.clip_text = true
+		name_label.tooltip_text = g.name
 		_market_grid.add_child(_icon(GOOD_ICON % id, ICON_SIZE))
 		_market_grid.add_child(name_label)
 		var can_buy: bool = id in for_sale
 		var can_sell: bool = state.market.buys(state.city, id)
+		var ratio := state.market.price_ratio(state.city, id)
+		var ratio_color := PixelTheme.TEXT
+		if ratio < 0.85:
+			ratio_color = Color(0.55, 0.85, 0.5)
+		elif ratio > 1.15:
+			ratio_color = PixelTheme.ACCENT
+		var ratio_label := _label("%d%%" % roundi(ratio * 100))
+		ratio_label.add_theme_color_override("font_color", ratio_color)
+		ratio_label.tooltip_text = "기준가 대비 시세"
+		_market_grid.add_child(ratio_label)
 		_market_grid.add_child(_label(str(state.market.buy_price(state.city, id)) if can_buy else "-"))
-		_market_grid.add_child(_label(str(state.market.sell_price(state.city, id)) if can_sell else "거부"))
 		var owned: int = state.cargo.get(id, 0)
-		_market_grid.add_child(_label(str(owned) if owned > 0 else ""))
+		var sell_label := _label("-")
+		if can_sell:
+			var sp := state.market.sell_price(state.city, id)
+			sell_label.text = str(sp)
+			if owned > 0:
+				var avg := state.avg_cost(id)
+				sell_label.add_theme_color_override("font_color", Color(0.55, 0.85, 0.5) if sp > avg else Color(0.9, 0.45, 0.4))
+				sell_label.tooltip_text = "평균 구입가 %d" % roundi(avg)
+		else:
+			sell_label.text = "거부"
+		_market_grid.add_child(sell_label)
+		var owned_label := _label("")
+		if owned > 0:
+			owned_label.text = "%d (%d)" % [owned, roundi(state.avg_cost(id))]
+			owned_label.tooltip_text = "보유 수량 (평균 구입가)"
+		_market_grid.add_child(owned_label)
 		var max_buy := state.max_buyable(id) if can_buy else 0
 		_market_grid.add_child(_button("사기", can_buy and max_buy > 0, _on_buy.bind(id, 1)))
 		_market_grid.add_child(_button("최대", can_buy and max_buy > 0, _on_buy.bind(id, max_buy)))
@@ -346,23 +405,35 @@ func _refresh_routes() -> void:
 
 
 func _on_buy(id: String, qty: int) -> void:
-	var before := state.power
 	var err := state.buy(id, qty)
 	if err == "":
-		_add_log("%s %d개를 샀다. (전력 -%d셀)" % [GameData.goods[id].name, qty, before - state.power])
+		var t := state.last_trade
+		_add_log("%s %d개를 샀다. 전력 -%d셀%s" % [GameData.goods[id].name, qty, t.value, _trade_effects(t)])
 	else:
 		_add_log(err)
 	_refresh()
+	_show_next_event()
 
 
 func _on_sell(id: String, qty: int) -> void:
-	var before := state.power
 	var err := state.sell(id, qty)
 	if err == "":
-		_add_log("%s %d개를 팔았다. (전력 +%d셀)" % [GameData.goods[id].name, qty, state.power - before])
+		var t := state.last_trade
+		_add_log("%s %d개를 팔았다. 전력 +%d셀 (이익 %+d)%s" % [GameData.goods[id].name, qty, t.value, t.profit, _trade_effects(t)])
 	else:
 		_add_log(err)
 	_refresh()
+	_show_next_event()
+
+
+## 거래가 남긴 평판, 정세 변화를 한 줄로.
+func _trade_effects(t: Dictionary) -> String:
+	var parts := []
+	if t.rep_delta != 0:
+		parts.append("%s 평판 %+d" % [_city_name(state.city), t.rep_delta])
+	if t.influence > 0.05:
+		parts.append("%s 세력 +%.1f" % [GameData.factions[t.faction].name, t.influence])
+	return "" if parts.is_empty() else "  ·  " + "  ·  ".join(parts)
 
 
 func _on_travel(to: String) -> void:
@@ -390,7 +461,7 @@ func _check_stranded() -> void:
 	var msg := "전력이 바닥났다. 더는 움직일 수 없다. '새 게임'으로 다시 시작한다."
 	if _log.back() != msg:
 		_add_log(msg)
-		_log_label.text = "\n".join(_log.slice(-2))
+		_log_label.text = "\n".join(_log.slice(-3))
 
 
 func _add_log(msg: String) -> void:

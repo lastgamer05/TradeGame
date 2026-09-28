@@ -12,6 +12,8 @@ func _initialize() -> void:
 	test_sell_pressure_and_recovery()
 	test_travel()
 	test_events()
+	test_trade_effects()
+	test_politics()
 	print("\n%s" % ("ALL PASSED" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -151,6 +153,55 @@ func test_events() -> void:
 			t.power = 1000
 			EventRunner.resolve(t, ch)
 	_expect(true, "모든 선택지 실행")
+	data.free()
+
+
+func test_trade_effects() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	var s := GameState.new(data, 7)
+	s.buy("raw_food", 10)
+	var paid: int = s.last_trade.value
+	_expect(absf(s.avg_cost("raw_food") - paid / 10.0) < 0.01, "평균 구입가 기록")
+	s.travel("helios")
+	s.sell("raw_food", 10)
+	var t := s.last_trade
+	_expect(t.profit == t.value - paid, "판매 이익 = 판매액 - 구입액 (%d)" % t.profit)
+	_expect(s.reputation.helios > 0, "수요품을 팔면 도시 평판 상승 (%+d)" % s.reputation.helios)
+	_expect(s.market.price_ratio("greenhouse", "raw_food") < 1.0, "특산품 시세는 100% 미만")
+
+	# 스크랩야드와 거래하면 다른 도시 평판이 모두 떨어진다.
+	var y := GameState.new(data, 8)
+	y.city = "scrapyard"
+	y.buy("stolen_module", 1)
+	_expect(y.reputation.helios == -1 and y.reputation.undergrid == -1, "스크랩야드 거래는 다른 도시 평판 하락")
+	data.free()
+
+
+func test_politics() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	var s := GameState.new(data, 9)
+	var before := s.politics.share("rebel")
+	s.city = "undergrid"
+	s.add_cargo("chip_military", 10)
+	s.sell("chip_military", 10)
+	_expect(s.politics.share("rebel") > before, "언더그리드에 칩을 팔면 반란 점유율 상승 (%d%% -> %d%%)" % [
+		roundi(before * 100), roundi(s.politics.share("rebel") * 100)])
+	s.politics.on_trade("undergrid", "chip_military", 2000, true)
+	s.pending_news.append_array(s.politics.update_crises())
+	_expect(s.politics.active.has("rebel_uprising"), "문턱을 넘으면 반란 격화 시작")
+	_expect(s.pending_news.size() > 0 and s.pending_news[0].started, "정세 변화 알림 대기")
+	var ratio_before := s.market.price_ratio("helios", "ammo")
+	s.politics.active.erase("rebel_uprising")
+	_expect(ratio_before > s.market.price_ratio("helios", "ammo") * 1.4, "반란 격화 중 탄약 시세 상승")
+	s.politics.active["rebel_uprising"] = data.politics.crises[0]
+	for i in 200:
+		s.politics.advance_day()
+	s.politics.update_crises()
+	_expect(not s.politics.active.has("rebel_uprising"), "시간이 지나면 세력이 돌아오고 사건이 끝난다")
 	data.free()
 
 

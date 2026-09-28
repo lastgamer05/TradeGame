@@ -6,7 +6,7 @@ extends RefCounted
 
 ## 이동을 마친 뒤 호출. 확률에 걸리면 조건에 맞는 이동 이벤트 하나를 가중치로 고른다.
 static func pick_travel_event(state: GameState) -> Dictionary:
-	if state.rng.randf() >= float(state.data.economy.events.travel_chance):
+	if state.rng.randf() >= float(state.data.economy.events.travel_chance) + state.politics.travel_event_bonus():
 		return {}
 	return _pick(state, func(t: Dictionary):
 		return t.get("on") == "travel" and (not t.has("road_types") or state.last_road in t.road_types))

@@ -8,7 +8,19 @@ func _initialize() -> void:
 	root.add_child(main)
 	await process_frame
 	var args := OS.get_cmdline_user_args()
-	if args.size() > 1:
+	if args.size() > 1 and args[1] == "demo":
+		# 거래 몇 번과 정세 사건이 진행 중인 화면
+		var s: GameState = main.state
+		s.buy("raw_food", 12)
+		s.travel("helios")
+		s.sell("raw_food", 6)
+		s.politics.on_trade("undergrid", "chip_military", 2000, true)
+		s.politics.update_crises()
+		s.pending_news.clear()
+		main._event_queue.clear()
+		main._on_buy("suppressant", 2)
+		main._close_modal()
+	elif args.size() > 1:
 		main._event_queue.append(root.get_node("GameData").events[args[1]])
 		main._close_modal()
 	for i in 10:

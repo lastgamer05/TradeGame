@@ -1,0 +1,73 @@
+{
+	"_note": "진영 정세 초안. 모든 수치는 임시 밸런스 값. 점유율 = 진영 세력 / 전체 세력 합 (중립 제외).",
+	"start_strength": {
+		"victor": 40,
+		"rebel": 20,
+		"displaced": 20,
+		"lawless": 20
+	},
+	"influence": {
+		"cells_per_point": 200,
+		"demand_bonus": 2.0,
+		"buy_ratio": 0.3,
+		"category_weight": {
+			"necessity": 1.0,
+			"tech": 1.5,
+			"strategic": 2.0,
+			"info": 2.0,
+			"contraband": 1.5
+		}
+	},
+	"decay_per_day": 0.02,
+	"crises": [
+		{
+			"id": "rebel_uprising",
+			"name": "반란 격화",
+			"faction": "rebel",
+			"start_share": 0.3,
+			"end_share": 0.25,
+			"start_text": "언더그리드에 칩과 부품이 쌓이자 반란군이 공공연히 무장하기 시작했다. 황무지 곳곳에서 무기와 탄약 값이 치솟는다.",
+			"end_text": "반란군의 기세가 꺾였다. 무기 시세가 가라앉는다.",
+			"prices": [
+				{ "goods": ["weapon_parts", "ammo"], "cities": "all", "mult": 1.5 }
+			]
+		},
+		{
+			"id": "greenhouse_blockade",
+			"name": "그린하우스 봉쇄",
+			"faction": "displaced",
+			"start_share": 0.3,
+			"end_share": 0.25,
+			"start_text": "힘을 얻은 그린하우스가 헬리오스로 가는 식량줄을 끊었다. 승전 도시의 식량 값이 폭등한다.",
+			"end_text": "그린하우스가 봉쇄를 풀었다. 헬리오스에 다시 식량이 들어간다.",
+			"prices": [
+				{ "goods": ["raw_food", "synth_food"], "cities": ["helios", "gate7"], "mult": 2.0 }
+			]
+		},
+		{
+			"id": "crackdown",
+			"name": "단속 강화",
+			"faction": "victor",
+			"start_share": 0.55,
+			"end_share": 0.5,
+			"start_text": "헬리오스가 검문소를 늘리고 밀수를 뿌리 뽑겠다고 선언했다. 바깥 도시에서는 억제제와 해킹 툴이 귀해진다.",
+			"end_text": "단속이 느슨해졌다. 밀수품 값이 제자리로 돌아온다.",
+			"prices": [
+				{ "goods": ["suppressant", "hacking_tool"], "cities": ["undergrid", "red_mesa", "rustbelt", "greenhouse", "swapmeet", "scrapyard"], "mult": 1.5 }
+			]
+		},
+		{
+			"id": "raider_surge",
+			"name": "약탈 증가",
+			"faction": "lawless",
+			"start_share": 0.3,
+			"end_share": 0.25,
+			"start_text": "스크랩야드가 장물로 배를 불리자 약탈자 무리가 늘어났다. 길이 위험해지고 탄약 수요가 오른다.",
+			"end_text": "약탈자들이 흩어졌다. 길이 조금 조용해진다.",
+			"prices": [
+				{ "goods": ["ammo", "weapon_parts"], "cities": "all", "mult": 1.3 }
+			],
+			"travel_event_bonus": 0.2
+		}
+	]
+}

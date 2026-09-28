@@ -36,6 +36,8 @@
 		"city_chance": 0.5
 	},
 	"reputation": {
+		"trade_cells_per_point": 100,
+		"trade_demand_bonus": 2.0,
 		"min": -100,
 		"max": 100,
 		"friendly_threshold": 30,

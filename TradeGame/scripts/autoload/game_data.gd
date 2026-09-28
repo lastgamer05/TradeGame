@@ -10,6 +10,7 @@ var cities: Dictionary = {}
 var modules: Dictionary = {}
 var events: Dictionary = {}
 var economy: Dictionary = {}
+var politics: Dictionary = {}
 ## 도시 간 도로. { a, b, road, days }
 var routes: Array = []
 ## 도시 id -> Vector2 (0~100 지도 좌표)
@@ -33,6 +34,8 @@ func load_all() -> void:
 	modules = _index(_read_json(DATA_DIR + "/modules.json"), "modules")
 	var econ = _read_json(DATA_DIR + "/economy.json")
 	economy = econ if econ is Dictionary else {}
+	var pol = _read_json(DATA_DIR + "/politics.json")
+	politics = pol if pol is Dictionary else {}
 	var map = _read_json(DATA_DIR + "/routes.json")
 	routes = map.get("routes", []) if map is Dictionary else []
 	positions = {}
@@ -81,6 +84,18 @@ func validate() -> void:
 			errors.append("%s: 알 수 없는 road '%s'" % [where, r.get("road")])
 		if int(r.get("days", 0)) <= 0:
 			errors.append("%s: days가 0 이하" % where)
+
+	for f in politics.get("start_strength", {}):
+		_check_ref("politics", "start_strength", f, factions)
+	for c in politics.get("crises", []):
+		var where: String = "politics/" + str(c.get("id"))
+		_check_ref(where, "faction", c.get("faction"), factions)
+		for p in c.get("prices", []):
+			for id in p.get("goods", []):
+				_check_ref(where, "prices.goods", id, goods)
+			if str(p.get("cities")) != "all":
+				for id in p.get("cities", []):
+					_check_ref(where, "prices.cities", id, cities)
 
 	for ev in events.values():
 		_validate_event(ev)

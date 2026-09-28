@@ -10,6 +10,8 @@ var _rng: RandomNumberGenerator
 var _pressure: Dictionary = {}
 ## city -> good -> 오늘의 변동 배율
 var _drift: Dictionary = {}
+## 정세 사건의 시세 배율을 준다. 없으면 무시한다.
+var politics: Politics
 
 
 func _init(data, rng: RandomNumberGenerator) -> void:
@@ -38,6 +40,11 @@ func buys(city_id: String, good_id: String) -> bool:
 	if "strict_contraband" in city.traits and _data.goods[good_id].get("contraband", false):
 		return false
 	return true
+
+
+## 기준가(base_price) 대비 현재 시세. 1.0 = 100%.
+func price_ratio(city_id: String, good_id: String) -> float:
+	return _price(city_id, good_id) / float(_data.goods[good_id].base_price)
 
 
 ## 플레이어가 살 때 값.
@@ -87,7 +94,8 @@ func _price(city_id: String, good_id: String) -> float:
 	elif good_id in city.demands:
 		m = mult.demand
 	var pressure: float = _pressure[city_id].get(good_id, 0.0)
-	return _data.goods[good_id].base_price * m * (1.0 - pressure) * _drift[city_id][good_id]
+	var crisis := politics.price_multiplier(city_id, good_id) if politics else 1.0
+	return _data.goods[good_id].base_price * m * (1.0 - pressure) * _drift[city_id][good_id] * crisis
 
 
 func _add_pressure(city_id: String, good_id: String, amount: float) -> void:

@@ -36,6 +36,7 @@
 - `scripts/autoload/game_data.gd`: `GameData` autoload. JSON을 읽어 id로 색인하고 참조 무결성을 검증한다.
 - `scripts/core/defs.gd`: 데이터에서 쓰는 고정 식별자 (능력치, 도로 종류, 요구 조건·효과 타입). 새 타입은 여기와 `GameData` 검증에 같이 추가한다.
 - `scripts/core/game_state.gd`, `market.gd`: 한 판의 상태(전력, 화물, 날짜, 이동)와 도시별 시세. UI와 분리돼 있어 테스트에서 직접 쓴다.
+- `scripts/core/politics.gd`, `data/politics.json`: 진영 세력과 정세 사건. 거래가 세력을 키우고, 점유율이 문턱을 넘으면 사건이 시작돼 시세 배율이 바뀐다.
 - `scripts/core/event_runner.gd`: 이벤트 선택(이동 후 도로 종류, 도시 도착), 선택지 조건·비용 확인, d20 판정, 효과 적용. 전투와 차량 파손은 아직 로그만 남긴다.
 - `scripts/ui/`, `scenes/main.tscn`: 교역 루프 프로토타입 화면. UI는 코드로 만든다.
 - `data/routes.json`: 임시 지도 (도시 좌표, 도로). 월드맵 초안이 정해지면 교체한다.
