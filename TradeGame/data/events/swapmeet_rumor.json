@@ -1,0 +1,76 @@
+{
+	"id": "swapmeet_rumor",
+	"title": "미터의 소문",
+	"trigger": {
+		"on": "city",
+		"cities": ["swapmeet"],
+		"requires": [],
+		"weight": 10
+	},
+	"text": "스왑밋 좌판 사이 천막 안, 정보상 미터가 찻잔을 돌리며 앉아 있다. \"운반꾼. 요즘 길 소식은 비싸. 그래도 들을 텐가?\"",
+	"choices": [
+		{
+			"id": "buy_route_tip",
+			"text": "교역로 정보를 산다",
+			"cost": [
+				{ "type": "power", "amount": 10 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "\"게이트 7에 탄약이 모자라. 보급 트럭이 약탈당했거든. 며칠 안에 값이 뛸 거야.\"",
+					"effects": [
+						{ "type": "flag_set", "flag": "rumor_gate7_ammo_shortage" }
+					]
+				}
+			}
+		},
+		{
+			"id": "buy_patrol_tip",
+			"text": "검문소 교대 시간을 산다",
+			"cost": [
+				{ "type": "power", "amount": 20 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "미터가 종이 한 장을 밀어 준다. 헬리오스 간선도로 검문소의 교대 시간표다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "knows_checkpoint_schedule" }
+					]
+				}
+			}
+		},
+		{
+			"id": "trade_data",
+			"text": "전쟁 전 데이터를 정보와 바꾼다",
+			"cost": [
+				{ "type": "cargo", "good": "prewar_data", "amount": 1 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "미터가 데이터 칩을 단말에 꽂고 한동안 말이 없다. \"좋은 걸 가져왔군. 대신 한 가지 알려 주지. 헬리오스가 요즘 발전기 부품을 조용히 사 모으고 있어.\"",
+					"effects": [
+						{ "type": "reputation", "city": "swapmeet", "delta": 10 },
+						{ "type": "flag_set", "flag": "rumor_helios_buying_generator_parts" }
+					]
+				}
+			}
+		},
+		{
+			"id": "pry",
+			"text": "공짜로 말을 캐 본다",
+			"check": { "stat": "negotiation", "dc": 16 },
+			"outcomes": {
+				"success": {
+					"text": "미터가 웃는다. \"말솜씨 값으로 하나는 주지. 그린하우스 원로가 요즘 헬리오스 쪽 트럭을 세 번에 한 번씩 돌려보낸대.\"",
+					"effects": [
+						{ "type": "flag_set", "flag": "rumor_greenhouse_tension" }
+					]
+				},
+				"failure": {
+					"text": "\"공짜는 없어, 운반꾼.\" 미터가 천막 입구를 가리킨다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

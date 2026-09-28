@@ -1,0 +1,75 @@
+{
+	"id": "rebel_courier",
+	"title": "반란군 전령",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway", "wasteland"],
+		"requires": [],
+		"weight": 7
+	},
+	"text": "오토바이 한 대가 옆으로 붙어 달린다. 헬멧에 언더그리드 회로 문양이 그려져 있다. 전령이 손짓으로 차를 세우고, 봉인된 금속 통을 내민다. \"헬리오스 외곽에 사람이 기다려. 우리 오토바이는 검문에 걸려.\"",
+	"choices": [
+		{
+			"id": "accept",
+			"text": "통을 받아 싣는다",
+			"outcomes": {
+				"success": {
+					"text": "전령이 주먹을 가슴에 대고 떠난다. 통은 생각보다 가볍다. 무엇이 들었는지는 묻지 않기로 한다.",
+					"effects": [
+						{ "type": "reputation", "city": "undergrid", "delta": 8 },
+						{ "type": "reputation", "city": "red_mesa", "delta": 4 },
+						{ "type": "flag_set", "flag": "carrying_rebel_package" }
+					]
+				}
+			}
+		},
+		{
+			"id": "demand_pay",
+			"text": "선불로 보수를 요구한다",
+			"check": { "stat": "negotiation", "dc": 13 },
+			"outcomes": {
+				"success": {
+					"text": "전령이 투덜대며 재생 셀 묶음을 건넨다. 헬리오스 근처에서는 못 쓰는 셀이지만 전력은 전력이다.",
+					"effects": [
+						{ "type": "power", "delta": 15 },
+						{ "type": "reputation", "city": "undergrid", "delta": 3 },
+						{ "type": "flag_set", "flag": "carrying_rebel_package" }
+					]
+				},
+				"failure": {
+					"text": "전령이 혀를 차고 통을 거둔다. \"혁명에 값을 매기는 놈은 믿을 수 없지.\"",
+					"effects": [
+						{ "type": "reputation", "city": "undergrid", "delta": -3 }
+					]
+				}
+			}
+		},
+		{
+			"id": "refuse",
+			"text": "위험한 짐은 안 싣는다",
+			"outcomes": {
+				"success": {
+					"text": "전령이 어깨를 으쓱하고 다른 길로 사라진다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "turn_in",
+			"text": "통을 받는 척하고 헬리오스 순찰대에 넘긴다",
+			"outcomes": {
+				"success": {
+					"text": "순찰대가 통을 가져가며 포상금을 준다. 그날 밤 언더그리드 주파수에 내 차량 번호가 돈다.",
+					"effects": [
+						{ "type": "power", "delta": 20 },
+						{ "type": "reputation", "city": "helios", "delta": 10 },
+						{ "type": "reputation", "city": "gate7", "delta": 5 },
+						{ "type": "reputation", "city": "undergrid", "delta": -20 },
+						{ "type": "reputation", "city": "red_mesa", "delta": -10 },
+						{ "type": "flag_set", "flag": "betrayed_rebel_courier" }
+					]
+				}
+			}
+		}
+	]
+}

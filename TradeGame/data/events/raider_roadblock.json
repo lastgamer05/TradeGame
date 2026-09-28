@@ -1,0 +1,89 @@
+{
+	"id": "raider_roadblock",
+	"title": "약탈자 바리케이드",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway", "wasteland"],
+		"requires": [],
+		"weight": 12
+	},
+	"text": "폐차 세 대를 엮은 바리케이드가 길을 막고 있다. 녹슨 지붕 위에서 약탈자들이 총구를 흔든다. \"짐 절반, 아니면 목숨.\"",
+	"choices": [
+		{
+			"id": "intimidate",
+			"text": "차에서 내려 먼저 총을 겨눈다",
+			"check": { "stat": "might", "dc": 14 },
+			"outcomes": {
+				"success": {
+					"text": "두목이 한참 노려보다 침을 뱉고 바리케이드를 치운다. 싸울 가치가 없다고 본 것이다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "허세가 들통났다. 지붕 위에서 첫 발이 날아온다.",
+					"effects": [
+						{ "type": "start_combat", "encounter": "raider_roadblock" }
+					]
+				}
+			}
+		},
+		{
+			"id": "turret",
+			"text": "터렛을 돌려 지붕을 겨눈다",
+			"requires": [
+				{ "type": "module", "module": "turret" }
+			],
+			"outcomes": {
+				"success": {
+					"text": "터렛 모터가 도는 소리에 약탈자들이 지붕에서 뛰어내린다. 바리케이드가 저절로 열린다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "pay_toll",
+			"text": "통행료를 낸다",
+			"cost": [
+				{ "type": "power", "amount": 20 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "약탈자가 팩 두 개를 받아 불빛에 비춰 본다. 정품인지 확인하고서야 길을 연다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "pay_ammo",
+			"text": "탄약 상자로 값을 치른다",
+			"cost": [
+				{ "type": "cargo", "good": "ammo", "amount": 3 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "탄약을 본 약탈자들의 눈빛이 바뀐다. 두목이 다음에도 이 길로 오라고 손을 흔든다.",
+					"effects": [
+						{ "type": "reputation", "city": "scrapyard", "delta": 3 }
+					]
+				}
+			}
+		},
+		{
+			"id": "ram",
+			"text": "가속해서 바리케이드를 들이받는다",
+			"check": { "stat": "driving", "dc": 13 },
+			"outcomes": {
+				"success": {
+					"text": "폐차 사이 틈으로 차체를 밀어 넣는다. 철판이 긁히는 소리를 남기고 빠져나간다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "폐차가 생각보다 무겁다. 앞머리가 찌그러지고, 뒤에서 총알이 적재함을 뚫는다.",
+					"effects": [
+						{ "type": "vehicle_damage", "part": "cargo_bay" },
+						{ "type": "power", "delta": -5 }
+					]
+				}
+			}
+		}
+	]
+}

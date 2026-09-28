@@ -1,0 +1,98 @@
+{
+	"id": "stranded_refugees",
+	"title": "멈춰 선 유민 트럭",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway", "wasteland"],
+		"requires": [],
+		"weight": 9
+	},
+	"text": "짐을 가득 실은 트럭이 길가에 멈춰 있다. 러스트벨 쪽 유민들이다. 아이 둘이 보닛 위에 앉아 이쪽을 본다. 노인이 손을 들어 차를 세운다.",
+	"choices": [
+		{
+			"id": "repair",
+			"text": "트럭 엔진을 봐 준다",
+			"check": { "stat": "mechanics", "dc": 12 },
+			"outcomes": {
+				"success": {
+					"text": "끊어진 냉각 호스를 이어 주자 트럭이 다시 숨을 쉰다. 노인이 고물 부품 한 자루를 억지로 쥐여 준다.",
+					"effects": [
+						{ "type": "cargo_add", "good": "scrap_electronics", "amount": 3 },
+						{ "type": "reputation", "city": "rustbelt", "delta": 6 }
+					]
+				},
+				"failure": {
+					"text": "손을 댈수록 엔진이 더 나빠진다. 결국 내 배터리로 시동을 걸어 준다.",
+					"effects": [
+						{ "type": "power", "delta": -8 },
+						{ "type": "reputation", "city": "rustbelt", "delta": 3 }
+					]
+				}
+			}
+		},
+		{
+			"id": "share_food",
+			"text": "식량을 나눠 준다",
+			"cost": [
+				{ "type": "cargo", "good": "raw_food", "amount": 3 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "아이들이 생식량 자루를 끌어안는다. 노인이 그린하우스에 친척이 있다며 이름을 전해 주겠다고 한다.",
+					"effects": [
+						{ "type": "reputation", "city": "rustbelt", "delta": 5 },
+						{ "type": "reputation", "city": "greenhouse", "delta": 5 }
+					]
+				}
+			}
+		},
+		{
+			"id": "share_medicine",
+			"text": "기침하는 아이에게 의약품을 준다",
+			"cost": [
+				{ "type": "cargo", "good": "medicine", "amount": 1 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "노인이 약병을 받아 들고 한참 말이 없다. \"보급이 끊긴 뒤로 약은 처음 본다.\"",
+					"effects": [
+						{ "type": "reputation", "city": "rustbelt", "delta": 10 }
+					]
+				}
+			}
+		},
+		{
+			"id": "rob",
+			"text": "트럭 짐을 턴다",
+			"check": { "stat": "might", "dc": 10 },
+			"outcomes": {
+				"success": {
+					"text": "유민들은 저항하지 못한다. 트럭에서 쓸 만한 금속을 끌어낸다. 등 뒤에서 아이가 운다.",
+					"effects": [
+						{ "type": "cargo_add", "good": "metal", "amount": 5 },
+						{ "type": "reputation", "city": "rustbelt", "delta": -15 },
+						{ "type": "reputation", "city": "scrapyard", "delta": 3 },
+						{ "type": "flag_set", "flag": "robbed_refugees" }
+					]
+				},
+				"failure": {
+					"text": "트럭 짐칸에서 쇠파이프를 든 젊은이들이 뛰어내린다. 빈손으로 물러난다.",
+					"effects": [
+						{ "type": "reputation", "city": "rustbelt", "delta": -10 },
+						{ "type": "flag_set", "flag": "robbed_refugees" }
+					]
+				}
+			}
+		},
+		{
+			"id": "drive_on",
+			"text": "그냥 지나간다",
+			"outcomes": {
+				"success": {
+					"text": "백미러 속에서 노인의 손이 천천히 내려간다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

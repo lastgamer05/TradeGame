@@ -11,6 +11,7 @@ func _initialize() -> void:
 	test_trade_loop()
 	test_sell_pressure_and_recovery()
 	test_travel()
+	test_events()
 	print("\n%s" % ("ALL PASSED" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -99,6 +100,57 @@ func test_travel() -> void:
 	_expect(s.power < p - 18 + 1, "전력 소모와 자연 방전")
 	s.power = 0
 	_expect(s.travel("greenhouse") != "", "전력이 없으면 못 간다")
+	data.free()
+
+
+func test_events() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	data.economy.events.travel_chance = 1.0
+	data.economy.events.city_chance = 1.0
+	var s := GameState.new(data, 5)
+	var checkpoint: Dictionary = data.events.helios_checkpoint
+	_expect(not EventRunner.requirements_met(s, checkpoint.trigger.requires), "억제제가 없으면 검문소 이벤트 조건 불충족")
+	s.add_cargo("suppressant", 3)
+	_expect(EventRunner.requirements_met(s, checkpoint.trigger.requires), "억제제가 있으면 조건 충족")
+
+	var choices := {}
+	for ch in checkpoint.choices:
+		choices[ch.id] = ch
+	_expect(EventRunner.choice_blocker(s, choices.smuggle_compartment) != "", "밀수칸 없으면 선택 불가")
+	_expect(EventRunner.choice_tags(s, choices.talk).begins_with("[교섭 DC 15]"), "판정 태그 표시")
+
+	s.stats.negotiation = 30
+	var r := EventRunner.resolve(s, choices.talk)
+	_expect(r.outcome == "success" and s.cargo.get("suppressant", 0) == 3, "판정 성공이면 화물 유지")
+	s.stats.negotiation = -30
+	r = EventRunner.resolve(s, choices.talk)
+	_expect(r.outcome == "failure" and not s.cargo.has("suppressant"), "판정 실패면 억제제 압수")
+	_expect(s.reputation.helios == -10, "실패 시 헬리오스 평판 -10")
+
+	var p := s.power
+	EventRunner.resolve(s, choices.bribe)
+	_expect(s.power == p - 10 and s.flags.has("corrupt_soldier"), "뇌물: 전력 차감과 플래그")
+
+	# 이동 이벤트는 도로 종류에 맞는 것만 뜬다.
+	s.last_road = "wasteland"
+	for i in 20:
+		var ev := EventRunner.pick_travel_event(s)
+		if ev.is_empty() or not ev.trigger.has("road_types"):
+			continue
+		if "wasteland" not in ev.trigger.road_types:
+			_expect(false, "도로 종류가 안 맞는 이벤트 '%s'" % ev.id)
+			break
+	_expect(true, "도로 종류에 맞는 이벤트만 선택")
+
+	# 모든 이벤트의 모든 선택지가 오류 없이 실행된다.
+	for ev in data.events.values():
+		for ch in ev.choices:
+			var t := GameState.new(data, 6)
+			t.power = 1000
+			EventRunner.resolve(t, ch)
+	_expect(true, "모든 선택지 실행")
 	data.free()
 
 

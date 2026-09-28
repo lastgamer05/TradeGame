@@ -1,0 +1,89 @@
+{
+	"id": "em_storm",
+	"title": "전자기 폭풍",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["wasteland"],
+		"requires": [],
+		"weight": 8
+	},
+	"text": "지평선 위로 보랏빛 번개가 가로로 번진다. 계기판 바늘이 떨리기 시작한다. 전자기 폭풍이 이쪽으로 온다.",
+	"choices": [
+		{
+			"id": "shelter",
+			"text": "무너진 터널을 찾아 몸을 숨긴다",
+			"check": { "stat": "survival", "dc": 13 },
+			"outcomes": {
+				"success": {
+					"text": "콘크리트 아래에서 폭풍이 지나가길 기다린다. 밖에서 고철이 번개를 맞고 우는 소리가 난다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				},
+				"failure": {
+					"text": "터널을 찾기 전에 폭풍이 덮친다. 배터리 셀 몇 개가 부풀어 오른다.",
+					"effects": [
+						{ "type": "vehicle_damage", "part": "battery" },
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				}
+			}
+		},
+		{
+			"id": "shield",
+			"text": "배선을 뜯어 배터리를 임시로 차폐한다",
+			"check": { "stat": "mechanics", "dc": 14 },
+			"outcomes": {
+				"success": {
+					"text": "알루미늄 판을 덧대 배터리함을 감싼다. 폭풍이 지나간 뒤에도 계기판이 멀쩡하다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				},
+				"failure": {
+					"text": "차폐가 늦었다. 모듈 회로 하나가 타 버린다.",
+					"effects": [
+						{ "type": "vehicle_damage", "part": "module" },
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				}
+			}
+		},
+		{
+			"id": "armor",
+			"text": "장갑판을 믿고 그대로 달린다",
+			"requires": [
+				{ "type": "module", "module": "armor_plate" }
+			],
+			"outcomes": {
+				"success": {
+					"text": "번개가 장갑판을 때리고 땅으로 흘러내린다. 차 안은 조용하다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				}
+			}
+		},
+		{
+			"id": "salvage_after",
+			"text": "폭풍이 지나간 뒤 타 버린 드론 잔해를 뒤진다",
+			"check": { "stat": "mechanics", "dc": 12 },
+			"outcomes": {
+				"success": {
+					"text": "번개를 맞고 떨어진 감시 드론에서 쓸 만한 부품을 뜯어낸다.",
+					"effects": [
+						{ "type": "cargo_add", "good": "scrap_electronics", "amount": 4 },
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				},
+				"failure": {
+					"text": "잔해를 뒤지는 사이 남은 방전이 차까지 번진다. 전력이 샌다.",
+					"effects": [
+						{ "type": "power", "delta": -10 },
+						{ "type": "flag_set", "flag": "em_storm_recent" }
+					]
+				}
+			}
+		}
+	]
+}

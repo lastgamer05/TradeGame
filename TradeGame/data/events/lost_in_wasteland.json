@@ -1,0 +1,55 @@
+{
+	"id": "lost_in_wasteland",
+	"title": "모래바람 속 길 잃음",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["wasteland"],
+		"requires": [],
+		"weight": 10
+	},
+	"text": "모래바람이 이정표를 모두 지웠다. 전조등 불빛이 세 걸음 앞에서 부서진다. 어느 쪽이 길인지 모르겠다.",
+	"choices": [
+		{
+			"id": "read_terrain",
+			"text": "바람 방향과 모래 결을 읽는다",
+			"check": { "stat": "survival", "dc": 12 },
+			"outcomes": {
+				"success": {
+					"text": "쓰러진 송전탑 그림자를 따라가자 다시 바큇자국이 보인다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "한참을 돌다 같은 폐차를 두 번 지난다. 길은 찾았지만 전력을 많이 썼다.",
+					"effects": [
+						{ "type": "power", "delta": -12 }
+					]
+				}
+			}
+		},
+		{
+			"id": "scanner",
+			"text": "스캐너로 옛 도로의 금속 반응을 찾는다",
+			"requires": [
+				{ "type": "module", "module": "scanner" }
+			],
+			"outcomes": {
+				"success": {
+					"text": "모래 아래 묻힌 가드레일이 스캐너 화면에 선으로 떠오른다. 그대로 따라간다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "wait_out",
+			"text": "엔진을 끄고 바람이 잘 때까지 기다린다",
+			"outcomes": {
+				"success": {
+					"text": "밤새 차 안에서 모래 긁히는 소리를 듣는다. 아침에 길이 보이지만 배터리는 그만큼 방전됐다.",
+					"effects": [
+						{ "type": "power", "delta": -6 }
+					]
+				}
+			}
+		}
+	]
+}

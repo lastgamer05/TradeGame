@@ -1,0 +1,78 @@
+{
+	"id": "roadside_cell_dealer",
+	"title": "길가의 셀 장수",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway", "wasteland"],
+		"requires": [],
+		"weight": 7
+	},
+	"text": "주유소 폐허 앞에 천막이 서 있다. 상인이 정품 헬리오스 셀이라며 한 상자를 반값에 내놓는다. 셀 표면의 인장이 조금 번져 있다.",
+	"choices": [
+		{
+			"id": "inspect",
+			"text": "셀을 하나 뜯어 전압을 재 본다",
+			"check": { "stat": "mechanics", "dc": 12 },
+			"outcomes": {
+				"success": {
+					"text": "전압이 절반도 안 나온다. 위조 셀이다. 상인이 웃으며 도매가라면 다르게 쳐 주겠다고 한다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "knows_forged_cell_dealer" }
+					]
+				},
+				"failure": {
+					"text": "전압계가 이상하게 튄다. 판단을 못 한 채 자리를 뜬다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "buy_forged",
+			"text": "위조 셀을 알고서 도매로 산다",
+			"requires": [
+				{ "type": "flag", "flag": "knows_forged_cell_dealer" }
+			],
+			"cost": [
+				{ "type": "power", "amount": 15 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "상인이 상자를 차에 실어 준다. \"헬리오스 근처에선 꺼내지 마쇼.\"",
+					"effects": [
+						{ "type": "cargo_add", "good": "forged_cell", "amount": 10 }
+					]
+				}
+			}
+		},
+		{
+			"id": "haggle",
+			"text": "정품이라니 믿고 흥정한다",
+			"check": { "stat": "negotiation", "dc": 14 },
+			"outcomes": {
+				"success": {
+					"text": "값을 깎다 보니 상인이 말실수를 한다. 위조품이라는 걸 알아채고 손을 턴다.",
+					"effects": [
+						{ "type": "flag_set", "flag": "knows_forged_cell_dealer" }
+					]
+				},
+				"failure": {
+					"text": "기분 좋게 한 상자를 산다. 며칠 뒤 셀이 하나도 충전되지 않는다는 걸 안다.",
+					"effects": [
+						{ "type": "power", "delta": -20 },
+						{ "type": "cargo_add", "good": "forged_cell", "amount": 5 }
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "지나간다",
+			"outcomes": {
+				"success": {
+					"text": "싼 셀은 대개 이유가 있다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

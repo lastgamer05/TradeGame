@@ -24,6 +24,9 @@ var _market_grid: GridContainer
 var _routes_box: VBoxContainer
 var _map: Control
 var _log_label: Label
+var _overlay: Control
+var _modal: VBoxContainer
+var _event_queue: Array = []
 
 
 func _ready() -> void:
@@ -35,8 +38,119 @@ func _ready() -> void:
 func _new_game() -> void:
 	state = GameState.new(GameData)
 	_log.clear()
+	_event_queue.clear()
 	_add_log("%s에서 출발한다. 전력 %s, 짐칸 %d칸." % [_city_name(state.city), _fmt_power(state.power), state.cargo_capacity])
 	_refresh()
+	_show_character_creation()
+
+
+# --- 모달 창 (능력치 분배, 이벤트) ---
+
+func _build_overlay() -> void:
+	_overlay = Control.new()
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.visible = false
+	add_child(_overlay)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.55)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.add_child(center)
+	var panel := PanelContainer.new()
+	var box := PixelTheme.panel_box()
+	box.bg_color.a = 0.95
+	box.set_content_margin_all(24)
+	panel.add_theme_stylebox_override("panel", box)
+	panel.custom_minimum_size = Vector2(820, 0)
+	center.add_child(panel)
+	_modal = VBoxContainer.new()
+	_modal.add_theme_constant_override("separation", 12)
+	panel.add_child(_modal)
+
+
+func _open_modal(title: String) -> void:
+	for c in _modal.get_children():
+		c.queue_free()
+	var t := _label(title)
+	t.add_theme_font_override("font", PixelTheme.font(true))
+	t.add_theme_color_override("font_color", PixelTheme.ACCENT)
+	_modal.add_child(t)
+	_overlay.visible = true
+
+
+func _modal_text(text: String, color := PixelTheme.TEXT) -> Label:
+	var l := _label(text)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size = Vector2(770, 0)
+	l.add_theme_color_override("font_color", color)
+	_modal.add_child(l)
+	return l
+
+
+func _show_character_creation() -> void:
+	var cfg: Dictionary = GameData.economy.character
+	var spent := 0
+	for s in Defs.STATS:
+		spent += state.stats[s] - int(cfg.base_stat)
+	var left: int = int(cfg.bonus_points) - spent
+	_open_modal("운반꾼의 능력치")
+	_modal_text("판정은 d20 + 능력치가 난이도(DC) 이상이면 성공한다. 남은 포인트: %d" % left, PixelTheme.TEXT_DIM)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 16)
+	_modal.add_child(grid)
+	for s in Defs.STATS:
+		var name_label := _label(Defs.STAT_NAMES[s])
+		name_label.custom_minimum_size = Vector2(120, 0)
+		grid.add_child(name_label)
+		grid.add_child(_button("-", state.stats[s] > int(cfg.base_stat), _change_stat.bind(s, -1)))
+		var v := _label(str(state.stats[s]))
+		v.custom_minimum_size = Vector2(40, 0)
+		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		grid.add_child(v)
+		grid.add_child(_button("+", left > 0 and state.stats[s] < int(cfg.max_stat), _change_stat.bind(s, 1)))
+	var go := _button("출발한다", left == 0, _close_modal)
+	_modal.add_child(go)
+
+
+func _change_stat(stat: String, delta: int) -> void:
+	state.stats[stat] += delta
+	_show_character_creation()
+
+
+func _close_modal() -> void:
+	_overlay.visible = false
+	_refresh()
+	_show_next_event()
+
+
+func _show_next_event() -> void:
+	if _event_queue.is_empty():
+		return
+	var ev: Dictionary = _event_queue.pop_front()
+	_open_modal(ev.title)
+	_modal_text(ev.text)
+	for ch in ev.choices:
+		var blocker := EventRunner.choice_blocker(state, ch)
+		var b := _button(EventRunner.choice_tags(state, ch) + ch.text, blocker == "", _on_choice.bind(ev, ch))
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.tooltip_text = blocker
+		_modal.add_child(b)
+
+
+func _on_choice(ev: Dictionary, ch: Dictionary) -> void:
+	var r := EventRunner.resolve(state, ch)
+	_add_log("[%s] %s" % [ev.title, ch.text])
+	_open_modal(ev.title)
+	if r.roll_text != "":
+		_modal_text(r.roll_text, PixelTheme.ACCENT if r.outcome == "success" else Color(0.9, 0.45, 0.4))
+	_modal_text(r.text)
+	for line in r.effect_lines:
+		_modal_text("· " + line, PixelTheme.TEXT_DIM)
+		_add_log("  " + line)
+	_modal.add_child(_button("계속", true, _close_modal))
 
 
 func _build_layout() -> void:
@@ -118,6 +232,8 @@ func _build_layout() -> void:
 	_log_label.add_theme_color_override("font_color", PixelTheme.TEXT_DIM)
 	log_panel.add_child(_log_label)
 
+	_build_overlay()
+
 
 func _build_top_bar() -> Control:
 	var panel := PanelContainer.new()
@@ -167,7 +283,9 @@ func _refresh() -> void:
 	_power_label.text = _fmt_power(state.power)
 	_cargo_label.text = "%d/%d" % [state.cargo_count(), state.cargo_capacity]
 	_worth_label.text = "재산 %s" % _fmt_power(state.net_worth())
-	_city_info.text = "특산 ▼ %s\n수요 ▲ %s" % [_goods_names(city.specialties), _goods_names(city.demands)]
+	var stat_text := "  ".join(Defs.STATS.map(func(s): return "%s %d" % [Defs.STAT_NAMES[s], state.stats[s]]))
+	_city_info.text = "특산 ▼ %s\n수요 ▲ %s\n평판 %+d   |   %s" % [
+		_goods_names(city.specialties), _goods_names(city.demands), state.reputation[state.city], stat_text]
 	_refresh_market(city)
 	_refresh_routes()
 	_map.current_city = state.city
@@ -251,9 +369,13 @@ func _on_travel(to: String) -> void:
 	var err := state.travel(to)
 	if err == "":
 		_add_log("%s에 도착했다. %d일차." % [_city_name(to), state.day])
+		for ev in [EventRunner.pick_travel_event(state), EventRunner.pick_city_event(state)]:
+			if not ev.is_empty():
+				_event_queue.append(ev)
 	else:
 		_add_log(err)
 	_refresh()
+	_show_next_event()
 
 
 func _check_stranded() -> void:

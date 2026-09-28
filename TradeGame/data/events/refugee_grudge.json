@@ -1,0 +1,71 @@
+{
+	"id": "refugee_grudge",
+	"title": "기억하는 얼굴",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway", "wasteland"],
+		"requires": [
+			{ "type": "flag", "flag": "robbed_refugees" }
+		],
+		"weight": 6
+	},
+	"text": "앞길에 트럭 한 대가 가로로 서 있다. 쇠파이프를 든 젊은이들 사이에 그때 그 노인이 있다. 노인은 아무 말도 하지 않는다. 젊은이 하나가 대신 말한다. \"가져간 거, 이자까지 쳐서.\"",
+	"choices": [
+		{
+			"id": "repay",
+			"text": "빼앗은 값을 전력으로 돌려준다",
+			"cost": [
+				{ "type": "power", "amount": 30 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "노인이 팩을 받아 들고 트럭을 비키라고 손짓한다. 용서는 아니다. 그냥 셈이 끝났을 뿐이다.",
+					"effects": [
+						{ "type": "reputation", "city": "rustbelt", "delta": 8 },
+						{ "type": "flag_clear", "flag": "robbed_refugees" }
+					]
+				}
+			}
+		},
+		{
+			"id": "apologize",
+			"text": "그때는 살려고 그랬다고 말한다",
+			"check": { "stat": "negotiation", "dc": 15 },
+			"outcomes": {
+				"success": {
+					"text": "노인이 오래 쳐다보다가 말한다. \"다들 살려고 그랬지.\" 트럭이 비킨다.",
+					"effects": [
+						{ "type": "reputation", "city": "rustbelt", "delta": 3 },
+						{ "type": "flag_clear", "flag": "robbed_refugees" }
+					]
+				},
+				"failure": {
+					"text": "젊은이의 쇠파이프가 앞 유리를 내리친다. 그들은 부서진 차를 두고 떠난다.",
+					"effects": [
+						{ "type": "vehicle_damage", "part": "engine" },
+						{ "type": "reputation", "city": "rustbelt", "delta": -5 }
+					]
+				}
+			}
+		},
+		{
+			"id": "force_through",
+			"text": "트럭을 밀어내고 지나간다",
+			"check": { "stat": "driving", "dc": 12 },
+			"outcomes": {
+				"success": {
+					"text": "트럭 옆구리를 밀고 빠져나간다. 러스트벨에 이 이야기가 퍼질 것이다.",
+					"effects": [
+						{ "type": "reputation", "city": "rustbelt", "delta": -10 }
+					]
+				},
+				"failure": {
+					"text": "트럭이 꿈쩍도 하지 않는다. 젊은이들이 차를 에워싼다.",
+					"effects": [
+						{ "type": "start_combat", "encounter": "refugee_ambush" }
+					]
+				}
+			}
+		}
+	]
+}

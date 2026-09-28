@@ -1,0 +1,77 @@
+{
+	"id": "scrapyard_toll",
+	"title": "크랭크의 세금",
+	"trigger": {
+		"on": "city",
+		"cities": ["scrapyard"],
+		"requires": [],
+		"weight": 10
+	},
+	"text": "스크랩야드 입구에서 문신한 사내 둘이 차를 막는다. 뒤쪽 폐차 탑 위에서 누군가 내려다보고 있다. \"크랭크 님 구역이야. 들어가려면 몫을 내.\"",
+	"choices": [
+		{
+			"id": "pay",
+			"text": "몫을 낸다",
+			"cost": [
+				{ "type": "power", "amount": 15 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "사내들이 길을 비킨다. 폐차 탑 위의 그림자가 고개를 끄덕인다.",
+					"effects": [
+						{ "type": "reputation", "city": "scrapyard", "delta": 3 }
+					]
+				}
+			}
+		},
+		{
+			"id": "pay_in_weapons",
+			"text": "무기 부품으로 낸다",
+			"cost": [
+				{ "type": "cargo", "good": "weapon_parts", "amount": 1 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "사내가 부품을 들어 보고 휘파람을 분다. \"크랭크 님이 좋아하시겠군.\" 한 번 들어간 사람은 다음에도 알아본다.",
+					"effects": [
+						{ "type": "reputation", "city": "scrapyard", "delta": 8 }
+					]
+				}
+			}
+		},
+		{
+			"id": "old_uniform",
+			"text": "헬리오스 군 시절 이야기를 꺼낸다",
+			"check": { "stat": "negotiation", "dc": 14 },
+			"outcomes": {
+				"success": {
+					"text": "폐차 탑 위에서 웃음소리가 들린다. \"보급대 운전병이라고? 들여보내. 버려진 놈끼리는 세금 안 받는다.\"",
+					"effects": [
+						{ "type": "reputation", "city": "scrapyard", "delta": 5 },
+						{ "type": "flag_set", "flag": "crank_knows_past" }
+					]
+				},
+				"failure": {
+					"text": "헬리오스라는 말에 사내들 표정이 험악해진다. 몫이 두 배가 된다.",
+					"effects": [
+						{ "type": "power", "delta": -30 },
+						{ "type": "reputation", "city": "scrapyard", "delta": -3 }
+					]
+				}
+			}
+		},
+		{
+			"id": "refuse",
+			"text": "돌아간다",
+			"outcomes": {
+				"success": {
+					"text": "사내들이 등 뒤에서 낄낄거린다. 오늘 스크랩야드와의 거래는 없다.",
+					"effects": [
+						{ "type": "reputation", "city": "scrapyard", "delta": -2 },
+						{ "type": "flag_set", "flag": "turned_away_scrapyard" }
+					]
+				}
+			}
+		}
+	]
+}

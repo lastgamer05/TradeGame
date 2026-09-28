@@ -1,0 +1,74 @@
+{
+	"id": "stray_war_machine",
+	"title": "떠도는 전쟁 기계",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["wasteland"],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "모래 언덕 너머에서 네 다리 달린 전차가 걸어 나온다. 부대 표식은 녹슬어 지워졌지만 포탑은 아직 움직인다. 붉은 조준등이 차를 훑는다.",
+	"choices": [
+		{
+			"id": "hack",
+			"text": "군용 주파수로 정지 명령을 보낸다",
+			"check": { "stat": "hacking", "dc": 16 },
+			"outcomes": {
+				"success": {
+					"text": "조준등이 녹색으로 바뀌고 기계가 무릎을 꿇는다. 정비 패널을 열어 제어 칩을 뽑아낸다.",
+					"effects": [
+						{ "type": "cargo_add", "good": "chip_military", "amount": 2 }
+					]
+				},
+				"failure": {
+					"text": "응답 대신 경고음이 울린다. 적 신호로 인식됐다.",
+					"effects": [
+						{ "type": "start_combat", "encounter": "stray_war_machine" }
+					]
+				}
+			}
+		},
+		{
+			"id": "outrun",
+			"text": "언덕 뒤로 돌아 사각으로 빠진다",
+			"check": { "stat": "driving", "dc": 13 },
+			"outcomes": {
+				"success": {
+					"text": "포탑이 도는 속도보다 빠르게 언덕을 끼고 돈다. 기계는 목표를 잃고 다시 걷기 시작한다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "포탄 한 발이 차 옆을 스친다. 엔진이 비명을 지르지만 겨우 빠져나온다.",
+					"effects": [
+						{ "type": "vehicle_damage", "part": "engine" }
+					]
+				}
+			}
+		},
+		{
+			"id": "smoke",
+			"text": "연막을 터뜨리고 빠진다",
+			"requires": [
+				{ "type": "module", "module": "smoke_launcher" }
+			],
+			"outcomes": {
+				"success": {
+					"text": "연막 속에서 조준등이 헛돈다. 연기가 걷혔을 때 차는 이미 언덕 너머다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "fight",
+			"text": "싸운다",
+			"outcomes": {
+				"success": {
+					"text": "차를 엄폐물 삼아 무기를 꺼낸다.",
+					"effects": [
+						{ "type": "start_combat", "encounter": "stray_war_machine" }
+					]
+				}
+			}
+		}
+	]
+}

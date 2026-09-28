@@ -1,0 +1,62 @@
+{
+	"id": "corrupt_soldier_return",
+	"title": "낯익은 병사",
+	"trigger": {
+		"on": "travel",
+		"road_types": ["highway"],
+		"requires": [
+			{ "type": "flag", "flag": "corrupt_soldier" }
+		],
+		"weight": 8
+	},
+	"text": "검문소 병사가 차창을 두드린다. 지난번 배터리를 받아 간 그 병사다. 오늘은 옆에 처음 보는 장교가 서 있다.",
+	"choices": [
+		{
+			"id": "quiet_bribe",
+			"text": "장교 몰래 셀 몇 개를 쥐여 준다",
+			"cost": [
+				{ "type": "power", "amount": 5 }
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 장교에게 \"아는 운반꾼입니다\" 하고 말한다. 장교는 서류만 보고 통과시킨다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "pretend_stranger",
+			"text": "처음 보는 척한다",
+			"check": { "stat": "negotiation", "dc": 12 },
+			"outcomes": {
+				"success": {
+					"text": "병사도 눈치를 채고 모른 척한다. 장교는 형식적으로 짐칸을 훑고 보낸다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "병사의 표정이 굳는다. 장교가 둘 사이를 번갈아 보더니 차에서 내리라고 한다. 긴 조사 끝에 벌금을 문다.",
+					"effects": [
+						{ "type": "power", "delta": -15 },
+						{ "type": "reputation", "city": "helios", "delta": -5 },
+						{ "type": "flag_clear", "flag": "corrupt_soldier" }
+					]
+				}
+			}
+		},
+		{
+			"id": "report_soldier",
+			"text": "장교에게 병사의 뇌물 수수를 고발한다",
+			"outcomes": {
+				"success": {
+					"text": "병사가 끌려간다. 장교가 고개를 끄덕이며 이름을 적어 간다. 이 길에 이제 아는 얼굴은 없다.",
+					"effects": [
+						{ "type": "reputation", "city": "helios", "delta": 8 },
+						{ "type": "reputation", "city": "gate7", "delta": 3 },
+						{ "type": "flag_clear", "flag": "corrupt_soldier" },
+						{ "type": "flag_set", "flag": "reported_corrupt_soldier" }
+					]
+				}
+			}
+		}
+	]
+}
