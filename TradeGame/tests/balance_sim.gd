@@ -31,7 +31,7 @@ func _initialize():
 						var sc := 0.0
 						var near := 99
 						for e in b.active_units("enemy"):
-							near = mini(near, Battle.cheb(cell, e.pos))
+							near = mini(near, Battle.hex_dist(cell, e.pos))
 							sc += b.cover_level(cell, e.pos) * 3
 						sc -= abs(near - 6)
 						if sc > bestscore: bestscore = sc; bestpos = cell

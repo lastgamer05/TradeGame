@@ -29,7 +29,7 @@ func _initialize() -> void:
 		# 한 턴 진행한 모습: 첫 유닛 앞으로 이동, 턴 종료
 		var u: Dictionary = b.active_units("player")[0]
 		var cells: Array = b.reachable(u).keys()
-		cells.sort_custom(func(a, c): return a.y < c.y)
+		cells.sort_custom(func(a, c): return a.x > c.x)
 		b.move(u, cells[0])
 		b.end_player_turn()
 		view.speed = 20.0

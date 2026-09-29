@@ -5,7 +5,10 @@ extends RefCounted
 
 enum Tile { FLOOR, HALF, FULL, BARREL }
 
-const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+## 육각 격자 (pointy-top, odd-r 오프셋). 홀수 줄이 반 칸 오른쪽으로 밀린다.
+## 좌표는 Vector2i(열, 줄). 거리와 시야는 큐브 좌표로 계산한다.
+const DIRS_EVEN := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1), Vector2i(-1, -1), Vector2i(0, 1), Vector2i(-1, 1)]
+const DIRS_ODD := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(1, -1), Vector2i(0, -1), Vector2i(1, 1), Vector2i(0, 1)]
 
 var cfg: Dictionary
 var encounter: Dictionary
@@ -72,26 +75,25 @@ func _try_generate() -> void:
 		row.resize(w)
 		row.fill(Tile.FLOOR)
 		tiles.append(row)
-	# 차는 아래쪽 가운데 2x2, 탈출 구역은 차 주변 칸
-	var cx := w / 2 - 1
-	car_cells = [Vector2i(cx, h - 2), Vector2i(cx + 1, h - 2), Vector2i(cx, h - 1), Vector2i(cx + 1, h - 1)]
+	# 차는 왼쪽 가장자리 가운데 4칸, 탈출 구역은 차에 붙은 칸
+	var mid := h / 2
+	car_cells = [Vector2i(0, mid - 1), Vector2i(0, mid), Vector2i(1, mid), Vector2i(0, mid + 1)]
 	escape_cells = []
 	for c in car_cells:
-		for d in DIRS + [Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1)]:
-			var n: Vector2i = c + d
-			if _in_bounds(n) and n not in car_cells and n not in escape_cells:
+		for n in neighbors(c):
+			if n not in car_cells and n not in escape_cells:
 				escape_cells.append(n)
-	# 왼쪽 절반에 뿌리고 오른쪽에 거울처럼 옮긴 뒤 일부를 흩뜨린다 (좌우 밀도 맞추기).
+	# 위쪽 절반에 뿌리고 아래쪽에 거울처럼 옮긴 뒤 일부를 흩뜨린다 (양쪽 측면 밀도 맞추기).
 	_scatter(Tile.FULL, int(location.full) / 2)
 	_scatter(Tile.HALF, int(location.half) / 2)
 	_scatter(Tile.BARREL, int(location.barrels) / 2 + int(location.barrels) % 2)
-	for y in h:
-		for x in w / 2:
+	for y in h / 2:
+		for x in w:
 			var t: int = tiles[y][x]
 			if t == Tile.FLOOR:
 				continue
-			var mx := w - 1 - x
-			var my := clampi(y + rng.randi_range(-1, 1), 0, h - 1)
+			var my := h - 1 - y
+			var mx := clampi(x + rng.randi_range(-1, 1), 0, w - 1)
 			var m := Vector2i(mx, my)
 			if tiles[my][mx] == Tile.FLOOR and not _reserved(m):
 				tiles[my][mx] = t
@@ -109,7 +111,7 @@ func _scatter(t: int, count: int) -> void:
 	var tries := 0
 	while placed < count and tries < 400:
 		tries += 1
-		var p := Vector2i(rng.randi_range(0, w / 2 - 1), rng.randi_range(4, h - 4))
+		var p := Vector2i(rng.randi_range(4, w - 4), rng.randi_range(0, h / 2 - 1))
 		if tiles[p.y][p.x] != Tile.FLOOR or _reserved(p):
 			continue
 		if t == Tile.BARREL and (_near_cells(p, _player_spawn_cells(), 2) or _near_cells(p, _enemy_spawn_cells(), 2)):
@@ -123,19 +125,19 @@ func _reserved(p: Vector2i) -> bool:
 
 
 func _player_spawn_cells() -> Array:
-	return [Vector2i(w / 2 - 3, h - 4), Vector2i(w / 2 + 2, h - 4)]
+	return [Vector2i(3, h / 2 - 3), Vector2i(3, h / 2 + 3)]
 
 
 func _enemy_spawn_cells() -> Array:
 	var out := []
-	for x in range(2, w - 2, 2):
-		out.append(Vector2i(x, 1))
+	for y in range(1, h - 1, 2):
+		out.append(Vector2i(w - 2, y))
 	return out
 
 
 func _near_cells(p: Vector2i, cells: Array, dist: int) -> bool:
 	for c in cells:
-		if cheb(p, c) <= dist:
+		if hex_dist(p, c) <= dist:
 			return true
 	return false
 
@@ -152,24 +154,22 @@ func _cover_near(cells: Array) -> int:
 func _free_near(cells: Array) -> Vector2i:
 	var options := []
 	for c in cells:
-		for dy in range(-2, 3):
-			for dx in range(-2, 3):
-				var p: Vector2i = c + Vector2i(dx, dy)
-				if _in_bounds(p) and tiles[p.y][p.x] == Tile.FLOOR and not _reserved(p):
-					options.append(p)
+		for p in cells_within(c, 2):
+			if tiles[p.y][p.x] == Tile.FLOOR and not _reserved(p):
+				options.append(p)
 	return options[rng.randi_range(0, options.size() - 1)] if not options.is_empty() else Vector2i(-1, -1)
 
 
-## 공정성: 적 시작점에서 탈출 구역까지 길이 이어져 있고, 좌우 엄폐물 수가 비슷하다.
+## 공정성: 적 시작점에서 탈출 구역까지 길이 이어져 있고, 위아래 측면 엄폐물 수가 비슷하다.
 func _fair() -> bool:
 	var left := 0
 	var right := 0
 	for y in h:
 		for x in w:
 			if tiles[y][x] in [Tile.HALF, Tile.FULL]:
-				if x < w / 2:
+				if y < h / 2:
 					left += 1
-				else:
+				elif y > h / 2:
 					right += 1
 	if absi(left - right) > 2:
 		return false
@@ -200,7 +200,7 @@ func _spawn(squad: Array) -> void:
 			var e: Dictionary = cfg.enemies[kind]
 			var weapon: Dictionary = cfg.weapons[e.weapon]
 			units.append({
-				"id": "e%d" % i, "side": "enemy", "kind": kind, "name": e.name, "pos": cells[i % cells.size()] + Vector2i(0, i / cells.size()),
+				"id": "e%d" % i, "side": "enemy", "kind": kind, "name": e.name, "pos": cells[i % cells.size()] - Vector2i(i / cells.size(), 0),
 				"hp": int(e.hp), "max_hp": int(e.hp), "aim": int(e.aim), "might": int(e.aim),
 				"weapon": e.weapon if not weapon.get("melee", false) else "", "melee_weapon": e.weapon if weapon.get("melee", false) else "",
 				"defense": int(e.get("defense", cfg.base_defense)),
@@ -215,8 +215,42 @@ func _in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < w and p.y < h
 
 
-static func cheb(a: Vector2i, b: Vector2i) -> int:
-	return maxi(absi(a.x - b.x), absi(a.y - b.y))
+static func to_cube(p: Vector2i) -> Vector3i:
+	var q := p.x - (p.y - (p.y & 1)) / 2
+	return Vector3i(q, p.y, -q - p.y)
+
+
+static func from_cube(c: Vector3i) -> Vector2i:
+	return Vector2i(c.x + (c.y - (c.y & 1)) / 2, c.y)
+
+
+static func hex_dist(a: Vector2i, b: Vector2i) -> int:
+	var d := to_cube(a) - to_cube(b)
+	return maxi(absi(d.x), maxi(absi(d.y), absi(d.z)))
+
+
+## 격자 좌표를 평면 좌표로 (칸 중심 간격 약 1.7). 방향 계산과 화면 배치에 쓴다.
+static func to_plane(p: Vector2i) -> Vector2:
+	return Vector2(sqrt(3.0) * (p.x + 0.5 * (p.y & 1)), 1.5 * p.y)
+
+
+func neighbors(p: Vector2i) -> Array:
+	var out := []
+	for d in (DIRS_ODD if p.y & 1 else DIRS_EVEN):
+		var n: Vector2i = p + d
+		if _in_bounds(n):
+			out.append(n)
+	return out
+
+
+func cells_within(p: Vector2i, r: int) -> Array:
+	var out := []
+	for y in range(p.y - r, p.y + r + 1):
+		for x in range(p.x - r - 1, p.x + r + 2):
+			var c := Vector2i(x, y)
+			if _in_bounds(c) and hex_dist(p, c) <= r:
+				out.append(c)
+	return out
 
 
 func tile(p: Vector2i) -> int:
@@ -243,9 +277,8 @@ func _flood(from: Vector2i) -> Dictionary:
 	var queue := [from]
 	while not queue.is_empty():
 		var c: Vector2i = queue.pop_front()
-		for d in DIRS:
-			var n: Vector2i = c + d
-			if _in_bounds(n) and not dist.has(n) and tile(n) == Tile.FLOOR and n not in car_cells:
+		for n in neighbors(c):
+			if not dist.has(n) and tile(n) == Tile.FLOOR and n not in car_cells:
 				dist[n] = dist[c] + 1
 				queue.append(n)
 	return dist
@@ -260,8 +293,7 @@ func reachable(u: Dictionary) -> Dictionary:
 		var c: Vector2i = queue.pop_front()
 		if paths[c].size() >= limit:
 			continue
-		for d in DIRS:
-			var n: Vector2i = c + d
+		for n in neighbors(c):
 			if not paths.has(n) and is_walkable(n):
 				paths[n] = paths[c] + [n]
 				queue.append(n)
@@ -271,25 +303,36 @@ func reachable(u: Dictionary) -> Dictionary:
 
 ## 시야: 완전 엄폐물과 차가 가린다.
 func has_los(a: Vector2i, b: Vector2i) -> bool:
-	var n := maxi(absi(b.x - a.x), absi(b.y - a.y))
+	var n := hex_dist(a, b)
+	var nudge := Vector3(1e-4, 2e-4, -3e-4)
+	var ca := Vector3(to_cube(a)) + nudge
+	var cb := Vector3(to_cube(b)) + nudge
 	for i in range(1, n):
-		var t := float(i) / n
-		var p := Vector2i(roundi(lerpf(a.x, b.x, t)), roundi(lerpf(a.y, b.y, t)))
+		var p := from_cube(_cube_round(ca.lerp(cb, float(i) / n)))
 		if tile(p) == Tile.FULL or p in car_cells:
 			return false
 	return true
 
 
+static func _cube_round(c: Vector3) -> Vector3i:
+	var r := Vector3i(roundi(c.x), roundi(c.y), roundi(c.z))
+	var d := (Vector3(r) - c).abs()
+	if d.x > d.y and d.x > d.z:
+		r.x = -r.y - r.z
+	elif d.y > d.z:
+		r.y = -r.x - r.z
+	else:
+		r.z = -r.x - r.y
+	return r
+
+
 ## 공격자 방향에서 대상 옆에 붙은 엄폐. 0 없음, 1 반, 2 완전
+## 엄폐로 치는 칸은 대상 옆 6칸 중 공격자 쪽으로 60도 안에 있는 칸이다.
 func cover_level(target: Vector2i, attacker: Vector2i) -> int:
 	var best := 0
-	var sx := signi(attacker.x - target.x)
-	var sy := signi(attacker.y - target.y)
-	for d in [Vector2i(sx, 0), Vector2i(0, sy)]:
-		if d == Vector2i.ZERO:
-			continue
-		var p: Vector2i = target + d
-		if not _in_bounds(p):
+	var to_attacker := (to_plane(attacker) - to_plane(target)).normalized()
+	for p in neighbors(target):
+		if (to_plane(p) - to_plane(target)).normalized().dot(to_attacker) < 0.49:
 			continue
 		if tile(p) == Tile.FULL or p in car_cells:
 			best = maxi(best, 2)
@@ -300,7 +343,7 @@ func cover_level(target: Vector2i, attacker: Vector2i) -> int:
 
 ## 이 공격자가 이 대상을 칠 때 쓰는 무기. 사거리 밖이거나 시야가 없으면 "".
 func weapon_for(a: Dictionary, target_pos: Vector2i) -> String:
-	var d := cheb(a.pos, target_pos)
+	var d := hex_dist(a.pos, target_pos)
 	if d == 1 and a.melee_weapon != "":
 		return a.melee_weapon
 	if a.weapon != "" and d <= int(cfg.weapons[a.weapon].range) and has_los(a.pos, target_pos):
@@ -317,7 +360,7 @@ func _needed_roll(a: Dictionary, target: Dictionary, weapon_id: String, extra_pe
 	if not melee:
 		var cover := cover_level(target.pos, a.pos)
 		defense += [0, int(cfg.cover_bonus.half), int(cfg.cover_bonus.full)][cover]
-		var over := cheb(a.pos, target.pos) - int(wpn.range) / 2
+		var over := hex_dist(a.pos, target.pos) - int(wpn.range) / 2
 		defense += maxi(over, 0) * int(cfg.range_penalty_per_tile)
 	if target.hidden:
 		defense += int(cfg.hide_bonus)
@@ -387,7 +430,7 @@ func set_overwatch(u: Dictionary) -> bool:
 
 
 func throw_grenade(u: Dictionary, at: Vector2i) -> bool:
-	if not can_act(u) or grenades <= 0 or cheb(u.pos, at) > int(cfg.grenade.range) or not _in_bounds(at):
+	if not can_act(u) or grenades <= 0 or hex_dist(u.pos, at) > int(cfg.grenade.range) or not _in_bounds(at):
 		return false
 	grenades -= 1
 	u.ap = 0
@@ -521,7 +564,7 @@ func _choose_enemy_move(e: Dictionary) -> Vector2i:
 		var nearest := 999
 		var nearest_pos := Vector2i.ZERO
 		for t in targets:
-			var d := cheb(cell, t.pos)
+			var d := hex_dist(cell, t.pos)
 			if d < nearest:
 				nearest = d
 				nearest_pos = t.pos
@@ -535,7 +578,7 @@ func _choose_enemy_move(e: Dictionary) -> Vector2i:
 			if e.ai != "machine":
 				score += [0.0, 2.5, 5.0][cover_level(cell, nearest_pos)]
 		if e.ai == "raider":
-			score -= cheb(cell, car_cells[0]) * 0.3
+			score -= hex_dist(cell, car_cells[0]) * 0.3
 		score += rng.randf() * 0.5
 		if score > best_score:
 			best_score = score
@@ -550,7 +593,7 @@ func _maybe_shoot_car(e: Dictionary) -> void:
 	var chance: float = car_cfg.raider_shot_chance if e.ai == "raider" else car_cfg.shot_chance
 	var wpn: Dictionary = cfg.weapons[e.weapon]
 	var target: Vector2i = car_cells[0]
-	if cheb(e.pos, target) > int(wpn.range) or not has_los(e.pos, target) or rng.randf() >= chance:
+	if hex_dist(e.pos, target) > int(wpn.range) or not has_los(e.pos, target) or rng.randf() >= chance:
 		return
 	var d20 := rng.randi_range(1, 20)
 	if d20 + e.aim + int(wpn.aim) < int(car_cfg.defense):
@@ -602,7 +645,7 @@ func _trigger_overwatch(mover: Dictionary, watcher_side: String) -> void:
 	for w_unit in active_units(watcher_side):
 		if not w_unit.overwatch or w_unit.weapon == "":
 			continue
-		if cheb(w_unit.pos, mover.pos) > int(cfg.weapons[w_unit.weapon].range) or not has_los(w_unit.pos, mover.pos):
+		if hex_dist(w_unit.pos, mover.pos) > int(cfg.weapons[w_unit.weapon].range) or not has_los(w_unit.pos, mover.pos):
 			continue
 		w_unit.overwatch = false
 		messages.append("%s의 경계 사격!" % w_unit.name)
@@ -617,20 +660,16 @@ func _explode(at: Vector2i, blast: Dictionary) -> void:
 	var r := int(blast.radius)
 	events.append({ "type": "explode", "cell": at, "radius": r })
 	var chain := []
-	for dy in range(-r, r + 1):
-		for dx in range(-r, r + 1):
-			var p := at + Vector2i(dx, dy)
-			if not _in_bounds(p):
-				continue
-			var u := unit_at(p)
-			if not u.is_empty():
-				var dmg := rng.randi_range(int(blast.damage[0]), int(blast.damage[1]))
-				_damage(u, dmg, "폭발: %s %d 피해" % [u.name, dmg])
-			if tile(p) == Tile.HALF:
-				tiles[p.y][p.x] = Tile.FLOOR
-			elif tile(p) == Tile.BARREL:
-				tiles[p.y][p.x] = Tile.FLOOR
-				chain.append(p)
+	for p in cells_within(at, r):
+		var u := unit_at(p)
+		if not u.is_empty():
+			var dmg := rng.randi_range(int(blast.damage[0]), int(blast.damage[1]))
+			_damage(u, dmg, "폭발: %s %d 피해" % [u.name, dmg])
+		if tile(p) == Tile.HALF:
+			tiles[p.y][p.x] = Tile.FLOOR
+		elif tile(p) == Tile.BARREL:
+			tiles[p.y][p.x] = Tile.FLOOR
+			chain.append(p)
 	for p in chain:
 		messages.append("통이 연쇄 폭발한다!")
 		_explode(p, cfg.barrel)

@@ -236,23 +236,26 @@ func test_battle_rules() -> void:
 	for y in b.h:
 		for x in b.w:
 			b.tiles[y][x] = Battle.Tile.FLOOR
+	_expect(Battle.hex_dist(Vector2i(2, 2), Vector2i(2, 3)) == 1 and Battle.hex_dist(Vector2i(2, 2), Vector2i(1, 3)) == 1, "육각 이웃 거리 1")
+	_expect(Battle.hex_dist(Vector2i(0, 0), Vector2i(4, 0)) == 4 and Battle.hex_dist(Vector2i(0, 0), Vector2i(0, 4)) == 4, "육각 거리")
+	_expect(b.neighbors(Vector2i(5, 5)).size() == 6 and b.neighbors(Vector2i(5, 4)).size() == 6, "이웃은 6칸")
 	var me: Dictionary = b.units[0]
 	var foe: Dictionary = b.active_units("enemy")[0]
-	me.pos = Vector2i(5, 12)
-	foe.pos = Vector2i(5, 6)
+	me.pos = Vector2i(6, 6)
+	foe.pos = Vector2i(12, 6)
 	var open := b.hit_chance(me, foe)
-	b.tiles[7][5] = Battle.Tile.HALF
+	b.tiles[6][11] = Battle.Tile.HALF
 	var half := b.hit_chance(me, foe)
 	_expect(half < open, "반 엄폐는 명중률을 낮춘다 (%d%% -> %d%%)" % [open, half])
-	b.tiles[7][5] = Battle.Tile.FULL
+	b.tiles[6][11] = Battle.Tile.FULL
 	_expect(not b.has_los(me.pos, foe.pos), "완전 엄폐물은 시야를 가린다")
-	b.tiles[7][5] = Battle.Tile.FLOOR
+	b.tiles[6][11] = Battle.Tile.FLOOR
 	foe.hidden = true
 	_expect(b.hit_chance(me, foe) < open, "숨은 적은 맞히기 어렵다")
 	foe.hidden = false
 	var reach := b.reachable(me)
-	_expect(reach.has(Vector2i(5, 7)) and not reach.has(Vector2i(5, 6)), "이동 범위 5칸, 적이 선 칸은 못 간다")
-	_expect(b.move(me, Vector2i(5, 9)) and me.ap == 1, "이동하면 행동력 1 소모")
+	_expect(reach.has(Vector2i(11, 6)) and not reach.has(Vector2i(12, 6)), "이동 범위 5칸, 적이 선 칸은 못 간다")
+	_expect(b.move(me, Vector2i(8, 6)) and me.ap == 1, "이동하면 행동력 1 소모")
 	_expect(b.attack(me, foe) and me.ap == 0, "공격하면 턴 종료")
 	# 탑승과 탈출
 	for u in b.active_units("player"):
@@ -291,7 +294,7 @@ func test_battle_simulation() -> void:
 					var moves := b.reachable(u)
 					var best: Vector2i = u.pos
 					for c in moves:
-						if c.y < best.y:
+						if c.x > best.x:
 							best = c
 					b.move(u, best)
 					if u.ap > 0 and not b.active_units("enemy").is_empty():

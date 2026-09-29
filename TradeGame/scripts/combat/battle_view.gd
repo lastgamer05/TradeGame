@@ -1,13 +1,13 @@
 extends Control
-## 쿼터뷰(아이소메트릭) 전투 화면. 규칙은 Battle이 처리하고, 이 화면은 Battle.events를
+## 정육각형 타일 전투 화면 (pointy-top). 규칙은 Battle이 처리하고, 이 화면은 Battle.events를
 ## 차례대로 애니메이션으로 재생한다. 스프라이트가 없으면 입체 도형으로 대신 그린다.
 ## 조작: 내 유닛 클릭 = 선택, 파란 칸 = 이동, 적 = 공격, 우클릭 = 취소
 ## 단축키: 1 숨기, 2 경계, 3 수류탄, 4 탑승, 5 항복 요구, Space 턴 종료, Tab 다음 유닛, F 빠르게
 
 signal finished(battle: Battle)
 
-const TW := 56.0  # 타일 마름모 폭
-const TH := 28.0  # 타일 마름모 높이
+const R := 24.0  # 육각형 외접원 반지름. 칸 폭 = sqrt(3) * R
+const TH := 20.0  # 스프라이트 발밑 보정용
 const HALF_H := 12.0
 const FULL_H := 30.0
 const UNIT_H := 56.0
@@ -48,7 +48,7 @@ var speed := 1.0
 
 var origin := Vector2.ZERO
 ## 화면에 보이는 상태. 규칙 상태와 달리 애니메이션이 끝나야 따라간다.
-var disp := {}      # id -> Vector2 (타일 좌표, 소수)
+var disp := {}      # id -> Vector2 (화면 좌표, 발밑)
 var disp_hp := {}
 var disp_down := {}
 var disp_boarded := {}
@@ -72,15 +72,15 @@ var _buttons := {}
 func setup(b: Battle) -> void:
 	battle = b
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	battle.events.clear()
+	_build_ui()
+	_layout_origin()
 	for u in battle.units:
-		disp[u.id] = Vector2(u.pos)
+		disp[u.id] = tile_center(u.pos)
 		disp_hp[u.id] = u.hp
 		disp_down[u.id] = u.down
 		disp_boarded[u.id] = u.boarded
 		facing[u.id] = 1 if u.side == "player" else -1
-	battle.events.clear()
-	_build_ui()
-	_layout_origin()
 	_select_next()
 	_refresh()
 	_show_banner("%s" % battle.encounter.name)
@@ -153,40 +153,41 @@ func _build_ui() -> void:
 
 func _layout_origin() -> void:
 	# 맵 전체가 위아래 HUD 사이에 들어오게 가운데 정렬
-	var corners := [Vector2(0, 0), Vector2(battle.w, 0), Vector2(0, battle.h), Vector2(battle.w, battle.h)]
 	var min_p := Vector2(INF, INF)
 	var max_p := Vector2(-INF, -INF)
-	for c in corners:
-		var p := Vector2((c.x - c.y) * TW / 2, (c.x + c.y) * TH / 2)
-		min_p = min_p.min(p)
-		max_p = max_p.max(p)
-	var area := Rect2(0, 60, 1280, 720 - 60 - 130)
-	origin = area.get_center() - (min_p + max_p) / 2
-	origin = origin.round()
+	for y in battle.h:
+		for x in battle.w:
+			var p := Battle.to_plane(Vector2i(x, y)) * R
+			min_p = min_p.min(p - Vector2(R, R))
+			max_p = max_p.max(p + Vector2(R, R))
+	var area := Rect2(0, 100, 1280, 720 - 100 - 136)
+	origin = (area.get_center() - (min_p + max_p) / 2).round()
 
 
 # --- 좌표 ---
 
-func iso(c: Vector2) -> Vector2:
-	return origin + Vector2((c.x - c.y) * TW / 2, (c.x + c.y) * TH / 2)
-
-
-func tile_center(c: Vector2) -> Vector2:
-	return iso(c) + Vector2(0, TH / 2)
+func tile_center(c: Vector2i) -> Vector2:
+	return origin + Battle.to_plane(c) * R
 
 
 func cell_at(p: Vector2) -> Vector2i:
-	var l := p - origin
-	var fx := (l.x / (TW / 2) + l.y / (TH / 2)) / 2
-	var fy := (l.y / (TH / 2) - l.x / (TW / 2)) / 2
-	return Vector2i(floori(fx), floori(fy))
+	var l := (p - origin) / R
+	var q := sqrt(3.0) / 3.0 * l.x - l.y / 3.0
+	var r := 2.0 / 3.0 * l.y
+	return Battle.from_cube(Battle._cube_round(Vector3(q, r, -q - r)))
 
 
-func _diamond(c: Vector2, inset := 0.0, lift := 0.0) -> PackedVector2Array:
-	var ctr := tile_center(c) - Vector2(0, lift)
-	var hw := TW / 2 * (1.0 - inset)
-	var hh := TH / 2 * (1.0 - inset)
-	return PackedVector2Array([ctr + Vector2(0, -hh), ctr + Vector2(hw, 0), ctr + Vector2(0, hh), ctr + Vector2(-hw, 0)])
+## 화면 좌표 중심의 정육각형 (꼭짓점: 오른쪽 위부터 시계 방향, 위가 뾰족)
+func _hex_at(center: Vector2, scale := 1.0) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	for i in 6:
+		var a := deg_to_rad(60.0 * i - 30.0)
+		pts.append(center + Vector2(cos(a), sin(a)) * R * scale)
+	return pts
+
+
+func _hex(c: Vector2i, scale := 1.0) -> PackedVector2Array:
+	return _hex_at(tile_center(c), scale)
 
 
 # --- 입력 ---
@@ -343,7 +344,7 @@ func _play_events() -> void:
 				_refresh_squad()
 				await _wait(0.35)
 			"explode":
-				_fx.append({ "kind": "explode", "pos": tile_center(Vector2(ev.cell)), "r": (ev.radius + 0.6) * TW, "t": 0.0, "dur": 0.5 })
+				_fx.append({ "kind": "explode", "pos": tile_center(ev.cell), "r": (ev.radius + 0.6) * R * 1.7, "t": 0.0, "dur": 0.5 })
 				await _wait(0.45)
 			"status":
 				_popup(ev.text, _unit_head(ev.id), PixelTheme.ACCENT)
@@ -364,7 +365,7 @@ func _play_events() -> void:
 				await _wait(0.7)
 	# 규칙 상태와 맞추기
 	for u in battle.units:
-		disp[u.id] = Vector2(u.pos)
+		disp[u.id] = tile_center(u.pos)
 		disp_hp[u.id] = u.hp
 		disp_down[u.id] = u.down
 		disp_boarded[u.id] = u.boarded
@@ -374,9 +375,9 @@ func _play_events() -> void:
 func _anim_move(ev: Dictionary) -> void:
 	var path: Array = ev.path
 	for i in range(1, path.size()):
-		var a := Vector2(path[i - 1])
-		var b := Vector2(path[i])
-		var dir := iso(b) - iso(a)
+		var a := tile_center(path[i - 1])
+		var b := tile_center(path[i])
+		var dir := b - a
 		if absf(dir.x) > 0.1:
 			facing[ev.id] = 1 if dir.x > 0 else -1
 		var tw := create_tween()
@@ -434,7 +435,7 @@ func _process(delta: float) -> void:
 
 
 func _unit_screen(id: String) -> Vector2:
-	return tile_center(disp[id]) + lunge.get(id, Vector2.ZERO)
+	return disp[id] + lunge.get(id, Vector2.ZERO)
 
 
 func _unit_chest(id: String) -> Vector2:
@@ -445,8 +446,15 @@ func _unit_head(id: String) -> Vector2:
 	return _unit_screen(id) + Vector2(0, -UNIT_H - 10)
 
 
+func _car_ground() -> Vector2:
+	var sum := Vector2.ZERO
+	for c in battle.car_cells:
+		sum += tile_center(c)
+	return sum / battle.car_cells.size()
+
+
 func _car_center() -> Vector2:
-	return tile_center(Vector2(battle.car_cells[0]) + Vector2(0.5, 0.5)) + Vector2(0, -16)
+	return _car_ground() + Vector2(0, -20)
 
 
 # --- HUD ---
@@ -557,51 +565,46 @@ func _draw_board() -> void:
 	# 바닥
 	for y in battle.h:
 		for x in battle.w:
-			var c := Vector2(x, y)
+			var c := Vector2i(x, y)
 			var shade := float((x * 7 + y * 13) % 5) / 4.0
-			_board.draw_colored_polygon(_diamond(c), colors[0].lerp(colors[1], shade))
-			if Vector2i(x, y) in battle.escape_cells:
-				_board.draw_colored_polygon(_diamond(c, 0.08), COL_ESCAPE)
-			if reach.has(Vector2i(x, y)):
-				_board.draw_colored_polygon(_diamond(c, 0.08), COL_REACH)
-			_board.draw_polyline(_closed(_diamond(c)), Color(0, 0, 0, 0.25), 1.0)
+			_board.draw_colored_polygon(_hex(c), colors[0].lerp(colors[1], shade))
+			if c in battle.escape_cells:
+				_board.draw_colored_polygon(_hex(c, 0.88), COL_ESCAPE)
+			if reach.has(c):
+				_board.draw_colored_polygon(_hex(c, 0.88), COL_REACH)
+			_board.draw_polyline(_closed(_hex(c)), Color(0, 0, 0, 0.3), 1.0)
 	# 공격 가능한 적 표시
 	if not sel.is_empty() and battle.can_act(sel) and not playing:
 		for e in battle.active_units("enemy"):
 			if battle.weapon_for(sel, e.pos) != "":
-				_board.draw_polyline(_closed(_diamond(Vector2(e.pos), 0.1)), Color(1, 0.4, 0.3, 0.9), 2.0)
+				_board.draw_polyline(_closed(_hex(e.pos, 0.86)), Color(1, 0.4, 0.3, 0.9), 2.0)
 	# 선택 유닛 발밑
 	if not sel.is_empty() and not disp_boarded.get(sel.id, false):
-		_board.draw_polyline(_closed(_diamond(disp[sel.id], 0.05)), Color.WHITE, 2.0)
+		_board.draw_polyline(_closed(_hex_at(disp[sel.id], 0.9)), Color.WHITE, 2.0)
 	# 이동 경로 미리보기
 	if reach.has(hover):
 		_draw_path([sel.pos] + reach[hover])
 	elif battle._in_bounds(hover) and mode == "normal":
-		_board.draw_polyline(_closed(_diamond(Vector2(hover), 0.05)), Color(1, 1, 1, 0.35), 1.5)
+		_board.draw_polyline(_closed(_hex(hover, 0.92)), Color(1, 1, 1, 0.35), 1.5)
 	# 수류탄 범위
 	if mode == "grenade" and battle._in_bounds(hover) and not sel.is_empty():
-		var ok := Battle.cheb(sel.pos, hover) <= int(battle.cfg.grenade.range)
-		var r := int(battle.cfg.grenade.radius)
-		for dy in range(-r, r + 1):
-			for dx in range(-r, r + 1):
-				var p := hover + Vector2i(dx, dy)
-				if battle._in_bounds(p):
-					_board.draw_colored_polygon(_diamond(Vector2(p), 0.08), Color(1, 0.5, 0.2, 0.35) if ok else Color(0.5, 0.5, 0.5, 0.3))
+		var ok := Battle.hex_dist(sel.pos, hover) <= int(battle.cfg.grenade.range)
+		for p in battle.cells_within(hover, int(battle.cfg.grenade.radius)):
+			_board.draw_colored_polygon(_hex(p, 0.88), Color(1, 0.5, 0.2, 0.35) if ok else Color(0.5, 0.5, 0.5, 0.3))
 
-	# 물체와 유닛을 깊이 순서로
+	# 물체와 유닛을 화면 아래쪽일수록 나중에 (앞에) 그린다
 	var items := []
 	for y in battle.h:
 		for x in battle.w:
 			var t := battle.tile(Vector2i(x, y))
 			if t != Battle.Tile.FLOOR:
-				items.append({ "d": x + y, "k": "tile", "c": Vector2i(x, y), "t": t })
-	var cc: Vector2i = battle.car_cells[3]
-	items.append({ "d": cc.x + cc.y, "k": "car" })
+				items.append({ "d": tile_center(Vector2i(x, y)).y, "k": "tile", "c": Vector2i(x, y), "t": t })
+	items.append({ "d": _car_ground().y, "k": "car" })
 	for u in battle.units:
 		if disp_boarded[u.id]:
 			continue
 		var p: Vector2 = disp[u.id]
-		items.append({ "d": p.x + p.y + 0.01, "k": "unit", "u": u })
+		items.append({ "d": p.y + 0.1, "k": "unit", "u": u })
 	items.sort_custom(func(a, b): return a.d < b.d)
 	for it in items:
 		match it.k:
@@ -668,7 +671,7 @@ func _dashed(a: Vector2, b: Vector2, col: Color) -> void:
 func _draw_path(cells: Array) -> void:
 	var pts := PackedVector2Array()
 	for c in cells:
-		pts.append(tile_center(Vector2(c)))
+		pts.append(tile_center(c))
 	for iter in 2:
 		var smooth := PackedVector2Array([pts[0]])
 		for i in pts.size() - 1:
@@ -678,32 +681,23 @@ func _draw_path(cells: Array) -> void:
 		pts = smooth
 	_board.draw_polyline(pts, Color(0, 0, 0, 0.5), 6.0)
 	_board.draw_polyline(pts, Color(1, 1, 1, 0.95), 3.0)
-	var end := Vector2(cells[cells.size() - 1])
-	_board.draw_polyline(_closed(_diamond(end, 0.15)), Color.WHITE, 3.0)
-	_board.draw_polyline(_closed(_diamond(end, 0.4)), Color(1, 1, 1, 0.6), 2.0)
+	var end: Vector2i = cells[cells.size() - 1]
+	_board.draw_polyline(_closed(_hex(end, 0.8)), Color.WHITE, 3.0)
+	_board.draw_polyline(_closed(_hex(end, 0.5)), Color(1, 1, 1, 0.6), 2.0)
 
 
-## 바닥 위에 선 입체 상자 (윗면, 왼쪽 면, 오른쪽 면)
-func _draw_prism(c: Vector2, inset: float, height: float, col: Color, footprint := Vector2.ONE) -> void:
-	var base := _diamond_rect(c, footprint, inset)
+## 바닥 위에 선 육각 기둥. 스프라이트가 없을 때 쓴다.
+func _draw_prism(ground: Vector2, scale: float, height: float, col: Color) -> void:
+	var base := _hex_at(ground, scale)
 	var top := PackedVector2Array()
 	for p in base:
 		top.append(p - Vector2(0, height))
-	# base: 위, 오른쪽, 아래, 왼쪽
-	_board.draw_colored_polygon(PackedVector2Array([base[3], base[2], top[2], top[3]]), col.darkened(0.35))
-	_board.draw_colored_polygon(PackedVector2Array([base[2], base[1], top[1], top[2]]), col.darkened(0.15))
+	# 아래를 향한 면 (꼭짓점 0-1, 1-2, 2-3, 3-4)
+	var shades := [0.15, 0.25, 0.35, 0.45]
+	for i in 4:
+		_board.draw_colored_polygon(PackedVector2Array([base[i], base[i + 1], top[i + 1], top[i]]), col.darkened(shades[i]))
 	_board.draw_colored_polygon(top, col.lightened(0.12))
 	_board.draw_polyline(_closed(top), Color(0, 0, 0, 0.5), 1.0)
-	_board.draw_line(base[2], top[2], Color(0, 0, 0, 0.4), 1.0)
-
-
-func _diamond_rect(c: Vector2, footprint: Vector2, inset: float) -> PackedVector2Array:
-	var i := inset / 2
-	var a := iso(c + Vector2(i, i))
-	var r := iso(c + Vector2(footprint.x - i, i))
-	var b := iso(c + Vector2(footprint.x - i, footprint.y - i))
-	var l := iso(c + Vector2(i, footprint.y - i))
-	return PackedVector2Array([a, r, b, l])
 
 
 func _draw_tile_object(c: Vector2i, t: int) -> void:
@@ -711,15 +705,15 @@ func _draw_tile_object(c: Vector2i, t: int) -> void:
 	var prop: String = "barrel" if t == Battle.Tile.BARREL else names[(c.x * 3 + c.y * 5) % names.size()]
 	var tex := _tex(PROP_SPRITE % prop)
 	if tex:
-		_draw_sprite(tex, tile_center(Vector2(c)), PROP_WIDTHS[prop], (c.x + c.y) % 2 == 1)
+		_draw_sprite(tex, tile_center(c), PROP_WIDTHS[prop], (c.x + c.y) % 2 == 1)
 		return
 	match t:
 		Battle.Tile.HALF:
-			_draw_prism(Vector2(c), 0.2, HALF_H, COL_HALF)
+			_draw_prism(tile_center(c), 0.75, HALF_H, COL_HALF)
 		Battle.Tile.FULL:
-			_draw_prism(Vector2(c), 0.08, FULL_H, COL_FULL)
+			_draw_prism(tile_center(c), 0.9, FULL_H, COL_FULL)
 		Battle.Tile.BARREL:
-			var ctr := tile_center(Vector2(c))
+			var ctr := tile_center(c)
 			_board.draw_rect(Rect2(ctr + Vector2(-8, -20), Vector2(16, 20)), COL_BARREL)
 			_board.draw_rect(Rect2(ctr + Vector2(-8, -12), Vector2(16, 3)), Color(0.95, 0.8, 0.2))
 			_board.draw_circle(ctr + Vector2(0, -20), 8, COL_BARREL.lightened(0.2))
@@ -727,13 +721,12 @@ func _draw_tile_object(c: Vector2i, t: int) -> void:
 
 func _draw_car() -> void:
 	var tex := _tex(PROP_SPRITE % "car")
-	var c0 := Vector2(battle.car_cells[0])
-	var ground := tile_center(c0 + Vector2(0.5, 0.5))
+	var ground := _car_ground()
 	if tex:
-		_draw_sprite(tex, ground + Vector2(0, TH * 0.5), PROP_WIDTHS.car, false)
+		_draw_sprite(tex, ground + Vector2(0, R * 0.6), PROP_WIDTHS.car, true)
 	else:
-		_draw_prism(c0, 0.12, 22, COL_CAR, Vector2(2, 2))
-		_draw_prism(c0 + Vector2(0.15, 0.15), 0.5, 36, COL_CAR.darkened(0.15), Vector2(0.9, 1.7))
+		_draw_prism(ground, 1.7, 22, COL_CAR)
+		_draw_prism(ground + Vector2(-6, -4), 0.9, 38, COL_CAR.darkened(0.15))
 	if not battle.damaged_parts.is_empty():
 		_label_at("파손", ground + Vector2(0, -56), Color(1, 0.45, 0.35))
 
