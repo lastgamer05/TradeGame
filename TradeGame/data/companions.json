@@ -1,0 +1,89 @@
+[
+	{
+		"id": "ian",
+		"name": "이안",
+		"npc": "ian",
+		"origin": "victor",
+		"combat": {
+			"hp": 14,
+			"focus": 3,
+			"might": 1,
+			"weapon": "pistol"
+		},
+		"bonus_stat": "tech",
+		"bonus": 2,
+		"leave_if": [
+			{
+				"type": "reputation",
+				"city": "helios",
+				"min": 60
+			}
+		],
+		"leave_text": "헬리오스 사람들이 당신을 너무 반긴다. 여기 있으면 결국 붙잡힐 거야. 미안해."
+	},
+	{
+		"id": "piece",
+		"name": "피스",
+		"npc": "piece",
+		"origin": "rebel",
+		"combat": {
+			"hp": 12,
+			"focus": 3,
+			"might": 1,
+			"weapon": "pistol"
+		},
+		"bonus_stat": "tech",
+		"bonus": 2,
+		"leave_if": [
+			{
+				"type": "faction_reputation",
+				"faction": "victor",
+				"min": 50
+			}
+		],
+		"leave_text": "헬리오스 개가 됐구나. 네 운행 기록은 이미 노바에게 넘겼어."
+	},
+	{
+		"id": "morae",
+		"name": "모래",
+		"npc": "morae",
+		"origin": "displaced",
+		"combat": {
+			"hp": 16,
+			"focus": 2,
+			"might": 2,
+			"weapon": "rifle"
+		},
+		"bonus_stat": "survival",
+		"bonus": 2,
+		"leave_if": [
+			{
+				"type": "faction_reputation",
+				"faction": "displaced",
+				"max": -30
+			}
+		],
+		"leave_text": "밀려난 사람들 등골을 빼먹는 운반꾼이랑은 못 다녀."
+	},
+	{
+		"id": "han",
+		"name": "한",
+		"npc": "han",
+		"origin": "lawless",
+		"combat": {
+			"hp": 18,
+			"focus": 2,
+			"might": 3,
+			"weapon": "shotgun"
+		},
+		"bonus_stat": "might",
+		"bonus": 2,
+		"leave_if": [
+			{
+				"type": "power",
+				"max": 30
+			}
+		],
+		"leave_text": "보수 못 줄 거면 여기까지야. 나쁘게 생각하지 마."
+	}
+]

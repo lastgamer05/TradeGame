@@ -31,6 +31,19 @@ var pending_news: Array = []
 var vehicle_damage: Dictionary = {}
 ## 이벤트가 시작시킨 전투 encounter id. 화면이 전투를 띄우고 비운다.
 var pending_combat: String = ""
+## --- 도시 탐방 (docs/city_spec.md 4절). 틀만 있고 엔진 담당이 채운다 ---
+## 지금 있는 구역, 도시 허브면 ""
+var location: String = ""
+## 태운 동료 id
+var companion: String = ""
+## 동료 id -> 신뢰
+var trust: Dictionary = {}
+## 의뢰 id -> "active" | "done"
+var quests: Dictionary = {}
+## 도시 id -> true (첫 도착 대화용)
+var visited_cities: Dictionary = {}
+## 주인공 이름 (대화의 {player})
+var player_name: String = "운반꾼"
 ## 도시 id -> 평판으로 바뀌기 전 누적된 거래 실적
 var _rep_progress: Dictionary = {}
 
@@ -322,3 +335,28 @@ func apply_battle(b: Battle) -> Array:
 			lines.append("정신을 잃었다. %d일 뒤 %s에서 깨어났다." % [int(pen.days), data.cities[city].name])
 			lines.append("화물 %d개, 전력 %d셀을 빼앗겼다." % [lost, pl])
 	return lines
+
+
+# --- 도시 탐방 (틀) ---
+
+func enter_location(location_id: String) -> void:
+	location = location_id
+
+
+func leave_location() -> void:
+	location = ""
+
+
+## 지금 도시의 구역 목록 (데이터 순서)
+func locations_here() -> Array:
+	return data.locations.values().filter(func(l): return l.city == city)
+
+
+## 그 구역에 지금 나타나는 NPC. 조건(requires)은 엔진 담당이 확인하게 만든다.
+func npc_at(location_id: String) -> Dictionary:
+	var loc: Dictionary = data.locations.get(location_id, {})
+	return data.npcs.get(loc.get("npc", ""), {})
+
+
+func quest_ready(quest_id: String) -> bool:
+	return false

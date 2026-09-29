@@ -1,0 +1,57 @@
+{
+	"id": "ration_clerk",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "ration_clerk",
+			"text": "배급표 없으면 줄 서지 마. 운반꾼이면 저쪽 거래 창구로 가고.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_ration_clerk"
+				}
+			],
+			"choices": [
+				{
+					"text": "요즘 시장은 어때?",
+					"next": "market"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"market": {
+			"speaker": "ration_clerk",
+			"text": "억제제는 늘 모자라고, 식량은 그린하우스 기분에 달렸지. 식량 싣고 오면 값은 쳐준다.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "ration_clerk",
+			"text": "또 왔나. 오늘은 뭘 싣고 왔지?",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_ration_clerk"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

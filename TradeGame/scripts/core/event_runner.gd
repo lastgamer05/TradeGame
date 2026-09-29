@@ -20,6 +20,16 @@ static func pick_city_event(state: GameState) -> Dictionary:
 		return t.get("on") == "city" and state.city in t.get("cities", []))
 
 
+## 도시 도착 (docs/city_spec.md 2.6). 틀: 엔진 담당이 확률과 조건을 채운다.
+static func pick_arrival_event(state: GameState) -> Dictionary:
+	return pick_city_event(state)
+
+
+## 구역에 들어갈 때 (docs/city_spec.md 2.6). 틀: 엔진 담당이 채운다.
+static func pick_location_event(state: GameState, location_id: String) -> Dictionary:
+	return {}
+
+
 static func _pick(state: GameState, match_trigger: Callable) -> Dictionary:
 	var pool := []
 	var total := 0

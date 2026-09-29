@@ -1,0 +1,322 @@
+[
+	{
+		"id": "ration_clerk",
+		"name": "배급관 오르",
+		"city": "helios",
+		"location": "helios_market",
+		"role": "시장 관리인",
+		"faction": "victor",
+		"dialogue": "ration_clerk",
+		"companion": ""
+	},
+	{
+		"id": "aurel_beck",
+		"name": "아우렐 벡",
+		"city": "helios",
+		"location": "helios_hq",
+		"role": "전력청장 (세력 대표)",
+		"faction": "victor",
+		"dialogue": "aurel_beck",
+		"companion": ""
+	},
+	{
+		"id": "sergeant_kade",
+		"name": "케이드 하사",
+		"city": "helios",
+		"location": "helios_plaza",
+		"role": "검문소 책임자",
+		"faction": "victor",
+		"dialogue": "sergeant_kade",
+		"companion": ""
+	},
+	{
+		"id": "lina",
+		"name": "리나",
+		"city": "helios",
+		"location": "helios_outskirts",
+		"role": "배급에서 밀려난 주민",
+		"faction": "victor",
+		"dialogue": "lina",
+		"companion": ""
+	},
+	{
+		"id": "quartermaster_ro",
+		"name": "로 보급관",
+		"city": "gate7",
+		"location": "gate7_market",
+		"role": "",
+		"faction": "victor",
+		"dialogue": "quartermaster_ro",
+		"companion": ""
+	},
+	{
+		"id": "mechanic_juno",
+		"name": "정비사 주노",
+		"city": "gate7",
+		"location": "gate7_garage",
+		"role": "",
+		"faction": "victor",
+		"dialogue": "mechanic_juno",
+		"companion": ""
+	},
+	{
+		"id": "cook_bram",
+		"name": "취사병 브람",
+		"city": "gate7",
+		"location": "gate7_canteen",
+		"role": "",
+		"faction": "victor",
+		"dialogue": "cook_bram",
+		"companion": ""
+	},
+	{
+		"id": "commander_voss",
+		"name": "보스 지휘관 (보조 인물)",
+		"city": "gate7",
+		"location": "gate7_command",
+		"role": "",
+		"faction": "victor",
+		"dialogue": "commander_voss",
+		"companion": ""
+	},
+	{
+		"id": "dealer_vex",
+		"name": "암거래상 벡스",
+		"city": "undergrid",
+		"location": "undergrid_market",
+		"role": "",
+		"faction": "rebel",
+		"dialogue": "dealer_vex",
+		"companion": ""
+	},
+	{
+		"id": "nova",
+		"name": "노바",
+		"city": "undergrid",
+		"location": "undergrid_ops",
+		"role": "반란 지도자 (세력 대표)",
+		"faction": "rebel",
+		"dialogue": "nova",
+		"companion": ""
+	},
+	{
+		"id": "piece",
+		"name": "피스",
+		"city": "undergrid",
+		"location": "undergrid_den",
+		"role": "해커 (동료 후보)",
+		"faction": "rebel",
+		"dialogue": "piece",
+		"companion": "piece"
+	},
+	{
+		"id": "foreman_dal",
+		"name": "달 공장장",
+		"city": "undergrid",
+		"location": "undergrid_factory",
+		"role": "",
+		"faction": "rebel",
+		"dialogue": "foreman_dal",
+		"companion": ""
+	},
+	{
+		"id": "ammo_trader_sol",
+		"name": "탄약상 솔",
+		"city": "red_mesa",
+		"location": "red_mesa_market",
+		"role": "",
+		"faction": "rebel",
+		"dialogue": "ammo_trader_sol",
+		"companion": ""
+	},
+	{
+		"id": "han",
+		"name": "한",
+		"city": "red_mesa",
+		"location": "red_mesa_camp",
+		"role": "용병 (동료 후보)",
+		"faction": "rebel",
+		"dialogue": "han",
+		"companion": "han"
+	},
+	{
+		"id": "keeper_wen",
+		"name": "물지기 웬",
+		"city": "red_mesa",
+		"location": "red_mesa_cistern",
+		"role": "",
+		"faction": "rebel",
+		"dialogue": "keeper_wen",
+		"companion": ""
+	},
+	{
+		"id": "elder_tarr",
+		"name": "타르 원로 (보조 인물)",
+		"city": "red_mesa",
+		"location": "red_mesa_hall",
+		"role": "",
+		"faction": "rebel",
+		"dialogue": "elder_tarr",
+		"companion": ""
+	},
+	{
+		"id": "scrap_trader_pim",
+		"name": "고물상 핌",
+		"city": "rustbelt",
+		"location": "rustbelt_market",
+		"role": "",
+		"faction": "displaced",
+		"dialogue": "scrap_trader_pim",
+		"companion": ""
+	},
+	{
+		"id": "gale",
+		"name": "게일",
+		"city": "rustbelt",
+		"location": "rustbelt_guild",
+		"role": "조합장 (세력 대표)",
+		"faction": "displaced",
+		"dialogue": "gale",
+		"companion": ""
+	},
+	{
+		"id": "morae",
+		"name": "모래",
+		"city": "rustbelt",
+		"location": "rustbelt_shanty",
+		"role": "고물꾼 (동료 후보)",
+		"faction": "displaced",
+		"dialogue": "morae",
+		"companion": "morae"
+	},
+	{
+		"id": "crane_mechanic_ivo",
+		"name": "정비공 이보",
+		"city": "rustbelt",
+		"location": "rustbelt_crane",
+		"role": "",
+		"faction": "displaced",
+		"dialogue": "crane_mechanic_ivo",
+		"companion": ""
+	},
+	{
+		"id": "produce_trader_mei",
+		"name": "창고지기 메이",
+		"city": "greenhouse",
+		"location": "greenhouse_market",
+		"role": "",
+		"faction": "displaced",
+		"dialogue": "produce_trader_mei",
+		"companion": ""
+	},
+	{
+		"id": "soha",
+		"name": "소하",
+		"city": "greenhouse",
+		"location": "greenhouse_elder",
+		"role": "원로 (세력 대표)",
+		"faction": "displaced",
+		"dialogue": "soha",
+		"companion": ""
+	},
+	{
+		"id": "ian",
+		"name": "이안",
+		"city": "greenhouse",
+		"location": "greenhouse_tower",
+		"role": "떠돌이 기술자 (동료 후보)",
+		"faction": "displaced",
+		"dialogue": "ian",
+		"companion": "ian"
+	},
+	{
+		"id": "farmhand_tuk",
+		"name": "일꾼 턱",
+		"city": "greenhouse",
+		"location": "greenhouse_bunk",
+		"role": "",
+		"faction": "displaced",
+		"dialogue": "farmhand_tuk",
+		"companion": ""
+	},
+	{
+		"id": "bazaar_trader_ada",
+		"name": "상인 아다",
+		"city": "swapmeet",
+		"location": "swapmeet_bazaar",
+		"role": "",
+		"faction": "neutral",
+		"dialogue": "bazaar_trader_ada",
+		"companion": ""
+	},
+	{
+		"id": "meter",
+		"name": "미터",
+		"city": "swapmeet",
+		"location": "swapmeet_booth",
+		"role": "정보상 (세력 대표, 중립)",
+		"faction": "neutral",
+		"dialogue": "meter",
+		"companion": ""
+	},
+	{
+		"id": "innkeeper_moss",
+		"name": "여관 주인 모스",
+		"city": "swapmeet",
+		"location": "swapmeet_inn",
+		"role": "",
+		"faction": "neutral",
+		"dialogue": "innkeeper_moss",
+		"companion": ""
+	},
+	{
+		"id": "auctioneer_fin",
+		"name": "경매인 핀",
+		"city": "swapmeet",
+		"location": "swapmeet_auction",
+		"role": "",
+		"faction": "neutral",
+		"dialogue": "auctioneer_fin",
+		"companion": ""
+	},
+	{
+		"id": "fence_rook",
+		"name": "장물아비 룩",
+		"city": "scrapyard",
+		"location": "scrapyard_market",
+		"role": "",
+		"faction": "lawless",
+		"dialogue": "fence_rook",
+		"companion": ""
+	},
+	{
+		"id": "crank",
+		"name": "크랭크",
+		"city": "scrapyard",
+		"location": "scrapyard_fort",
+		"role": "약탈자 두목 (세력 대표)",
+		"faction": "lawless",
+		"dialogue": "crank",
+		"companion": ""
+	},
+	{
+		"id": "arena_master_gus",
+		"name": "투기장 주인 거스",
+		"city": "scrapyard",
+		"location": "scrapyard_arena",
+		"role": "",
+		"faction": "lawless",
+		"dialogue": "arena_master_gus",
+		"companion": ""
+	},
+	{
+		"id": "scavenger_nim",
+		"name": "넝마주이 님",
+		"city": "scrapyard",
+		"location": "scrapyard_graveyard",
+		"role": "",
+		"faction": "lawless",
+		"dialogue": "scavenger_nim",
+		"companion": ""
+	}
+]

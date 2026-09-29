@@ -1,0 +1,326 @@
+[
+	{
+		"id": "helios_market",
+		"city": "helios",
+		"kind": "market",
+		"name": "배급 시장",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "ration_clerk"
+	},
+	{
+		"id": "helios_hq",
+		"city": "helios",
+		"kind": "hq",
+		"name": "전력청",
+		"description": "",
+		"services": [],
+		"npc": "aurel_beck"
+	},
+	{
+		"id": "helios_plaza",
+		"city": "helios",
+		"kind": "plaza",
+		"name": "검문 광장",
+		"description": "",
+		"services": [
+			"rumors"
+		],
+		"npc": "sergeant_kade"
+	},
+	{
+		"id": "helios_outskirts",
+		"city": "helios",
+		"kind": "slum",
+		"name": "성벽 밖 판자촌",
+		"description": "",
+		"services": [],
+		"npc": "lina"
+	},
+	{
+		"id": "gate7_market",
+		"city": "gate7",
+		"kind": "market",
+		"name": "보급창",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "quartermaster_ro"
+	},
+	{
+		"id": "gate7_garage",
+		"city": "gate7",
+		"kind": "workshop",
+		"name": "정비고",
+		"description": "",
+		"services": [
+			"repair"
+		],
+		"npc": "mechanic_juno"
+	},
+	{
+		"id": "gate7_canteen",
+		"city": "gate7",
+		"kind": "tavern",
+		"name": "막사 식당",
+		"description": "",
+		"services": [
+			"rumors"
+		],
+		"npc": "cook_bram"
+	},
+	{
+		"id": "gate7_command",
+		"city": "gate7",
+		"kind": "hq",
+		"name": "지휘소",
+		"description": "",
+		"services": [],
+		"npc": "commander_voss"
+	},
+	{
+		"id": "undergrid_market",
+		"city": "undergrid",
+		"kind": "market",
+		"name": "암시장",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "dealer_vex"
+	},
+	{
+		"id": "undergrid_ops",
+		"city": "undergrid",
+		"kind": "hq",
+		"name": "작전실",
+		"description": "",
+		"services": [],
+		"npc": "nova"
+	},
+	{
+		"id": "undergrid_den",
+		"city": "undergrid",
+		"kind": "tavern",
+		"name": "해커 소굴",
+		"description": "",
+		"services": [
+			"rumors"
+		],
+		"npc": "piece"
+	},
+	{
+		"id": "undergrid_factory",
+		"city": "undergrid",
+		"kind": "workshop",
+		"name": "조립 공장",
+		"description": "",
+		"services": [
+			"repair"
+		],
+		"npc": "foreman_dal"
+	},
+	{
+		"id": "red_mesa_market",
+		"city": "red_mesa",
+		"kind": "market",
+		"name": "탄약 교역소",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "ammo_trader_sol"
+	},
+	{
+		"id": "red_mesa_camp",
+		"city": "red_mesa",
+		"kind": "tavern",
+		"name": "용병 모닥불",
+		"description": "",
+		"services": [
+			"recruit"
+		],
+		"npc": "han"
+	},
+	{
+		"id": "red_mesa_cistern",
+		"city": "red_mesa",
+		"kind": "special",
+		"name": "절벽 저수조",
+		"description": "",
+		"services": [],
+		"npc": "keeper_wen"
+	},
+	{
+		"id": "red_mesa_hall",
+		"city": "red_mesa",
+		"kind": "hq",
+		"name": "원로 회당",
+		"description": "",
+		"services": [],
+		"npc": "elder_tarr"
+	},
+	{
+		"id": "rustbelt_market",
+		"city": "rustbelt",
+		"kind": "market",
+		"name": "고물 장터",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "scrap_trader_pim"
+	},
+	{
+		"id": "rustbelt_guild",
+		"city": "rustbelt",
+		"kind": "hq",
+		"name": "고물상 조합",
+		"description": "",
+		"services": [],
+		"npc": "gale"
+	},
+	{
+		"id": "rustbelt_shanty",
+		"city": "rustbelt",
+		"kind": "slum",
+		"name": "판자촌",
+		"description": "",
+		"services": [],
+		"npc": "morae"
+	},
+	{
+		"id": "rustbelt_crane",
+		"city": "rustbelt",
+		"kind": "workshop",
+		"name": "크레인 정비소",
+		"description": "",
+		"services": [
+			"repair"
+		],
+		"npc": "crane_mechanic_ivo"
+	},
+	{
+		"id": "greenhouse_market",
+		"city": "greenhouse",
+		"kind": "market",
+		"name": "수확물 창고",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "produce_trader_mei"
+	},
+	{
+		"id": "greenhouse_elder",
+		"city": "greenhouse",
+		"kind": "hq",
+		"name": "원로의 온실",
+		"description": "",
+		"services": [],
+		"npc": "soha"
+	},
+	{
+		"id": "greenhouse_tower",
+		"city": "greenhouse",
+		"kind": "special",
+		"name": "정수탑",
+		"description": "",
+		"services": [],
+		"npc": "ian"
+	},
+	{
+		"id": "greenhouse_bunk",
+		"city": "greenhouse",
+		"kind": "tavern",
+		"name": "농부 숙소",
+		"description": "",
+		"services": [
+			"rumors"
+		],
+		"npc": "farmhand_tuk"
+	},
+	{
+		"id": "swapmeet_bazaar",
+		"city": "swapmeet",
+		"kind": "market",
+		"name": "대시장",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "bazaar_trader_ada"
+	},
+	{
+		"id": "swapmeet_booth",
+		"city": "swapmeet",
+		"kind": "hq",
+		"name": "정보 부스",
+		"description": "",
+		"services": [
+			"rumors"
+		],
+		"npc": "meter"
+	},
+	{
+		"id": "swapmeet_inn",
+		"city": "swapmeet",
+		"kind": "tavern",
+		"name": "운반꾼 여관",
+		"description": "",
+		"services": [
+			"recruit"
+		],
+		"npc": "innkeeper_moss"
+	},
+	{
+		"id": "swapmeet_auction",
+		"city": "swapmeet",
+		"kind": "special",
+		"name": "주차장 경매",
+		"description": "",
+		"services": [],
+		"npc": "auctioneer_fin"
+	},
+	{
+		"id": "scrapyard_market",
+		"city": "scrapyard",
+		"kind": "market",
+		"name": "장물 시장",
+		"description": "",
+		"services": [
+			"trade"
+		],
+		"npc": "fence_rook"
+	},
+	{
+		"id": "scrapyard_fort",
+		"city": "scrapyard",
+		"kind": "hq",
+		"name": "크랭크의 요새",
+		"description": "",
+		"services": [],
+		"npc": "crank"
+	},
+	{
+		"id": "scrapyard_arena",
+		"city": "scrapyard",
+		"kind": "special",
+		"name": "투기장",
+		"description": "",
+		"services": [],
+		"npc": "arena_master_gus"
+	},
+	{
+		"id": "scrapyard_graveyard",
+		"city": "scrapyard",
+		"kind": "special",
+		"name": "전쟁 기계 무덤",
+		"description": "",
+		"services": [],
+		"npc": "scavenger_nim"
+	}
+]

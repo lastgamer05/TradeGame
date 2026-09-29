@@ -12,6 +12,11 @@ var events: Dictionary = {}
 var economy: Dictionary = {}
 var politics: Dictionary = {}
 var combat: Dictionary = {}
+var locations: Dictionary = {}
+var npcs: Dictionary = {}
+var companions: Dictionary = {}
+var quests: Dictionary = {}
+var dialogues: Dictionary = {}
 ## 도시 간 도로. { a, b, road, days }
 var routes: Array = []
 ## 도시 id -> Vector2 (0~100 지도 좌표)
@@ -39,6 +44,16 @@ func load_all() -> void:
 	politics = pol if pol is Dictionary else {}
 	var cmb = _read_json(DATA_DIR + "/combat.json")
 	combat = cmb if cmb is Dictionary else {}
+	locations = _index(_read_json(DATA_DIR + "/locations.json"), "locations")
+	npcs = _index(_read_json(DATA_DIR + "/npcs.json"), "npcs")
+	companions = _index(_read_json(DATA_DIR + "/companions.json"), "companions")
+	quests = _index(_read_json(DATA_DIR + "/quests.json"), "quests")
+	dialogues = {}
+	for file in DirAccess.get_files_at(DATA_DIR + "/dialogues"):
+		if file.ends_with(".json"):
+			var dlg = _read_json(DATA_DIR + "/dialogues/" + file)
+			if dlg is Dictionary and dlg.has("id"):
+				dialogues[dlg.id] = dlg
 	var map = _read_json(DATA_DIR + "/routes.json")
 	routes = map.get("routes", []) if map is Dictionary else []
 	positions = {}
