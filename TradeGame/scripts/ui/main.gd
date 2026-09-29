@@ -36,6 +36,8 @@ var _battle_view: Control
 
 
 func _ready() -> void:
+	# 모든 그림을 절반 해상도로 만들어 2배로 보여 준다. 흐려지지 않게 최근접 필터.
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	theme = PixelTheme.build()
 	_build_layout()
 	_new_game()
@@ -309,7 +311,7 @@ func _build_top_bar() -> Control:
 func _icon_stat(parent: Control, icon: String) -> Label:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
-	box.add_child(_icon(UI_ICON % icon, Vector2(32, 32)))
+	box.add_child(_icon(UI_ICON % icon, Vector2(36, 36)))
 	var l := Label.new()
 	box.add_child(l)
 	parent.add_child(box)
