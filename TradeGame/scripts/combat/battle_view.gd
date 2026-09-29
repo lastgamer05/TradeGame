@@ -1,35 +1,36 @@
 extends Control
-## 정육각형 타일 전투 화면 (pointy-top). 규칙은 Battle이 처리하고, 이 화면은 Battle.events를
+## 정육각형 타일 전투 화면 (pointy-top). 픽셀 퍼펙트: 전장은 640x360 SubViewport에 1:1로 그리고
+## 화면에는 정확히 2배로 확대해 보여 준다. 스프라이트는 art_src/pixelize.py로 원래 픽셀 크기에 맞춰 둔다. 규칙은 Battle이 처리하고, 이 화면은 Battle.events를
 ## 차례대로 애니메이션으로 재생한다. 스프라이트가 없으면 입체 도형으로 대신 그린다.
 ## 조작: 내 유닛 클릭 = 선택, 파란 칸 = 이동, 적 = 공격, 우클릭 = 취소
 ## 단축키: 1 숨기, 2 경계, 3 수류탄, 4 탑승, 5 항복 요구, Space 턴 종료, Tab 다음 유닛, F 빠르게
 
 signal finished(battle: Battle)
 
-const R := 26.0  # 육각형 외접원 반지름. 칸 폭 = sqrt(3) * R
+const R := 13.0  # 육각형 외접원 반지름. 칸 폭 = sqrt(3) * R
 ## 세로 눌림 비율. 1.0 = 위에서 내려다본 정육각형, 1보다 작으면 비스듬히 본 시점.
 const TILT := 0.58
 ## 전장 회전 (도). 0 = 왼쪽→오른쪽 가로 배치, 음수면 오른쪽 위로 기운 대각선 배치.
 const ROT_DEG := -30.0
-const TH := 20.0  # 스프라이트 발밑 보정용
-const HALF_H := 12.0
-const FULL_H := 30.0
-const UNIT_H := 56.0
+const PX := 2  # 화면 픽셀 / 그림 픽셀
+const VIEW := Vector2(640, 360)
+const TH := 10.0  # 스프라이트 발밑 보정용
+const HALF_H := 6.0
+const FULL_H := 15.0
+const UNIT_H := 30.0
 const UNIT_SPRITE := "res://assets/combat/units/%s.png"
 const PROP_SPRITE := "res://assets/combat/props/%s.png"
 const GROUND := "res://assets/combat/ground/%s.png"
 ## 좌우로 뒤집어도 되는 소품. 줄로 늘어서는 소품은 뒤집으면 긴 축이 어긋난다.
 const FLIPPABLE := ["crates", "tires", "rubble", "scrap", "rocks", "boulder", "barrel"]
-## 스프라이트 표시 크기 (px). 유닛은 키, 소품은 폭 기준.
-const UNIT_HEIGHTS := { "raider_brute": 66.0, "war_machine": 64.0 }
+## 스프라이트 원래 픽셀 크기 (art_src/pixelize.py에 넘기는 값). 화면은 텍스처를 1:1로 그린다.
+const UNIT_HEIGHTS := { "default": 32, "raider_brute": 35, "war_machine": 32 }
 const PROP_WIDTHS := {
-	"barrier": 50.0, "crates": 48.0, "sandbags": 52.0, "wall": 42.0, "wreck": 64.0,
-	"container": 50.0, "barrel": 20.0, "car": 118.0,
-	"rubble": 46.0, "tires": 32.0, "brick": 52.0, "scrap": 48.0, "boulder": 50.0, "rocks": 42.0,
-	"tank": 100.0, "bus": 108.0,
+	"barrier": 26, "crates": 24, "sandbags": 27, "wall": 22, "wreck": 32,
+	"container": 26, "barrel": 11, "car": 60,
+	"rubble": 23, "tires": 17, "brick": 26, "scrap": 24, "boulder": 26, "rocks": 21,
+	"tank": 50, "bus": 54,
 }
-## 두 칸짜리로 놓였을 때의 폭
-const LONG_WIDTHS := { "container": 88.0, "tank": 100.0, "bus": 108.0 }
 const RESULT_NAMES := { "victory": "승리", "surrender": "항복을 받아냈다", "escaped": "도주 성공", "wiped": "분대 전멸" }
 
 const FLOOR_COLORS := {
@@ -45,7 +46,7 @@ const COL_BARREL := Color(0.72, 0.22, 0.16)
 const COL_CAR := Color(0.55, 0.46, 0.32)
 const COL_PLAYER := Color(0.4, 0.85, 0.95)
 const COL_ENEMY := Color(0.92, 0.35, 0.3)
-const COL_REACH := Color(0.35, 0.6, 1.0, 0.28)
+const COL_REACH := Color(0.45, 0.75, 1.0, 0.16)
 const COL_ESCAPE := Color(0.3, 0.85, 0.4, 0.25)
 
 var battle: Battle
@@ -70,6 +71,8 @@ var _banner_t := 0.0
 var _tex_cache := {}
 
 var _board: Control
+var _glow: Control
+var _light_tex: Texture2D
 var _title: Label
 var _phase: Label
 var _log_label: Label
@@ -101,11 +104,44 @@ func _build_ui() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
+	# 전장: 저해상도 SubViewport에 그리고 정수배로 확대
+	var container := SubViewportContainer.new()
+	container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	container.stretch = true
+	container.stretch_shrink = PX
+	container.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	add_child(container)
+	var vp := SubViewport.new()
+	vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+	vp.snap_2d_transforms_to_pixel = true
+	vp.snap_2d_vertices_to_pixel = true
+	container.add_child(vp)
+	var mood := CanvasModulate.new()
+	mood.color = Color(0.9, 0.86, 0.94)
+	vp.add_child(mood)
 	_board = Control.new()
-	_board.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_board.size = VIEW
 	_board.draw.connect(_draw_board)
 	_board.gui_input.connect(_on_board_input)
-	add_child(_board)
+	vp.add_child(_board)
+	# 빛: 더하기 합성으로 불빛과 섬광을 얹는다
+	_light_tex = _radial(Color(1, 1, 1, 1), Color(1, 1, 1, 0))
+	_glow = Control.new()
+	_glow.size = VIEW
+	_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var add := CanvasItemMaterial.new()
+	add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	_glow.material = add
+	_glow.draw.connect(_draw_glow)
+	vp.add_child(_glow)
+	# 가장자리를 어둡게
+	var vignette := TextureRect.new()
+	vignette.texture = _radial(Color(0, 0, 0, 0), Color(0, 0, 0, 0.6), 0.55)
+	vignette.size = VIEW
+	vignette.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	vignette.stretch_mode = TextureRect.STRETCH_SCALE
+	vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vp.add_child(vignette)
 
 	# 왼쪽 위: 제목과 턴
 	var top := PanelContainer.new()
@@ -169,7 +205,7 @@ func _layout_origin() -> void:
 			var p := _project(Battle.to_plane(Vector2i(x, y)) * R)
 			min_p = min_p.min(p - Vector2(R, R * TILT))
 			max_p = max_p.max(p + Vector2(R, R * TILT))
-	var area := Rect2(0, 100, 1280, 720 - 100 - 136)
+	var area := Rect2(0, 50, VIEW.x, VIEW.y - 50 - 68)
 	origin = (area.get_center() - (min_p + max_p) / 2).round()
 
 
@@ -212,7 +248,7 @@ func _on_board_input(ev: InputEvent) -> void:
 		if c != hover:
 			hover = c
 			_refresh_info()
-			_board.queue_redraw()
+			_redraw()
 	elif ev is InputEventMouseButton and ev.pressed and not playing:
 		if ev.button_index == MOUSE_BUTTON_RIGHT:
 			mode = "normal"
@@ -398,7 +434,7 @@ func _anim_move(ev: Dictionary) -> void:
 		var id: String = ev.id
 		tw.tween_method(func(v: Vector2):
 			disp[id] = v
-			_board.queue_redraw(), a, b, 0.09 / speed)
+			_redraw(), a, b, 0.09 / speed)
 		await tw.finished
 
 
@@ -407,7 +443,7 @@ func _anim_shot(ev: Dictionary) -> void:
 	var to := _unit_chest(ev.to)
 	facing[ev.from] = 1 if to.x >= from.x else -1
 	if ev.melee:
-		var dir := (to - from).normalized() * 14
+		var dir := (to - from).normalized() * 7
 		lunge[ev.from] = dir
 		await _wait(0.12)
 		lunge.erase(ev.from)
@@ -445,7 +481,29 @@ func _process(delta: float) -> void:
 		_banner_t -= delta
 		dirty = true
 	if dirty or playing:
-		_board.queue_redraw()
+		_redraw()
+
+
+func _redraw() -> void:
+	_board.queue_redraw()
+	_glow.queue_redraw()
+
+
+## 원형 그라디언트 텍스처 (빛 번짐, 가장자리 어둡게)
+func _radial(inner: Color, outer: Color, start := 0.0) -> Texture2D:
+	var g := Gradient.new()
+	g.set_color(0, inner)
+	g.set_color(1, outer)
+	if start > 0:
+		g.add_point(start, inner)
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	t.width = 64
+	t.height = 64
+	return t
 
 
 func _unit_screen(id: String) -> Vector2:
@@ -457,7 +515,7 @@ func _unit_chest(id: String) -> Vector2:
 
 
 func _unit_head(id: String) -> Vector2:
-	return _unit_screen(id) + Vector2(0, -UNIT_H - 10)
+	return _unit_screen(id) + Vector2(0, -UNIT_H - 12)
 
 
 func _car_ground() -> Vector2:
@@ -468,7 +526,7 @@ func _car_ground() -> Vector2:
 
 
 func _car_center() -> Vector2:
-	return _car_ground() + Vector2(0, -20)
+	return _car_ground() + Vector2(0, -10)
 
 
 # --- HUD ---
@@ -488,7 +546,7 @@ func _refresh() -> void:
 	_set_button("end_turn", "계속" if battle.result != "" else "턴 종료 [Space]", not playing)
 	_refresh_squad()
 	_refresh_info()
-	_board.queue_redraw()
+	_redraw()
 
 
 func _set_button(id: String, text: String, enabled: bool) -> void:
@@ -598,21 +656,20 @@ func _draw_board() -> void:
 				_board.draw_colored_polygon(_hex(c, 0.88), COL_ESCAPE)
 			if reach.has(c):
 				_board.draw_colored_polygon(_hex(c, 0.88), COL_REACH)
-			_board.draw_polyline(_closed(poly), Color(0, 0, 0, 0.28), 1.0)
-			_board.draw_polyline(_closed(_hex(c, 0.97)), Color(1, 0.9, 0.7, 0.06), 1.0)
+			_board.draw_polyline(_closed(poly), Color(0, 0, 0, 0.22), 1.0)
 	# 공격 가능한 적 표시
 	if not sel.is_empty() and battle.can_act(sel) and not playing:
 		for e in battle.active_units("enemy"):
 			if battle.weapon_for(sel, e.pos) != "":
-				_board.draw_polyline(_closed(_hex(e.pos, 0.86)), Color(1, 0.4, 0.3, 0.9), 2.0)
+				_board.draw_polyline(_closed(_hex(e.pos, 0.86)), Color(1, 0.4, 0.3, 0.9), 1.0)
 	# 선택 유닛 발밑
 	if not sel.is_empty() and not disp_boarded.get(sel.id, false):
-		_board.draw_polyline(_closed(_hex_at(disp[sel.id], 0.9)), Color.WHITE, 2.0)
+		_board.draw_polyline(_closed(_hex_at(disp[sel.id], 0.9)), Color.WHITE, 1.0)
 	# 이동 경로 미리보기
 	if reach.has(hover):
 		_draw_path([sel.pos] + reach[hover])
 	elif battle._in_bounds(hover) and mode == "normal":
-		_board.draw_polyline(_closed(_hex(hover, 0.92)), Color(1, 1, 1, 0.35), 1.5)
+		_board.draw_polyline(_closed(_hex(hover, 0.92)), Color(1, 1, 1, 0.35), 1.0)
 	# 수류탄 범위
 	if mode == "grenade" and battle._in_bounds(hover) and not sel.is_empty():
 		var ok := Battle.hex_dist(sel.pos, hover) <= int(battle.cfg.grenade.range)
@@ -656,7 +713,7 @@ func _draw_board() -> void:
 			var b := _unit_chest(t.id)
 			if ch > 0:
 				_dashed(a, b, Color(1, 0.72, 0.32, 0.9))
-			_label_at("%d%%" % ch if ch > 0 else "불가", _unit_head(t.id) + Vector2(0, -20), PixelTheme.ACCENT, 24)
+			_label_at("%d%%" % ch if ch > 0 else "불가", _unit_head(t.id) + Vector2(0, -8), PixelTheme.ACCENT)
 
 	# 효과
 	var font := get_theme_default_font()
@@ -666,19 +723,45 @@ func _draw_board() -> void:
 			"tracer":
 				var head: Vector2 = f.from.lerp(f.to, clampf(k * 1.3, 0, 1))
 				var tail: Vector2 = f.from.lerp(f.to, clampf(k * 1.3 - 0.35, 0, 1))
-				_board.draw_line(tail, head, f.color, 3.0)
+				_board.draw_line(tail, head, f.color, 1.0)
 			"muzzle":
-				_board.draw_circle(f.pos, 7.0 * (1.0 - k), Color(1, 0.9, 0.5, 1.0 - k))
+				_board.draw_circle(f.pos, 3.0 * (1.0 - k), Color(1, 0.9, 0.5, 1.0 - k))
 			"explode":
 				_board.draw_circle(f.pos, f.r * (0.3 + 0.7 * k), Color(1, 0.55, 0.2, 0.7 * (1.0 - k)))
 				_board.draw_circle(f.pos, f.r * 0.5 * (0.3 + 0.7 * k), Color(1, 0.9, 0.5, 0.8 * (1.0 - k)))
 			"text":
-				_label_at(f.text, f.pos + Vector2(0, -26 * k), Color(f.color, 1.0 - maxf(0, k - 0.6) / 0.4), 24)
+				_label_at(f.text, (f.pos + Vector2(0, -13 * k)).round(), Color(f.color, 1.0 - maxf(0, k - 0.6) / 0.4))
 	if _banner_t > 0:
 		var a := clampf(_banner_t, 0, 1)
-		var y := 300.0
-		_board.draw_rect(Rect2(0, y - 34, 1280, 56), Color(0, 0, 0, 0.55 * a))
-		_board.draw_string(font, Vector2(0, y + 8), _banner, HORIZONTAL_ALIGNMENT_CENTER, 1280, 24, Color(PixelTheme.ACCENT, a))
+		var y := 150.0
+		_board.draw_rect(Rect2(0, y - 12, VIEW.x, 22), Color(0, 0, 0, 0.55 * a))
+		_board.draw_string(font, Vector2(0, y + 4), _banner, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x, 12, Color(PixelTheme.ACCENT, a))
+
+
+## 더하기 합성 층: 차 전조등, 폭발물 통의 붉은 빛, 총구 섬광과 폭발의 빛 번짐
+func _draw_glow() -> void:
+	if battle == null:
+		return
+	var car := _car_ground()
+	_light(car + Vector2(22, -4), 40, Color(1.0, 0.72, 0.4, 0.35))
+	for y in battle.h:
+		for x in battle.w:
+			if battle.tile(Vector2i(x, y)) == Battle.Tile.BARREL:
+				_light(tile_center(Vector2i(x, y)) + Vector2(0, -4), 22, Color(1.0, 0.35, 0.2, 0.3))
+	for f in _fx:
+		var k: float = f.t / f.dur
+		match f.kind:
+			"muzzle":
+				_light(f.pos, 26, Color(1, 0.8, 0.45, 0.8 * (1.0 - k)))
+			"explode":
+				_light(f.pos, f.r * 2.5, Color(1, 0.6, 0.3, 0.9 * (1.0 - k)))
+			"tracer":
+				var head: Vector2 = f.from.lerp(f.to, clampf(k * 1.3, 0, 1))
+				_light(head, 14, Color(f.color, 0.6))
+
+
+func _light(pos: Vector2, size: float, col: Color) -> void:
+	_glow.draw_texture_rect(_light_tex, Rect2(pos - Vector2(size, size * 0.6) / 2, Vector2(size, size * 0.6)), false, col)
 
 
 func _closed(pts: PackedVector2Array) -> PackedVector2Array:
@@ -691,15 +774,15 @@ func _label_at(text: String, pos: Vector2, col: Color, fsize := 12) -> void:
 	var font := get_theme_default_font()
 	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x
 	var p := (pos - Vector2(w / 2, 0)).round()
-	_board.draw_string(font, p + Vector2(2, 2), text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(0, 0, 0, col.a * 0.8))
+	_board.draw_string(font, p + Vector2(1, 1), text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(0, 0, 0, col.a * 0.8))
 	_board.draw_string(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, col)
 
 
 func _dashed(a: Vector2, b: Vector2, col: Color) -> void:
-	var n := int(a.distance_to(b) / 10)
+	var n := int(a.distance_to(b) / 4)
 	for i in n:
 		if i % 2 == 0:
-			_board.draw_line(a.lerp(b, float(i) / n), a.lerp(b, float(i + 1) / n), col, 2.0)
+			_board.draw_line(a.lerp(b, float(i) / n).round(), a.lerp(b, float(i + 1) / n).round(), col, 1.0)
 
 
 ## 이동 경로를 부드러운 곡선으로 그리고 도착 칸에 고리를 친다.
@@ -714,11 +797,11 @@ func _draw_path(cells: Array) -> void:
 			smooth.append(pts[i].lerp(pts[i + 1], 0.75))
 		smooth.append(pts[pts.size() - 1])
 		pts = smooth
-	_board.draw_polyline(pts, Color(0, 0, 0, 0.5), 6.0)
-	_board.draw_polyline(pts, Color(1, 1, 1, 0.95), 3.0)
+	_board.draw_polyline(pts, Color(0, 0, 0, 0.5), 3.0)
+	_board.draw_polyline(pts, Color(1, 1, 1, 0.95), 1.0)
 	var end: Vector2i = cells[cells.size() - 1]
-	_board.draw_polyline(_closed(_hex(end, 0.8)), Color.WHITE, 3.0)
-	_board.draw_polyline(_closed(_hex(end, 0.5)), Color(1, 1, 1, 0.6), 2.0)
+	_board.draw_polyline(_closed(_hex(end, 0.8)), Color.WHITE, 1.0)
+	_board.draw_polyline(_closed(_hex(end, 0.5)), Color(1, 1, 1, 0.6), 1.0)
 
 
 ## 바닥 위에 선 육각 기둥. 스프라이트가 없을 때 쓴다.
@@ -737,7 +820,7 @@ func _draw_prism(ground: Vector2, scale: float, height: float, col: Color) -> vo
 
 ## 화면을 꽉 채우도록 비율을 유지해 늘린 사각형
 func _cover_rect(tex_size: Vector2) -> Rect2:
-	var screen := Vector2(1280, 720)
+	var screen := VIEW
 	var s := maxf(screen.x / tex_size.x, screen.y / tex_size.y)
 	var sz := tex_size * s
 	return Rect2((screen - sz) / 2, sz)
@@ -752,11 +835,8 @@ func _draw_tile_object(c: Vector2i, t: int, info: Dictionary) -> void:
 		for pc in cells:
 			ground += tile_center(pc)
 		ground /= cells.size()
-		var width: float = LONG_WIDTHS.get(prop, PROP_WIDTHS.get(prop, 48.0)) if cells.size() > 1 else PROP_WIDTHS.get(prop, 48.0)
-		if prop in FLIPPABLE:
-			# 같은 소품이 반복돼 보이지 않게 칸마다 크기를 조금씩 다르게
-			width *= 0.85 + 0.3 * float((c.x * 37 + c.y * 71) % 10) / 9.0
-		_draw_sprite(tex, ground, width, prop in FLIPPABLE and (c.x + c.y) % 2 == 1)
+		_shadow(ground, tex.get_width() * 0.45)
+		_draw_sprite(tex, ground, prop in FLIPPABLE and (c.x + c.y) % 2 == 1)
 		return
 	match t:
 		Battle.Tile.HALF:
@@ -774,7 +854,8 @@ func _draw_car() -> void:
 	var tex := _tex(PROP_SPRITE % "car")
 	var ground := _car_ground()
 	if tex:
-		_draw_sprite(tex, ground + Vector2(0, R * 0.6), PROP_WIDTHS.car, true)
+		_shadow(ground, 26)
+		_draw_sprite(tex, ground + Vector2(0, R * 0.6), true)
 	else:
 		_draw_prism(ground, 1.7, 22, COL_CAR)
 		_draw_prism(ground + Vector2(-6, -4), 0.9, 38, COL_CAR.darkened(0.15))
@@ -782,61 +863,63 @@ func _draw_car() -> void:
 		_label_at("파손", ground + Vector2(0, -56), Color(1, 0.45, 0.35))
 
 
-## 텍스처를 발밑(아래 가운데)이 ground에 오도록 폭 기준으로 그린다.
-func _draw_sprite(tex: Texture2D, ground: Vector2, width: float, flip: bool, modulate := Color.WHITE) -> void:
-	var s := width / tex.get_width()
-	var sz := tex.get_size() * s
-	var rect := Rect2(ground - Vector2(sz.x / 2, sz.y - TH * 0.25), sz)
+## 텍스처를 원래 크기(1:1)로, 발밑(아래 가운데)이 ground에 오도록 정수 좌표에 그린다.
+func _draw_sprite(tex: Texture2D, ground: Vector2, flip: bool, modulate := Color.WHITE) -> void:
+	var sz := tex.get_size()
+	var rect := Rect2((ground - Vector2(floorf(sz.x / 2), sz.y - 2)).round(), sz)
 	if flip:
 		rect.size.x = -sz.x
 	_board.draw_texture_rect(tex, rect, false, modulate)
 
 
+## 발밑의 납작한 타원 그림자
+func _shadow(ground: Vector2, radius: float) -> void:
+	_board.draw_set_transform(ground.round(), 0, Vector2(1, 0.45))
+	_board.draw_circle(Vector2.ZERO, radius, Color(0.05, 0.03, 0.08, 0.45))
+	_board.draw_set_transform(Vector2.ZERO, 0, Vector2.ONE)
+
+
 func _draw_unit(u: Dictionary) -> void:
-	var ground := _unit_screen(u.id)
+	var ground := _unit_screen(u.id).round()
 	var down: bool = disp_down[u.id]
 	var col := COL_PLAYER if u.side == "player" else COL_ENEMY
 	var tint := Color(3, 3, 3) if flash.has(u.id) else (Color(0.45, 0.4, 0.4, 0.8) if down else Color.WHITE)
-	# 그림자
-	_board.draw_set_transform(ground, 0, Vector2(1, 0.5))
-	_board.draw_circle(Vector2.ZERO, 16, Color(0, 0, 0, 0.35))
-	_board.draw_set_transform(Vector2.ZERO, 0, Vector2.ONE)
 	var tex := _tex(UNIT_SPRITE % u.kind)
 	var big: bool = u.kind == "war_machine"
+	_shadow(ground, 11 if big else 7)
 	if tex:
-		var width: float = UNIT_HEIGHTS.get(u.kind, 60.0) / tex.get_height() * tex.get_width()
 		if down:
 			_board.draw_set_transform(ground, PI / 2 * facing[u.id], Vector2.ONE)
-			_draw_sprite(tex, Vector2.ZERO, width, facing[u.id] > 0, tint)
+			_draw_sprite(tex, Vector2.ZERO, facing[u.id] > 0, tint)
 			_board.draw_set_transform(Vector2.ZERO, 0, Vector2.ONE)
 		else:
-			_draw_sprite(tex, ground, width, facing[u.id] > 0, tint)
+			_draw_sprite(tex, ground, facing[u.id] > 0, tint)
 	else:
 		if down:
-			_board.draw_rect(Rect2(ground + Vector2(-14, -6), Vector2(28, 8)), col.darkened(0.6))
+			_board.draw_rect(Rect2(ground + Vector2(-7, -3), Vector2(14, 4)), col.darkened(0.6))
 		else:
-			var body := Rect2(ground + Vector2(-9, -UNIT_H * 0.72), Vector2(18, UNIT_H * 0.62))
+			var body := Rect2(ground + Vector2(-4, -UNIT_H * 0.72), Vector2(9, UNIT_H * 0.62))
 			if big:
-				body = Rect2(ground + Vector2(-20, -UNIT_H * 0.8), Vector2(40, UNIT_H * 0.7))
+				body = Rect2(ground + Vector2(-10, -UNIT_H * 0.8), Vector2(20, UNIT_H * 0.7))
 			_board.draw_rect(body, col.darkened(0.35) * tint)
-			_board.draw_rect(body.grow(-3), col * tint)
-			_board.draw_circle(ground + Vector2(0, -UNIT_H * 0.85), 8, col.lightened(0.3) * tint)
-			_board.draw_circle(ground + Vector2(4 * facing[u.id], -UNIT_H * 0.86), 2, Color(0.05, 0.05, 0.08))
+			_board.draw_rect(body.grow(-1), col * tint)
+			_board.draw_circle(ground + Vector2(0, -UNIT_H * 0.85), 4, col.lightened(0.3) * tint)
 	if down:
 		return
 	# 체력 막대와 상태
-	var top := ground + Vector2(0, -UNIT_H - (14 if big else 0))
-	var w := 36.0
+	var h: float = tex.get_height() if tex else UNIT_H
+	var top := ground + Vector2(0, -h - 3)
+	var w := 16.0
 	var hp_ratio: float = float(disp_hp[u.id]) / u.max_hp
-	_board.draw_rect(Rect2(top + Vector2(-w / 2 - 1, -1), Vector2(w + 2, 6)), Color(0, 0, 0, 0.8))
-	_board.draw_rect(Rect2(top + Vector2(-w / 2, 0), Vector2(w * hp_ratio, 4)), Color(0.45, 0.9, 0.45) if u.side == "player" else Color(0.95, 0.35, 0.3))
+	_board.draw_rect(Rect2(top + Vector2(-w / 2 - 1, -1), Vector2(w + 2, 4)), Color(0.05, 0.03, 0.08, 0.9))
+	_board.draw_rect(Rect2(top + Vector2(-w / 2, 0), Vector2(roundf(w * hp_ratio), 2)), Color(0.45, 0.9, 0.45) if u.side == "player" else Color(0.95, 0.35, 0.3))
 	var tags := []
 	if u.hidden:
 		tags.append("숨")
 	if u.overwatch:
 		tags.append("경")
 	if not tags.is_empty():
-		_label_at(" ".join(tags), top + Vector2(0, -8), PixelTheme.ACCENT)
+		_label_at(" ".join(tags), top + Vector2(0, -4), PixelTheme.ACCENT)
 	if u.side == "player" and u.ap > 0 and battle.result == "" and not playing:
 		for i in u.ap:
-			_board.draw_rect(Rect2(top + Vector2(-w / 2 + i * 8, 8), Vector2(5, 5)), Color(0.4, 0.85, 0.95))
+			_board.draw_rect(Rect2(top + Vector2(-w / 2 + i * 4, 4), Vector2(2, 2)), Color(0.4, 0.85, 0.95))

@@ -292,9 +292,13 @@ func test_battle_simulation() -> void:
 					b.attack(u, target)
 				else:
 					var moves := b.reachable(u)
+					# 가장 가까운 적 쪽으로 (구조물에 막혀도 우회하도록 거리 기준)
+					if b.active_units("enemy").is_empty():
+						break
+					var goal: Vector2i = b.active_units("enemy")[0].pos
 					var best: Vector2i = u.pos
 					for c in moves:
-						if c.x > best.x:
+						if Battle.hex_dist(c, goal) < Battle.hex_dist(best, goal):
 							best = c
 					b.move(u, best)
 					if u.ap > 0 and not b.active_units("enemy").is_empty():
