@@ -90,7 +90,8 @@ static func _requirement_met(state: GameState, r: Dictionary) -> bool:
 		"faction_reputation":
 			return _in_range(faction_reputation(state, r.faction), r)
 		"flag":
-			return state.flags.has(r.flag)
+			# set: false면 플래그가 없을 때 참
+			return state.flags.has(r.flag) == bool(r.get("set", true))
 		"crisis":
 			return state.politics.active.has(r.crisis) == bool(r.get("active", true))
 		"faction_share":

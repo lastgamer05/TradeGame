@@ -71,7 +71,7 @@
 	},
 	{
 		"id": "commander_voss",
-		"name": "보스 지휘관 (보조 인물)",
+		"name": "보스 지휘관",
 		"city": "gate7",
 		"location": "gate7_command",
 		"role": "게이트 7 지휘관",
@@ -151,7 +151,7 @@
 	},
 	{
 		"id": "elder_tarr",
-		"name": "타르 원로 (보조 인물)",
+		"name": "타르 원로",
 		"city": "red_mesa",
 		"location": "red_mesa_hall",
 		"role": "레드 메사 원로",

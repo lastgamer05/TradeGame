@@ -41,7 +41,9 @@
 - `scripts/core/politics.gd`, `data/politics.json`: 진영 세력과 정세 사건. 거래가 세력을 키우고, 점유율이 문턱을 넘으면 사건이 시작돼 시세 배율이 바뀐다.
 - `scripts/combat/battle.gd`, `data/combat.json`: 전투 규칙 (맵 생성, 이동, 시야, 엄폐, 명중, 적 AI, 차량 저격, 종료 조건). 전투 격자는 정육각형(pointy-top, odd-r 오프셋 좌표, 거리·시야는 큐브 좌표). `battle_view.gd`는 전투 화면으로, `Battle.events`(이동, 사격, 피해, 폭발 등)를 차례대로 애니메이션 재생한다. 스프라이트는 `assets/combat/`, 없으면 도형으로 그린다. 화면은 30도 회전·세로 0.58 눌림(`ROT_DEG`, `TILT`)이고, 장소별 바닥 그림(`assets/combat/ground/`)을 칸 안에만 밝게 비춘다. 장애물 풀은 `combat.json`의 `locations.*.props`. 바르코 스프라이트 시트는 `art_src/slice_sheet.py`로 자른다. `tests/balance_sim.gd`로 조우별 승률을 확인한다.
 - `scripts/core/event_runner.gd`: 이벤트 선택(이동 후 도로 종류, 도시 도착), 선택지 조건·비용 확인, d20 판정, 효과 적용. `start_combat` 효과는 전투를 띄우고, `vehicle_damage`는 차량 부위를 파손시킨다.
-- `scripts/ui/`, `scenes/main.tscn`: 교역 루프 프로토타입 화면. UI는 코드로 만든다.
+- 도시 탐방 규격(흐름, 데이터 형식, 인터페이스)은 `docs/city_spec.md`, 1막 이야기와 플래그 목록은 `docs/story.md`.
+- `scripts/ui/main.gd`: 화면 흐름 제어 (큰 지도 → 도착 → 도시 허브 → 구역, 모달 대기열: 정세 알림·동료 알림·전투·대화·이벤트). 화면별 스크립트는 `world_map_screen.gd`, `arrival_view.gd`, `city_hub_view.gd`, `location_view.gd`, `market_panel.gd`, 공용 도우미는 `ui_kit.gd`. UI는 코드로 만든다.
+- `scripts/core/dialogue_runner.gd`, `scripts/ui/dialogue_view.gd`: 대화 진행과 대화창. 데이터는 `data/dialogues/`, `data/npcs.json`, `data/locations.json`, `data/quests.json`, `data/companions.json`.
 - `data/routes.json`: 임시 지도 (도시 좌표, 도로). 월드맵 초안이 정해지면 교체한다.
 - `tests/run_tests.gd`: 헤드리스 테스트 실행기. 데이터를 고치면 테스트를 돌려 검증 오류가 없는지 확인한다.
 

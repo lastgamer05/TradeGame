@@ -84,7 +84,7 @@
 | `day` | `min`/`max` | 날짜 |
 | `power` | `min` | 전력 보유량 |
 
-기존: `cargo`, `module`, `reputation`, `faction_reputation`, `flag`.
+기존: `cargo`, `module`, `reputation`, `faction_reputation`, `flag`. `flag`는 `"set": false`를 주면 플래그가 없을 때 참이다.
 
 숫자 조건(`reputation`, `faction_reputation`, `faction_share`, `day`, `power`)은 모두 `min`과 `max`를 둘 다 받는다 (하나만 써도 된다).
 
