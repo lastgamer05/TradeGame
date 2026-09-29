@@ -1,0 +1,82 @@
+{
+	"id": "red_mesa_wall_smell",
+	"title": "성벽 냄새",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"red_mesa"
+		],
+		"requires": [
+			{
+				"type": "reputation",
+				"city": "helios",
+				"min": 20
+			}
+		],
+		"weight": 9
+	},
+	"text": "절벽 길 보초들이 총구를 들어 올린다. \"헬리오스가 널 반긴다더군. 성벽 냄새가 여기까지 난다.\"",
+	"choices": [
+		{
+			"id": "water",
+			"text": "물을 내밀며 인사한다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "water",
+					"amount": 3
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "보초가 물통을 받아 들고 총구를 내린다. \"물을 아는 놈이군.\"",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "talk",
+			"text": "헬리오스와는 거래만 한다고 한다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "보초가 코웃음을 치지만 길을 연다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "\"거래만? 그 거래로 우물이 막혔지.\" 원로가 부른다는 전갈이 온다.",
+					"effects": [
+						{
+							"type": "start_dialogue",
+							"dialogue": "elder_tarr"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "elder",
+			"text": "원로를 직접 만나겠다고 한다",
+			"outcomes": {
+				"success": {
+					"text": "보초가 턱으로 위쪽을 가리킨다.",
+					"effects": [
+						{
+							"type": "start_dialogue",
+							"dialogue": "elder_tarr"
+						}
+					]
+				}
+			}
+		}
+	]
+}

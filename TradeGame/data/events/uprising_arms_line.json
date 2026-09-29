@@ -1,0 +1,91 @@
+{
+	"id": "uprising_arms_line",
+	"title": "총열 라인",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"undergrid_factory"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "rebel_uprising",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "조립 공장 라인이 전부 총열을 찍는다. 달 공장장이 소리친다. \"금속! 금속 있는 사람!\"",
+	"choices": [
+		{
+			"id": "sell_metal",
+			"text": "금속을 넘긴다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "metal",
+					"amount": 4
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "달이 금속을 저울에 달지도 않고 셀을 내민다. 라인이 한 칸 더 돈다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 100
+						},
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 3
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "qc",
+			"text": "총열 검수를 거든다",
+			"check": {
+				"stat": "tech",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "불량 총열 한 무더기를 골라낸다. 달이 수고비를 준다. 이 총이 누구를 쏠지는 생각하지 않기로 한다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 20
+						},
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 2
+						}
+					]
+				},
+				"failure": {
+					"text": "검수대 앞에서 멍하니 서 있다가 비키라는 소리를 듣는다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "공장을 나선다",
+			"outcomes": {
+				"success": {
+					"text": "등 뒤로 프레스 소리가 심장 소리처럼 울린다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

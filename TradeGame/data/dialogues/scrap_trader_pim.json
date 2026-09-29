@@ -1,0 +1,253 @@
+{
+	"id": "scrap_trader_pim",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "scrap_trader_pim",
+			"text": "첫 손님 특가! 전력 스무 셀에 고물 한 무더기랑 칩 하나! 오늘만! …사실 매일 해.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_scrap_trader_pim"
+				}
+			],
+			"choices": [
+				{
+					"text": "[전력 20셀] 한 무더기 산다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 20
+						}
+					],
+					"next": "bundle",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						},
+						{
+							"type": "cargo_add",
+							"good": "chip_low",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"text": "요즘 뭐가 잘 팔려?",
+					"next": "hot"
+				},
+				{
+					"text": "[의약품 1개] 고물이랑 바꾸자",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 1
+						}
+					],
+					"next": "barter",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"bundle": {
+			"speaker": "scrap_trader_pim",
+			"text": "거래 성립! 언더그리드에 가져가 봐. 거기선 칩 한 장이 여기 두 장 값이야.",
+			"choices": [
+				{
+					"text": "요즘 뭐가 잘 팔려?",
+					"next": "hot"
+				},
+				{
+					"text": "[의약품 1개] 고물이랑 바꾸자",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 1
+						}
+					],
+					"next": "barter",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "scrap_trader_pim",
+			"text": "또 왔네! 셀이야, 물건이야?",
+			"choices": [
+				{
+					"text": "요즘 뭐가 잘 팔려?",
+					"next": "hot"
+				},
+				{
+					"text": "[의약품 1개] 고물이랑 바꾸자",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 1
+						}
+					],
+					"next": "barter",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "scrap_trader_pim",
+			"text": "약탈자들이 크레인 너머까지 왔어. 탄약 있으면 고물 세 배로 쳐줄게. 진짜야, 이번엔 진짜.",
+			"choices": [
+				{
+					"text": "요즘 뭐가 잘 팔려?",
+					"next": "hot"
+				},
+				{
+					"text": "[의약품 1개] 고물이랑 바꾸자",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 1
+						}
+					],
+					"next": "barter",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_blockade": {
+			"speaker": "scrap_trader_pim",
+			"text": "그린하우스가 헬리오스를 한 방 먹였대! 요즘 성벽 트럭이 우리 고물도 사러 와. 값 좀 올려야지.",
+			"choices": [
+				{
+					"text": "요즘 뭐가 잘 팔려?",
+					"next": "hot"
+				},
+				{
+					"text": "[의약품 1개] 고물이랑 바꾸자",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 1
+						}
+					],
+					"next": "barter",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"hot": {
+			"speaker": "scrap_trader_pim",
+			"text": "저급 칩은 언더그리드, 금속은 헬리오스. 둘 다 여기서 사서 거기 팔면 남아. 황무지 길만 무사하면.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"barter": {
+			"speaker": "scrap_trader_pim",
+			"text": "의약품! 이건 셀보다 좋아. 고물 네 개, 골라 가.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_scrap_trader_pim"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_scrap_trader_pim"
+				},
+				{
+					"type": "crisis",
+					"crisis": "greenhouse_blockade",
+					"active": true
+				}
+			],
+			"start": "again_blockade"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_scrap_trader_pim"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

@@ -1,0 +1,278 @@
+{
+	"id": "keeper_wen",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "keeper_wen",
+			"text": "신발 털고 오르세요. 먼지 한 줌이 물 한 모금을 흐립니다. 저는 웬, 물지기입니다. 이 마을의 목숨을 잽니다.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_keeper_wen"
+				}
+			],
+			"choices": [
+				{
+					"text": "수위계를 같이 본다",
+					"check": {
+						"stat": "survival",
+						"dc": 13
+					},
+					"next": "gauge_ok",
+					"fail_next": "gauge_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "wen_trust"
+						}
+					]
+				},
+				{
+					"text": "저수조는 얼마나 남았지?",
+					"next": "level"
+				},
+				{
+					"text": "[정수된 물 3개] 저수조에 붓는다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "water",
+							"amount": 3
+						}
+					],
+					"next": "pour",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "keeper_wen",
+			"text": "다시 오셨군요. 오늘 수위는 손가락 두 마디 내려갔습니다.",
+			"choices": [
+				{
+					"text": "저수조는 얼마나 남았지?",
+					"next": "level"
+				},
+				{
+					"text": "[정수된 물 3개] 저수조에 붓는다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "water",
+							"amount": 3
+						}
+					],
+					"next": "pour",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "keeper_wen",
+			"text": "약탈자들이 물 트럭을 노립니다. 이번 달 트럭 넷 중 하나만 올라왔어요. 물을 가져오시면 원로께서 반드시 갚으실 겁니다.",
+			"choices": [
+				{
+					"text": "저수조는 얼마나 남았지?",
+					"next": "level"
+				},
+				{
+					"text": "[정수된 물 3개] 저수조에 붓는다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "water",
+							"amount": 3
+						}
+					],
+					"next": "pour",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"level": {
+			"speaker": "keeper_wen",
+			"text": "석 달. 비가 안 오면 석 달입니다. 그린하우스 물이 제일 맑고 쌉니다. 거기서 싣고 오시면 여기선 두 배로 쳐 드립니다.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"gauge_ok": {
+			"speaker": "keeper_wen",
+			"text": "눈이 좋으시군요. 금이 간 곳까지 보셨네요. 원로께 말씀드려 두겠습니다. 물을 아는 사람은 믿을 만하다고.",
+			"choices": [
+				{
+					"text": "저수조는 얼마나 남았지?",
+					"next": "level"
+				},
+				{
+					"text": "[정수된 물 3개] 저수조에 붓는다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "water",
+							"amount": 3
+						}
+					],
+					"next": "pour",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"gauge_fail": {
+			"speaker": "keeper_wen",
+			"text": "숫자는 제가 보겠습니다. 손님은 물이나 조심히 드세요.",
+			"choices": [
+				{
+					"text": "저수조는 얼마나 남았지?",
+					"next": "level"
+				},
+				{
+					"text": "[정수된 물 3개] 저수조에 붓는다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "water",
+							"amount": 3
+						}
+					],
+					"next": "pour",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"pour": {
+			"speaker": "keeper_wen",
+			"text": "(물통을 조심스럽게 기울인다) 세 통이면 아이들 사흘 치입니다. 레드 메사는 오늘을 잊지 않습니다.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"turnin": {
+			"speaker": "keeper_wen",
+			"text": "원로께서 말씀하신 물이군요. 뚜껑부터 확인하겠습니다. …맑네요.",
+			"choices": [
+				{
+					"text": "정수된 물 10개를 넘긴다",
+					"requires": [
+						{
+							"type": "quest_ready",
+							"quest": "tarr_first_job"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "turnin_done",
+					"effects": [
+						{
+							"type": "quest_complete",
+							"quest": "tarr_first_job"
+						}
+					]
+				},
+				{
+					"text": "아직 넘기지 않는다",
+					"next": ""
+				}
+			]
+		},
+		"turnin_done": {
+			"speaker": "keeper_wen",
+			"text": "수위가 손가락 세 마디 올랐습니다. 원로께서 보수를 맡겨 두셨어요. 받으세요. 그리고 고맙습니다. 진심으로.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "quest_ready",
+					"quest": "tarr_first_job"
+				}
+			],
+			"start": "turnin"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_keeper_wen"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_keeper_wen"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

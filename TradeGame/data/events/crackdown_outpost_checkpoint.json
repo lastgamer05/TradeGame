@@ -1,0 +1,150 @@
+{
+	"id": "crackdown_outpost_checkpoint",
+	"title": "임시 검문소",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"rustbelt",
+			"greenhouse"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "crackdown",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "도시 입구에 헬리오스 순찰차가 임시 검문소를 세웠다. 주민들이 멀찍이서 지켜본다.",
+	"choices": [
+		{
+			"id": "pay",
+			"text": "통행료를 낸다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 15
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 셀을 챙기고 바리케이드를 올린다. 주민들이 등을 돌린다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": -1
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "compartment",
+			"text": "밀수칸을 믿는다",
+			"requires": [
+				{
+					"type": "module",
+					"module": "smuggle_compartment"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "형식적인 수색. 밀수칸은 무사하다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "talk",
+			"text": "여긴 헬리오스 땅이 아니라고 따진다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "주민들이 하나둘 모여든다. 병사들이 눈치를 보다 물러난다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 4
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 4
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -3
+						}
+					]
+				},
+				"failure": {
+					"text": "병사가 총구로 당신 가슴을 민다. 금지품이 압수된다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "hacking_tool",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_core",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_module",
+							"amount": "all"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -3
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "fight",
+			"text": "바리케이드를 들이받는다",
+			"outcomes": {
+				"success": {
+					"text": "순찰대가 총을 든다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 6
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 6
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -12
+						},
+						{
+							"type": "start_combat",
+							"encounter": "helios_checkpoint_guards"
+						}
+					]
+				}
+			}
+		}
+	]
+}

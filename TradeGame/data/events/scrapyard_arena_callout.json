@@ -1,0 +1,81 @@
+{
+	"id": "scrapyard_arena_callout",
+	"title": "관중의 지목",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"scrapyard_arena"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "거스가 확성기로 관중 속 당신을 가리킨다. \"오늘의 새 얼굴! 링에 오를 배짱 있나?\" 함성이 쏟아진다.",
+	"choices": [
+		{
+			"id": "fight",
+			"text": "링에 오른다",
+			"outcomes": {
+				"success": {
+					"text": "철창 문이 닫힌다. 반대편에서 약탈자 넷이 걸어 나온다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": 5
+						},
+						{
+							"type": "start_combat",
+							"encounter": "raider_roadblock"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "stare",
+			"text": "확성기를 향해 노려본다",
+			"check": {
+				"stat": "might",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "관중이 웃음을 터뜨린다. \"배짱은 있군!\" 거스가 다음 사람을 찾는다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": 2
+						}
+					]
+				},
+				"failure": {
+					"text": "야유가 쏟아진다. 누군가 당신 차에 병을 던진다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": -3
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "slip",
+			"text": "셀 몇 개를 던지고 빠져나간다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 10
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "거스가 셀을 받아 챙기고 다른 이를 가리킨다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

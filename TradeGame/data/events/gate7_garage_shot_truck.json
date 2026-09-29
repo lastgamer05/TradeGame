@@ -1,0 +1,92 @@
+{
+	"id": "gate7_garage_shot_truck",
+	"title": "총구멍 트럭",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"gate7_garage"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "총구멍 투성이 보급 트럭이 견인돼 들어온다. 운전석 유리에 피가 말라붙었다. 주노가 공구를 집어 든다.",
+	"choices": [
+		{
+			"id": "help",
+			"text": "수리를 거든다",
+			"check": {
+				"stat": "tech",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "엔진이 다시 돈다. 주노가 셀 몇 개를 쥐여 준다. \"지휘관한테 좋게 말해 둘게.\"",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 20
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 3
+						}
+					]
+				},
+				"failure": {
+					"text": "손이 미끄러져 배선을 끊는다. 주노가 한숨을 쉰다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "casings",
+			"text": "짐칸에서 흩어진 탄약을 줍는다",
+			"check": {
+				"stat": "survival",
+				"dc": 12
+			},
+			"outcomes": {
+				"success": {
+					"text": "쓸 만한 탄약 몇 개를 찾는다. 아무도 못 봤다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 2
+						}
+					]
+				},
+				"failure": {
+					"text": "병사가 어깨를 잡는다. \"군수품이다.\" 벌금을 문다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": -10
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": -2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "ask",
+			"text": "누가 털었는지 묻는다",
+			"outcomes": {
+				"success": {
+					"text": "\"러스트벨 가는 황무지 길. 약탈자야. 요즘 탄약이 모자라서 트럭이 맨몸으로 다녀.\"",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "rumor_gate7_ammo_shortage"
+						}
+					]
+				}
+			}
+		}
+	]
+}

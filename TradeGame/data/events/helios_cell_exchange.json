@@ -1,0 +1,90 @@
+{
+	"id": "helios_cell_exchange",
+	"title": "정품 셀 교환소",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"helios"
+		],
+		"requires": [
+			{
+				"type": "cargo",
+				"good": "forged_cell",
+				"amount": 1
+			}
+		],
+		"weight": 7
+	},
+	"text": "성문 옆 정품 셀 교환소. 재생 셀과 잡동사니 셀을 정품으로 바꿔 주는 곳이다. 짐칸의 위조 셀이 신경 쓰인다.",
+	"choices": [
+		{
+			"id": "swap",
+			"text": "위조 셀을 섞어 교환한다",
+			"check": {
+				"stat": "tech",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "단말이 한 번 깜박이고 정품 셀이 나온다. 손바닥에 땀이 찬다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						},
+						{
+							"type": "power",
+							"delta": 30
+						}
+					]
+				},
+				"failure": {
+					"text": "단말이 경고음을 낸다. 위조 셀이 압수되고 이름이 적힌다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -8
+						},
+						{
+							"type": "flag_set",
+							"flag": "helios_criminal_record"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "dump",
+			"text": "성문 밖 도랑에 버린다",
+			"outcomes": {
+				"success": {
+					"text": "위조 셀이 흙탕물에 가라앉는다. 판자촌 아이가 벌써 그걸 건지러 내려간다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "keep",
+			"text": "그냥 지나간다",
+			"outcomes": {
+				"success": {
+					"text": "교환소 창구의 출납원이 당신 차를 흘끗 본다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

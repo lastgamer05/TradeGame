@@ -1,0 +1,207 @@
+{
+	"id": "fence_rook",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "fence_rook",
+			"text": "앉을 데는 없어. 여긴 오래 머무는 데가 아니거든. 첫 거래 기념으로 하나 알려 주지. 장물은 여기서 사고, 절대 헬리오스로 들고 가지 마.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_fence_rook"
+				}
+			],
+			"choices": [
+				{
+					"text": "출처 모를 모듈을 싸게 달라",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 25
+						}
+					],
+					"check": {
+						"stat": "negotiation",
+						"dc": 14
+					},
+					"next": "deal_ok",
+					"fail_next": "deal_fail",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "stolen_module",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"text": "장물 코어는 어디다 넘기지?",
+					"next": "core"
+				},
+				{
+					"text": "요즘 들어오는 물건은?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"deal_ok": {
+			"speaker": "fence_rook",
+			"text": "흥정할 줄 아네. 가져가. 원래 주인은 이제 이게 필요 없어. 묻지 마.",
+			"choices": [
+				{
+					"text": "장물 코어는 어디다 넘기지?",
+					"next": "core"
+				},
+				{
+					"text": "요즘 들어오는 물건은?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"deal_fail": {
+			"speaker": "fence_rook",
+			"text": "스물다섯 셀은 입장료로 받지. 모듈은 다음에. 여기선 그게 수업료야.",
+			"choices": [
+				{
+					"text": "장물 코어는 어디다 넘기지?",
+					"next": "core"
+				},
+				{
+					"text": "요즘 들어오는 물건은?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "fence_rook",
+			"text": "또 왔군. 오늘은 뭘 숨기러 왔지?",
+			"choices": [
+				{
+					"text": "장물 코어는 어디다 넘기지?",
+					"next": "core"
+				},
+				{
+					"text": "요즘 들어오는 물건은?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "fence_rook",
+			"text": "요즘 장물이 넘쳐. 약탈자들이 매일 트럭을 끌고 와. 코어 값이 바닥이야. 지금 사 두면 나중에 웃지. 걸리지만 않으면.",
+			"choices": [
+				{
+					"text": "장물 코어는 어디다 넘기지?",
+					"next": "core"
+				},
+				{
+					"text": "요즘 들어오는 물건은?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "fence_rook",
+			"text": "헬리오스가 검문을 조였다며? 좋은 소식이야. 막히면 값이 오르거든. 해킹 툴 있으면 여기서 두 배 쳐줄게.",
+			"choices": [
+				{
+					"text": "장물 코어는 어디다 넘기지?",
+					"next": "core"
+				},
+				{
+					"text": "요즘 들어오는 물건은?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"core": {
+			"speaker": "fence_rook",
+			"text": "언더그리드. 노바네 공장은 코어라면 눈이 뒤집혀. 스왑밋 경매에 넣으면 세탁도 되고. 헬리오스? 검문 단말이 코어 번호를 읽어. 끝이야.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"news": {
+			"speaker": "fence_rook",
+			"text": "이상한 게 하나 있어. 헬리오스 전력청 봉인이 찍힌 발전기 부품 상자. 누가 성 안에서 빼돌렸거나, 성 안이 몰래 사들이다 털렸거나. 어느 쪽이든 재밌지.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "rumor_helios_buying_generator_parts"
+				}
+			],
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_fence_rook"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_fence_rook"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_fence_rook"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

@@ -1,0 +1,175 @@
+{
+	"id": "arena_master_gus",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "arena_master_gus",
+			"text": "피! 땀! 배터리! 거스의 투기장에 온 걸 환영한다! 구경은 공짜, 판돈은 유료, 링은 목숨값! 넌 어느 쪽이야?",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_arena_master_gus"
+				}
+			],
+			"choices": [
+				{
+					"text": "[전력 20셀] 판돈을 건다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 20
+						}
+					],
+					"next": "bet"
+				},
+				{
+					"text": "직접 링에 오른다",
+					"next": "fight"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "arena_master_gus",
+			"text": "돌아왔군! 오늘 대진표가 끝내준다!",
+			"choices": [
+				{
+					"text": "[전력 20셀] 판돈을 건다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 20
+						}
+					],
+					"next": "bet"
+				},
+				{
+					"text": "직접 링에 오른다",
+					"next": "fight"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "arena_master_gus",
+			"text": "약탈자 천지라 도전자도 천지야! 오늘은 판돈 두 배! 크랭크 형님도 보러 오신대!",
+			"choices": [
+				{
+					"text": "[전력 20셀] 판돈을 건다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 20
+						}
+					],
+					"next": "bet"
+				},
+				{
+					"text": "직접 링에 오른다",
+					"next": "fight"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"bet": {
+			"speaker": "arena_master_gus",
+			"text": "누구한테 걸래? 외팔이 벤, 아니면 불곰 도라?",
+			"choices": [
+				{
+					"text": "선수들 움직임을 보고 고른다",
+					"check": {
+						"stat": "focus",
+						"dc": 13
+					},
+					"next": "bet_win",
+					"fail_next": "bet_lose",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 50
+						}
+					]
+				}
+			]
+		},
+		"bet_win": {
+			"speaker": "arena_master_gus",
+			"text": "맞혔어! 눈이 좋네! 판돈 두 배 반! 다음에도 와!",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"bet_lose": {
+			"speaker": "arena_master_gus",
+			"text": "아이고! 판돈은 투기장이 잘 먹겠다! 다음 판이 기다린다!",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"fight": {
+			"speaker": "arena_master_gus",
+			"text": "진짜로? 좋아! 약탈자 넷이랑 붙는다. 살아서 나가면 전리품은 네 거, 스크랩야드는 네 이름을 외치지!",
+			"choices": [
+				{
+					"text": "링에 오른다",
+					"next": "",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": 5
+						},
+						{
+							"type": "start_combat",
+							"encounter": "raider_roadblock"
+						}
+					]
+				},
+				{
+					"text": "관둔다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_arena_master_gus"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_arena_master_gus"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

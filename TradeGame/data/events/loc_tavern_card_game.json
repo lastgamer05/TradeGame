@@ -1,0 +1,82 @@
+{
+	"id": "loc_tavern_card_game",
+	"title": "판돈 카드",
+	"trigger": {
+		"on": "location",
+		"kinds": [
+			"tavern"
+		],
+		"requires": [],
+		"weight": 5
+	},
+	"text": "구석 탁자에서 운반꾼들이 셀을 걸고 카드를 친다. 한 자리가 비었다.",
+	"choices": [
+		{
+			"id": "play",
+			"text": "한 판 낀다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 10
+				}
+			],
+			"check": {
+				"stat": "focus",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "마지막 패가 맞아떨어진다. 판돈을 쓸어 담는다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 35
+						}
+					]
+				},
+				"failure": {
+					"text": "상대가 웃으며 판돈을 가져간다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "expose",
+			"text": "딜러의 소매를 붙잡는다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "소매에서 카드 두 장이 떨어진다. 사람들이 딜러를 끌어내고, 판돈 일부가 돌아온다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 20
+						}
+					]
+				},
+				"failure": {
+					"text": "소매는 비어 있다. 탁자 전체가 당신을 노려본다. 술값을 물어 주고 나온다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": -10
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "watch",
+			"text": "구경만 한다",
+			"outcomes": {
+				"success": {
+					"text": "누가 따고 누가 잃든 술은 계속 돈다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

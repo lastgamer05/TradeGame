@@ -1,0 +1,100 @@
+{
+	"id": "helios_plaza_wanted_poster",
+	"title": "새 수배 전단",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"helios_plaza"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "병사가 광장 게시판에 새 전단을 붙인다. 마른 젊은 남자의 얼굴. '발전소 기술자 이안. 생포 시 코어 1개.'",
+	"choices": [
+		{
+			"id": "read",
+			"text": "전단을 읽는다",
+			"outcomes": {
+				"success": {
+					"text": "'기밀 반출.' 무엇을 가지고 나갔는지는 적혀 있지 않다. 코어 하나짜리 비밀이다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_wanted"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "hide_ian",
+			"text": "옆자리의 이안을 차 안쪽으로 밀어 넣는다",
+			"requires": [
+				{
+					"type": "companion",
+					"companion": "ian"
+				}
+			],
+			"check": {
+				"stat": "driving",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "병사의 눈길이 스쳐 지나간다. 이안이 떨리는 손으로 당신 소매를 잡는다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_wanted"
+						},
+						{
+							"type": "trust",
+							"delta": 5
+						}
+					]
+				},
+				"failure": {
+					"text": "병사가 차 쪽으로 걸어온다. 급히 차를 뺀다. 광장 기록에 차 번호가 남는다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_wanted"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_spotted_in_helios"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -5
+						},
+						{
+							"type": "trust",
+							"delta": -3
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "ask",
+			"text": "병사에게 묻는다",
+			"outcomes": {
+				"success": {
+					"text": "병사가 턱으로 케이드 하사를 가리킨다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_wanted"
+						},
+						{
+							"type": "start_dialogue",
+							"dialogue": "sergeant_kade"
+						}
+					]
+				}
+			}
+		}
+	]
+}

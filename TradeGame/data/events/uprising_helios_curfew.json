@@ -1,0 +1,104 @@
+{
+	"id": "uprising_helios_curfew",
+	"title": "통행 금지",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"helios"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "rebel_uprising",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "성문에 통행 금지 포고문이 붙었다. 병사들이 언더그리드 출입 기록이 있는 차량을 따로 세운다.",
+	"choices": [
+		{
+			"id": "comply",
+			"text": "순순히 수색을 받는다",
+			"outcomes": {
+				"success": {
+					"text": "한 시간 뒤 통과. 병사가 서류에 무언가를 적는다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "talk",
+			"text": "헬리오스 납품 일정을 댄다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "\"전력청 납품이라고? 가.\" 줄을 건너뛴다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "병사가 비웃는다. 짐칸을 탈탈 턴다. 반란군 물건 같은 건 압수된다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "hacking_tool",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_core",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_module",
+							"amount": "all"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -3
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "rebel_friend",
+			"text": "언더그리드 쪽 병사에게 눈짓한다",
+			"requires": [
+				{
+					"type": "reputation",
+					"city": "undergrid",
+					"min": 30
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "줄 끝의 병사가 슬쩍 바리케이드를 올린다. 스치며 속삭인다. \"판자촌 리나에게 안부를.\"",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 2
+						}
+					]
+				}
+			}
+		}
+	]
+}

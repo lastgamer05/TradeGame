@@ -1,0 +1,90 @@
+{
+	"id": "uprising_recruiter",
+	"title": "완장 찬 청년",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"undergrid_den",
+			"red_mesa_camp",
+			"swapmeet_inn"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "rebel_uprising",
+				"active": true
+			}
+		],
+		"weight": 8
+	},
+	"text": "회로 문양 완장을 찬 청년이 탁자 위에 올라 외친다. \"불을 나누자! 헬리오스의 밤은 끝난다!\" 몇 사람이 잔을 든다.",
+	"choices": [
+		{
+			"id": "donate",
+			"text": "모금함에 셀을 넣는다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 20
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "청년이 주먹을 가슴에 댄다. 모금함 소리가 오늘 밤 가장 크다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 3
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "argue",
+			"text": "발전소가 멈추면 다 같이 어둡다고 반박한다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "청년이 말문이 막힌다. 몇 사람이 잔을 내려놓고 생각에 잠긴다.",
+					"effects": [
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": -1
+						}
+					]
+				},
+				"failure": {
+					"text": "\"헬리오스 개가 여기 있네!\" 야유와 함께 술이 날아온다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": -3
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "listen",
+			"text": "듣기만 한다",
+			"outcomes": {
+				"success": {
+					"text": "연설이 끝나자 청년 셋이 완장을 받아 간다. 모두 스무 살이 안 돼 보인다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

@@ -1,0 +1,80 @@
+{
+	"id": "rebel_low_morale",
+	"title": "꺼져 가는 터널",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"undergrid"
+		],
+		"requires": [
+			{
+				"type": "faction_share",
+				"faction": "rebel",
+				"max": 0.15
+			}
+		],
+		"weight": 8
+	},
+	"text": "터널 불빛 절반이 꺼졌다. 재생 셀이 바닥났다. 벡스가 무기 부품 상자를 헐값에 내놓는다. \"셀만 주면 돼.\"",
+	"choices": [
+		{
+			"id": "buy",
+			"text": "무기 부품을 헐값에 산다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 60
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "무기 부품이 실린다. 벡스가 웃지만 눈은 웃지 않는다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "weapon_parts",
+							"amount": 3
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "donate",
+			"text": "공장에 셀을 보탠다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 30
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "프레스 하나가 다시 돈다. 노바가 멀리서 고개를 끄덕인다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 4
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "지나간다",
+			"outcomes": {
+				"success": {
+					"text": "어둠 속에서 누군가 헬리오스 방송을 켠다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

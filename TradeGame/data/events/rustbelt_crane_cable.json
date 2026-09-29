@@ -1,0 +1,83 @@
+{
+	"id": "rustbelt_crane_cable",
+	"title": "끊어진 케이블",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"rustbelt_crane"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "크레인 케이블이 끊어지며 인부 하나가 철골에 매달린다. 이보가 소리친다. \"차! 차를 밑으로!\"",
+	"choices": [
+		{
+			"id": "drive",
+			"text": "차를 철골 밑으로 댄다",
+			"check": {
+				"stat": "driving",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "지붕 위로 인부가 떨어진다. 찌그러졌지만 모두 살았다. 조합원들이 당신 차를 둘러싼다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 6
+						}
+					]
+				},
+				"failure": {
+					"text": "차를 대다가 철골에 적재함을 긁는다. 인부는 다른 사람들이 받아 낸다.",
+					"effects": [
+						{
+							"type": "vehicle_damage",
+							"part": "cargo_bay"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "climb",
+			"text": "철골을 타고 올라간다",
+			"check": {
+				"stat": "might",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "인부의 손목을 잡아 끌어올린다. 팔이 빠질 것 같다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 6
+						}
+					]
+				},
+				"failure": {
+					"text": "반쯤 올라가다 미끄러진다. 인부는 다른 사람들이 구한다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "watch",
+			"text": "지켜본다",
+			"outcomes": {
+				"success": {
+					"text": "인부들이 사다리를 가져온다. 모두가 늦지 않기를 빈다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

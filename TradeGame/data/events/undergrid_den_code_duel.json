@@ -1,0 +1,58 @@
+{
+	"id": "undergrid_den_code_duel",
+	"title": "방화벽 내기",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"undergrid_den"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "해커들이 단말 하나를 둘러싸고 내기를 한다. 전력청 방화벽 모형을 누가 먼저 뚫나.",
+	"choices": [
+		{
+			"id": "join",
+			"text": "판돈을 걸고 앉는다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 10
+				}
+			],
+			"check": {
+				"stat": "tech",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "세 겹을 넘자 소굴이 조용해진다. 구석에서 피스가 고개를 든다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 30
+						},
+						{
+							"type": "flag_set",
+							"flag": "piece_respect"
+						}
+					]
+				},
+				"failure": {
+					"text": "경보음이 울린다. 해커들이 웃으며 판돈을 나눠 갖는다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "watch",
+			"text": "구경한다",
+			"outcomes": {
+				"success": {
+					"text": "누군가 세 번째 방화벽에서 막힌다. 모두 그 벽을 넘은 사람은 없다고 한다. 피스만 빼고.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

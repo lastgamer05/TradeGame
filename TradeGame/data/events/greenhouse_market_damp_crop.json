@@ -1,0 +1,76 @@
+{
+	"id": "greenhouse_market_damp_crop",
+	"title": "습기 먹은 수확물",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"greenhouse_market"
+		],
+		"requires": [],
+		"weight": 5
+	},
+	"text": "창고 한쪽에 습기 먹은 생식량 더미가 있다. 메이가 떨이로 가져가라고 한다. \"오늘 안에 안 팔리면 썩어.\"",
+	"choices": [
+		{
+			"id": "buy",
+			"text": "떨이로 산다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 15
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "생식량 네 짐이 실린다. 며칠은 버틸 것이다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "raw_food",
+							"amount": 4
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "sort",
+			"text": "멀쩡한 것만 골라 준다",
+			"check": {
+				"stat": "survival",
+				"dc": 12
+			},
+			"outcomes": {
+				"success": {
+					"text": "멀쩡한 것과 썩은 것을 가려 준다. 메이가 수고비로 세 짐을 얹는다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "raw_food",
+							"amount": 3
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 2
+						}
+					]
+				},
+				"failure": {
+					"text": "골라 봐도 대부분 물렀다. 손만 더러워졌다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "사양한다",
+			"outcomes": {
+				"success": {
+					"text": "메이가 어깨를 으쓱하고 퇴비 통 쪽으로 수레를 민다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

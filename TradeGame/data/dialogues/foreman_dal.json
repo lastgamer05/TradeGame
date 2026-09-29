@@ -1,0 +1,282 @@
+{
+	"id": "foreman_dal",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "foreman_dal",
+			"text": "손님은 선 밖에 서. 프레스에 손가락 먹힌 놈이 한둘이 아니야. 달이다. 공장장. 수리면 저쪽 창구, 잡담이면 짧게.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_foreman_dal"
+				}
+			],
+			"choices": [
+				{
+					"text": "프레스 옮기는 걸 거든다",
+					"check": {
+						"stat": "might",
+						"dc": 13
+					},
+					"next": "haul_ok",
+					"fail_next": "haul_fail",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 3
+						},
+						{
+							"type": "power",
+							"delta": 10
+						}
+					]
+				},
+				{
+					"text": "공장에선 뭘 만들지?",
+					"next": "make"
+				},
+				{
+					"text": "[발전기 부품 1개] 공장에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					],
+					"next": "donate",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 6
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 1
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "foreman_dal",
+			"text": "또 왔나. 짧게.",
+			"choices": [
+				{
+					"text": "공장에선 뭘 만들지?",
+					"next": "make"
+				},
+				{
+					"text": "[발전기 부품 1개] 공장에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					],
+					"next": "donate",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 6
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 1
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_uprising": {
+			"speaker": "foreman_dal",
+			"text": "모듈 라인은 멈췄어. 전부 총열이야. 노바 명령이지. 금속이랑 무기 부품 있으면 여기로 가져와. 요즘은 그게 제일 비싸.",
+			"choices": [
+				{
+					"text": "공장에선 뭘 만들지?",
+					"next": "make"
+				},
+				{
+					"text": "[발전기 부품 1개] 공장에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					],
+					"next": "donate",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 6
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 1
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"make": {
+			"speaker": "foreman_dal",
+			"text": "차량 모듈, 무기 개조품. 헬리오스 공장 반값이야. 문제는 전력. 재생 셀로 프레스 돌리면 하루 반나절이 멈춰.",
+			"choices": [
+				{
+					"text": "발전소를 얻으면 해결되겠군",
+					"next": "plant"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"plant": {
+			"speaker": "foreman_dal",
+			"text": "얻으면? 얻어서 뭐 해. 그거 전쟁 전 물건이야. 고칠 줄 아는 놈이 우리 중에 하나도 없어. 노바는 그 얘기만 하면 딴소리하지.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "heard_reactor_repair_doubt"
+				}
+			],
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"haul_ok": {
+			"speaker": "foreman_dal",
+			"text": "힘 좋네. 수고비다. 일자리 없으면 언제든 와. 운반꾼보다 오래 산다.",
+			"choices": [
+				{
+					"text": "공장에선 뭘 만들지?",
+					"next": "make"
+				},
+				{
+					"text": "[발전기 부품 1개] 공장에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					],
+					"next": "donate",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 6
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 1
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"haul_fail": {
+			"speaker": "foreman_dal",
+			"text": "비켜, 비켜! 허리 나가겠다. 운전이나 해.",
+			"choices": [
+				{
+					"text": "공장에선 뭘 만들지?",
+					"next": "make"
+				},
+				{
+					"text": "[발전기 부품 1개] 공장에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					],
+					"next": "donate",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 6
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 1
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"donate": {
+			"speaker": "foreman_dal",
+			"text": "발전기 부품? 진짜네. …고맙다. 이걸로 프레스 하나가 한 달은 제대로 돈다. 노바한테도 말해 두지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_foreman_dal"
+				},
+				{
+					"type": "crisis",
+					"crisis": "rebel_uprising",
+					"active": true
+				}
+			],
+			"start": "again_uprising"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_foreman_dal"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

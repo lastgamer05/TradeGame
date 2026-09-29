@@ -1,0 +1,195 @@
+{
+	"id": "farmhand_tuk",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "farmhand_tuk",
+			"text": "안녕하세요! 운반꾼이다! 차 멋져요! 저 턱이에요. 감자 캐요. 오늘 스무 자루 캤어요. 좀 들어 줄래요? 허리가 끊어질 것 같아요.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_farmhand_tuk"
+				}
+			],
+			"choices": [
+				{
+					"text": "자루를 들어 준다",
+					"check": {
+						"stat": "might",
+						"dc": 12
+					},
+					"next": "sacks_ok",
+					"fail_next": "sacks_fail",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "raw_food",
+							"amount": 3
+						}
+					]
+				},
+				{
+					"text": "요즘 무슨 소문 있어?",
+					"next": "rumor"
+				},
+				{
+					"text": "길 좀 알려 줘",
+					"next": "roads"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"sacks_ok": {
+			"speaker": "farmhand_tuk",
+			"text": "와, 힘세다! 이거 세 자루는 형 거예요. 원로님이 일한 사람은 먹어야 한대요.",
+			"choices": [
+				{
+					"text": "요즘 무슨 소문 있어?",
+					"next": "rumor"
+				},
+				{
+					"text": "길 좀 알려 줘",
+					"next": "roads"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"sacks_fail": {
+			"speaker": "farmhand_tuk",
+			"text": "하하, 괜찮아요! 감자가 원래 무거워요. 제가 할게요.",
+			"choices": [
+				{
+					"text": "요즘 무슨 소문 있어?",
+					"next": "rumor"
+				},
+				{
+					"text": "길 좀 알려 줘",
+					"next": "roads"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "farmhand_tuk",
+			"text": "형 또 왔다! 오늘은 스물두 자루요!",
+			"choices": [
+				{
+					"text": "요즘 무슨 소문 있어?",
+					"next": "rumor"
+				},
+				{
+					"text": "길 좀 알려 줘",
+					"next": "roads"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_blockade": {
+			"speaker": "farmhand_tuk",
+			"text": "원로님이 헬리오스 트럭은 돌려보내래요. 근데요, 우리 누나가 헬리오스 성벽 밖에 살아요. 누나도 굶으면 어떡해요? 형은 알아요?",
+			"choices": [
+				{
+					"text": "요즘 무슨 소문 있어?",
+					"next": "rumor"
+				},
+				{
+					"text": "길 좀 알려 줘",
+					"next": "roads"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_union": {
+			"speaker": "farmhand_tuk",
+			"text": "요즘 밤마다 숙소에서 회의해요! 러스트벨 아저씨들도 와요. 우리끼리 뭉치면 헬리오스도 무섭지 않대요. 저는 졸려서 잘 모르겠어요.",
+			"choices": [
+				{
+					"text": "요즘 무슨 소문 있어?",
+					"next": "rumor"
+				},
+				{
+					"text": "길 좀 알려 줘",
+					"next": "roads"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"rumor": {
+			"speaker": "farmhand_tuk",
+			"text": "정수탑 형 알아요? 이안 형. 밤새 뭘 적어요. 숫자요. 물어보면 펌프 기록이래요. 근데 펌프는 숫자를 그렇게 많이 안 먹잖아요.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"roads": {
+			"speaker": "farmhand_tuk",
+			"text": "헬리오스는 간선도로로 하루! 언더그리드는 황무지로 사흘인데 전력을 엄청 먹어요. 삼촌이 그랬어요. 황무지는 배터리를 마셔 버린대요.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_farmhand_tuk"
+				},
+				{
+					"type": "crisis",
+					"crisis": "greenhouse_blockade",
+					"active": true
+				}
+			],
+			"start": "again_blockade"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_farmhand_tuk"
+				},
+				{
+					"type": "faction_share",
+					"faction": "displaced",
+					"min": 0.25
+				}
+			],
+			"start": "again_union"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_farmhand_tuk"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

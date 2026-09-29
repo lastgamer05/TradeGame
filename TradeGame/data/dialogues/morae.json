@@ -1,0 +1,725 @@
+{
+	"id": "morae",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "morae",
+			"text": "…뭐. 고물 사러 왔으면 장터로 가. 여긴 사람 사는 데야.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_morae"
+				}
+			],
+			"choices": [
+				{
+					"text": "그냥 둘러보는 중이다",
+					"next": "look"
+				},
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"look": {
+			"speaker": "morae",
+			"text": "둘러볼 거 없어. 녹슨 지붕, 배고픈 애들, 나. 그게 다야. 모래라고 해.",
+			"choices": [
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "morae",
+			"text": "또 왔어? 할 일 없나 봐.",
+			"choices": [
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_favor": {
+			"speaker": "morae",
+			"text": "왔네. 그때 고마웠어. 말은 잘 못 해. 그래도 기억은 해.",
+			"choices": [
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_low": {
+			"speaker": "morae",
+			"text": "운반꾼들이 우리 고물을 헐값에 쓸어 가. 너도 그중 하나야? 대답 안 해도 돼. 셈은 내가 해.",
+			"choices": [
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"left": {
+			"speaker": "morae",
+			"text": "…다시 태워 달라고 온 거 아니야. 네가 어떤 운반꾼인지 봤어. 잘 지내.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"dig": {
+			"speaker": "morae",
+			"text": "전쟁 때 무너진 창고. 전선, 칩, 운 좋으면 발전기 코일. 하루 종일 파면 셀 몇 개. 그래도 굶진 않아.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"family": {
+			"speaker": "morae",
+			"text": "…전쟁 때 보급 트럭이 안 왔어. 석 달. 엄마랑 동생이 그 겨울에. 트럭 몰던 놈 얼굴도 몰라. 알면… 모르겠어. 뭘 할지.",
+			"choices": [
+				{
+					"text": "…안됐다",
+					"next": "family_sorry",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_told_story"
+						}
+					]
+				},
+				{
+					"text": "수송대도 명령을 받았을 거야",
+					"next": "family_orders",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_told_story"
+						}
+					]
+				},
+				{
+					"text": "말없이 듣는다",
+					"next": "family_silent",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_told_story"
+						}
+					]
+				}
+			]
+		},
+		"family_sorry": {
+			"speaker": "morae",
+			"text": "너한테 사과받을 일은 아니지. …아니, 고마워. 그런 말 오랜만에 들어.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"family_orders": {
+			"speaker": "morae",
+			"text": "명령. 그래. 다들 그렇게 말해. 명령 받은 놈은 살고 굶은 사람은 죽었어. …네가 왜 그 편을 들어?",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"family_silent": {
+			"speaker": "morae",
+			"text": "(한참 뒤) 들어 줘서 고마워. 여기선 다들 자기 얘기만 해.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"favor_meds": {
+			"speaker": "morae",
+			"text": "…이거 진짜 약이네. 윗집 꼬마가 사흘째 기침해. 고마워. 빚진 거 싫어하는데. 갚을게.",
+			"choices": [
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"favor_dig": {
+			"speaker": "morae",
+			"text": "손 좋네. 무너질 자리를 먼저 보는 눈이 있어. 황무지 오래 다녔지? …이건 네 몫.",
+			"choices": [
+				{
+					"text": "여기서 뭘 캐지?",
+					"next": "dig"
+				},
+				{
+					"text": "가족은?",
+					"next": "family"
+				},
+				{
+					"text": "[의약품 2개] 골목 아이들 약에 보탠다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "favor_meds",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "구덩이 파는 걸 거든다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "favor_dig",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "morae_favor"
+						},
+						{
+							"type": "faction_reputation",
+							"faction": "displaced",
+							"min": -9
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"dig_fail": {
+			"speaker": "morae",
+			"text": "거기 밟지 마! …됐어, 내가 할게. 운전만 할 줄 아는구나.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"recruit": {
+			"speaker": "morae",
+			"text": "…너랑? 황무지 길은 알아. 물 냄새도 맡고, 약탈자 발자국도 읽어. 대신 하나만. 밀려난 사람들 등쳐 먹으면 그날로 내려.",
+			"choices": [
+				{
+					"text": "약속한다",
+					"next": "recruited",
+					"effects": [
+						{
+							"type": "recruit",
+							"companion": "morae"
+						},
+						{
+							"type": "flag_set",
+							"flag": "recruited_morae"
+						}
+					]
+				},
+				{
+					"text": "다시 생각해 보겠다",
+					"next": ""
+				}
+			]
+		},
+		"recruited": {
+			"speaker": "morae",
+			"text": "짐은 이게 다야. 삽 하나, 담요 하나. 가자. 운전석 옆자리는 처음이네.",
+			"choices": [
+				{
+					"text": "출발하자",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "companion_left_morae"
+				}
+			],
+			"start": "left"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_morae"
+				},
+				{
+					"type": "faction_reputation",
+					"faction": "displaced",
+					"max": -10
+				}
+			],
+			"start": "again_low"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_morae"
+				},
+				{
+					"type": "flag",
+					"flag": "morae_favor"
+				}
+			],
+			"start": "again_favor"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_morae"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

@@ -1,0 +1,81 @@
+{
+	"id": "rustbelt_shanty_sick_kid",
+	"title": "기침 소리",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"rustbelt_shanty"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "판잣집 안에서 아이가 열에 들떠 기침한다. 문간의 여자가 당신 짐칸을 본다. 말은 하지 않는다.",
+	"choices": [
+		{
+			"id": "medicine",
+			"text": "의약품을 건넨다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "medicine",
+					"amount": 1
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "여자가 약을 받아 들고 고개를 숙인다. 골목 끝에서 모래가 이쪽을 보고 있다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 6
+						},
+						{
+							"type": "faction_strength",
+							"faction": "displaced",
+							"delta": 1
+						},
+						{
+							"type": "flag_set",
+							"flag": "morae_favor"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "herbs",
+			"text": "들판에서 해열 풀을 찾아 준다",
+			"check": {
+				"stat": "survival",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "쓴 풀을 달여 먹인다. 열이 조금 내린다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 3
+						}
+					]
+				},
+				"failure": {
+					"text": "해 질 때까지 헤맸지만 빈손이다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "지나간다",
+			"outcomes": {
+				"success": {
+					"text": "기침 소리가 골목 끝까지 따라온다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

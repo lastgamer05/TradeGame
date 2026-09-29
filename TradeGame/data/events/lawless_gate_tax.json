@@ -1,0 +1,81 @@
+{
+	"id": "lawless_gate_tax",
+	"title": "약탈자 통행세",
+	"trigger": {
+		"on": "arrival",
+		"cities": [],
+		"requires": [
+			{
+				"type": "faction_share",
+				"faction": "lawless",
+				"min": 0.28
+			}
+		],
+		"weight": 6
+	},
+	"text": "도시 입구에 약탈자 깃발을 단 트럭이 버티고 있다. 경비대는 보이지 않는다. \"크랭크 님 길이야. 몫을 내.\"",
+	"choices": [
+		{
+			"id": "pay",
+			"text": "몫을 낸다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 20
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "약탈자가 셀을 세고 길을 비킨다. 경비대 초소는 비어 있다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "threat",
+			"text": "총구를 들이민다",
+			"check": {
+				"stat": "might",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "약탈자들이 서로 보다가 트럭을 뺀다. \"다음에 보자.\"",
+					"effects": []
+				},
+				"failure": {
+					"text": "약탈자들이 웃으며 총을 든다.",
+					"effects": [
+						{
+							"type": "start_combat",
+							"encounter": "raider_roadblock"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "crank_friend",
+			"text": "크랭크의 이름을 댄다",
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "crank_first_job",
+					"state": "done"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "\"요새 식구였어? 들어가.\" 약탈자가 경례 흉내를 낸다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

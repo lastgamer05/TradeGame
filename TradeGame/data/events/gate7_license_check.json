@@ -1,0 +1,92 @@
+{
+	"id": "gate7_license_check",
+	"title": "인가 확인",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"gate7"
+		],
+		"requires": [],
+		"weight": 7
+	},
+	"text": "게이트 7 방벽 앞. 병사가 상인 인가증을 요구한다.",
+	"choices": [
+		{
+			"id": "license",
+			"text": "인가증을 내민다",
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "gate7_license"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 경례한다. \"인가 상인. 통과.\"",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 1
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "fee",
+			"text": "미인가 수수료를 낸다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 15
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 장부에 두 줄을 긋는다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "talk",
+			"text": "지휘관이 부른 운반꾼이라고 한다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "병사가 무전을 들었다 놓는다. \"들어가.\"",
+					"effects": []
+				},
+				"failure": {
+					"text": "\"지휘관은 운반꾼을 부르지 않는다.\" 수수료가 두 배다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": -30
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "bram",
+			"text": "식당 브람의 친구라고 한다",
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "bram_friend"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "병사가 피식 웃는다. \"국 얻어먹은 사람이군. 들어가.\"",
+					"effects": []
+				}
+			}
+		}
+	]
+}

@@ -1,0 +1,92 @@
+{
+	"id": "crackdown_suppressant_famine",
+	"title": "억제제 품귀",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"undergrid_market",
+			"rustbelt_market"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "crackdown",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "의체를 단 사람들이 떨리는 손으로 시장을 돈다. 억제제가 끊긴 지 열흘. 벡스든 핌이든 억제제라면 무엇이든 주겠다고 한다.",
+	"choices": [
+		{
+			"id": "give",
+			"text": "억제제 한 상자를 나눠 쓴다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "suppressant",
+					"amount": 1
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "사람들이 한 알씩 나눠 삼킨다. 떨림이 멎는다. 이 시장이 당신 얼굴을 기억한다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "undergrid",
+							"delta": 4
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 4
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 1
+						},
+						{
+							"type": "faction_strength",
+							"faction": "displaced",
+							"delta": 1
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "sell",
+			"text": "억제제를 비싸게 넘긴다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "suppressant",
+					"amount": 2
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "셀 주머니가 무거워진다. 뒤에서 누가 중얼거린다. \"헬리오스랑 뭐가 달라.\"",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 220
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "지나간다",
+			"outcomes": {
+				"success": {
+					"text": "시장 구석에서 누군가 의체 팔을 뜯어내려 한다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

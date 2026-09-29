@@ -1,0 +1,88 @@
+{
+	"id": "helios_outskirts_brownout",
+	"title": "일찍 꺼진 불",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"helios_outskirts"
+		],
+		"requires": [],
+		"weight": 7
+	},
+	"text": "해가 지고 얼마 안 돼 판자촌 전등이 한꺼번에 꺼진다. 성벽 위 가로등은 그대로다. 누군가 어둠 속에서 욕을 한다.",
+	"choices": [
+		{
+			"id": "trace",
+			"text": "전선을 따라가 본다",
+			"check": {
+				"stat": "tech",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "변압기는 멀쩡하다. 성 안에서 내려오는 전압 자체가 낮다. 공급이 줄었다. 누가, 왜 줄였을까.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "noticed_helios_brownout"
+						},
+						{
+							"type": "flag_set",
+							"flag": "traced_helios_voltage"
+						}
+					]
+				},
+				"failure": {
+					"text": "어둠 속에서 전선이 어디로 가는지 놓친다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "noticed_helios_brownout"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "share_cells",
+			"text": "아이들 손전등에 셀을 나눠 준다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 10
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "골목마다 작은 불빛이 켜진다. 누군가 당신 차 번호를 외워 둔다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 3
+						},
+						{
+							"type": "flag_set",
+							"flag": "noticed_helios_brownout"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "watch",
+			"text": "지켜본다",
+			"outcomes": {
+				"success": {
+					"text": "노인이 말한다. \"작년엔 자정까지 켜졌지.\" 성벽 위 불빛은 꺼지지 않는다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "noticed_helios_brownout"
+						}
+					]
+				}
+			}
+		}
+	]
+}

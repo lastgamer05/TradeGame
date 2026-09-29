@@ -1,0 +1,74 @@
+{
+	"id": "loc_tavern_old_comrade",
+	"title": "옛 얼굴",
+	"trigger": {
+		"on": "location",
+		"kinds": [
+			"tavern"
+		],
+		"requires": [
+			{
+				"type": "day",
+				"min": 4
+			}
+		],
+		"weight": 3
+	},
+	"text": "술잔을 든 사내가 당신 얼굴을 빤히 본다. \"…너, 그 겨울에 살아 나왔구나.\" 목소리가 낯익다.",
+	"choices": [
+		{
+			"id": "deny",
+			"text": "사람을 잘못 봤다고 한다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "사내가 고개를 갸웃하다 잔을 비운다. \"그래, 그놈은 죽었겠지.\"",
+					"effects": []
+				},
+				"failure": {
+					"text": "\"잘못 봐? 네 운전 버릇을 내가 모를까.\" 사내 목소리가 커진다. 몇 사람이 돌아본다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "past_rumor_spread"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "drink",
+			"text": "말없이 한 잔 산다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 10
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "사내가 잔을 부딪친다. \"난 지금 레드 메사 쪽에 있어. 죽은 놈들 몫까지 살아.\" 그는 먼저 자리를 뜬다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "old_comrade_met"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "자리를 뜬다",
+			"outcomes": {
+				"success": {
+					"text": "등 뒤에서 사내가 중얼거린다. \"도망친 건 너만이 아니야.\"",
+					"effects": []
+				}
+			}
+		}
+	]
+}
