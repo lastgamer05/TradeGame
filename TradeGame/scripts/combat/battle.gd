@@ -23,6 +23,11 @@ var units: Array = []
 var turn := 1
 var grenades := 0
 var messages: Array[String] = []
+## 화면이 차례대로 재생할 사건. { type, ... } 형태. 화면이 읽고 비운다.
+## move{id,path} shot{from,to,weapon,melee,hit,chance} damage{id,dmg,hp_after} explode{cell,radius}
+## status{id,text} board{id} car_shot{from,hit,part} phase{side} text{text}
+var events: Array = []
+var _move_buf := {}
 ## "" 이면 진행 중. victory, surrender, escaped, wiped
 var result := ""
 ## 이번 전투에서 새로 파손된 차량 부위
@@ -182,7 +187,7 @@ func _spawn(squad: Array) -> void:
 	for i in squad.size():
 		var s: Dictionary = squad[i]
 		units.append({
-			"id": "p%d" % i, "side": "player", "name": s.name, "pos": spawns[i],
+			"id": "p%d" % i, "side": "player", "kind": "player" if i == 0 else "mercenary", "name": s.name, "pos": spawns[i],
 			"hp": int(s.hp), "max_hp": int(s.hp), "aim": int(s.focus), "might": int(s.might),
 			"weapon": s.weapon, "melee_weapon": s.get("melee_weapon", ""), "defense": int(cfg.base_defense),
 			"ap": int(cfg.ap_per_turn), "hidden": false, "overwatch": false, "boarded": false, "down": false, "ai": "",
@@ -195,7 +200,7 @@ func _spawn(squad: Array) -> void:
 			var e: Dictionary = cfg.enemies[kind]
 			var weapon: Dictionary = cfg.weapons[e.weapon]
 			units.append({
-				"id": "e%d" % i, "side": "enemy", "name": e.name, "pos": cells[i % cells.size()] + Vector2i(0, i / cells.size()),
+				"id": "e%d" % i, "side": "enemy", "kind": kind, "name": e.name, "pos": cells[i % cells.size()] + Vector2i(0, i / cells.size()),
 				"hp": int(e.hp), "max_hp": int(e.hp), "aim": int(e.aim), "might": int(e.aim),
 				"weapon": e.weapon if not weapon.get("melee", false) else "", "melee_weapon": e.weapon if weapon.get("melee", false) else "",
 				"defense": int(e.get("defense", cfg.base_defense)),
@@ -343,10 +348,11 @@ func move(u: Dictionary, to: Vector2i) -> bool:
 	u.ap -= 1
 	u.hidden = false
 	for step in paths[to]:
-		u.pos = step
+		_step(u, step)
 		_trigger_overwatch(u, "enemy")
 		if u.down:
 			break
+	_flush_move()
 	_check_end()
 	return true
 
@@ -366,6 +372,7 @@ func hide(u: Dictionary) -> bool:
 	u.hidden = true
 	u.ap = 0
 	messages.append("%s: 몸을 숨긴다." % u.name)
+	events.append({ "type": "status", "id": u.id, "text": "숨기" })
 	return true
 
 
@@ -375,6 +382,7 @@ func set_overwatch(u: Dictionary) -> bool:
 	u.overwatch = true
 	u.ap = 0
 	messages.append("%s: 경계 태세." % u.name)
+	events.append({ "type": "status", "id": u.id, "text": "경계" })
 	return true
 
 
@@ -399,6 +407,7 @@ func board(u: Dictionary) -> bool:
 	u.boarded = true
 	u.ap = 0
 	messages.append("%s: 차에 탄다." % u.name)
+	events.append({ "type": "board", "id": u.id })
 	return true
 
 
@@ -419,6 +428,7 @@ func demand_surrender(u: Dictionary) -> bool:
 	var d20 := rng.randi_range(1, 20)
 	var ok := d20 + _negotiation >= dc
 	messages.append("%s: 항복을 요구한다. d20 %d + 교섭 %d vs DC %d → %s" % [u.name, d20, _negotiation, dc, "성공" if ok else "실패"])
+	events.append({ "type": "status", "id": u.id, "text": "항복 요구 " + ("성공" if ok else "실패") })
 	if ok:
 		result = "surrender"
 		messages.append("적이 무기를 내려놓는다.")
@@ -438,9 +448,11 @@ func end_player_turn() -> void:
 			result = "escaped"
 			messages.append("차가 먼지를 일으키며 빠져나간다.")
 			return
+	events.append({ "type": "phase", "side": "enemy" })
 	_enemy_turn()
 	if result != "":
 		return
+	events.append({ "type": "phase", "side": "player" })
 	turn += 1
 	for u in units:
 		if u.side == "player":
@@ -488,10 +500,11 @@ func _enemy_act(e: Dictionary) -> bool:
 	var path: Array = reachable(e)[dest]
 	e.ap -= 1
 	for step in path:
-		e.pos = step
+		_step(e, step)
 		_trigger_overwatch(e, "player")
 		if e.down:
 			break
+	_flush_move()
 	return true
 
 
@@ -542,6 +555,7 @@ func _maybe_shoot_car(e: Dictionary) -> void:
 	var d20 := rng.randi_range(1, 20)
 	if d20 + e.aim + int(wpn.aim) < int(car_cfg.defense):
 		messages.append("%s의 총알이 차체를 스친다." % e.name)
+		events.append({ "type": "car_shot", "from": e.id, "hit": false, "part": "" })
 		return
 	var intact: Array = car_cfg.parts.keys().filter(func(p): return not damaged_parts.has(p))
 	if intact.is_empty():
@@ -550,6 +564,7 @@ func _maybe_shoot_car(e: Dictionary) -> void:
 	damaged_parts[part] = true
 	car_hits.append(part)
 	messages.append("%s가 차를 맞혔다! %s 파손." % [e.name, car_cfg.parts[part].name])
+	events.append({ "type": "car_shot", "from": e.id, "hit": true, "part": car_cfg.parts[part].name })
 
 
 # --- 공통 ---
@@ -561,7 +576,11 @@ func _shoot(a: Dictionary, target: Dictionary, penalty: int) -> void:
 	var wpn: Dictionary = cfg.weapons[wid]
 	var needed := _needed_roll(a, target, wid, penalty)
 	var d20 := rng.randi_range(1, 20)
-	if d20 < needed and d20 != 20:
+	var hit := d20 >= needed or d20 == 20
+	_flush_move()
+	events.append({ "type": "shot", "from": a.id, "to": target.id, "weapon": wpn.name,
+		"melee": wpn.get("melee", false), "hit": hit, "chance": _chance(needed) })
+	if not hit:
 		messages.append("%s → %s: %s 빗나감 (%d%%)" % [a.name, target.name, wpn.name, _chance(needed)])
 		return
 	var dmg := rng.randi_range(int(wpn.damage[0]), int(wpn.damage[1]))
@@ -571,6 +590,7 @@ func _shoot(a: Dictionary, target: Dictionary, penalty: int) -> void:
 func _damage(target: Dictionary, dmg: int, msg: String) -> void:
 	target.hp = maxi(0, target.hp - dmg)
 	messages.append(msg)
+	events.append({ "type": "damage", "id": target.id, "dmg": dmg, "hp_after": target.hp })
 	if target.hp == 0 and not target.down:
 		target.down = true
 		target.overwatch = false
@@ -586,6 +606,8 @@ func _trigger_overwatch(mover: Dictionary, watcher_side: String) -> void:
 			continue
 		w_unit.overwatch = false
 		messages.append("%s의 경계 사격!" % w_unit.name)
+		_flush_move()
+		events.append({ "type": "status", "id": w_unit.id, "text": "경계 사격!" })
 		_shoot(w_unit, mover, int(cfg.overwatch_penalty))
 		if mover.down:
 			return
@@ -593,6 +615,7 @@ func _trigger_overwatch(mover: Dictionary, watcher_side: String) -> void:
 
 func _explode(at: Vector2i, blast: Dictionary) -> void:
 	var r := int(blast.radius)
+	events.append({ "type": "explode", "cell": at, "radius": r })
 	var chain := []
 	for dy in range(-r, r + 1):
 		for dx in range(-r, r + 1):
@@ -611,6 +634,20 @@ func _explode(at: Vector2i, blast: Dictionary) -> void:
 	for p in chain:
 		messages.append("통이 연쇄 폭발한다!")
 		_explode(p, cfg.barrel)
+
+
+func _step(u: Dictionary, cell: Vector2i) -> void:
+	if _move_buf.get("id", "") != u.id:
+		_flush_move()
+		_move_buf = { "type": "move", "id": u.id, "path": [u.pos] }
+	u.pos = cell
+	_move_buf.path.append(cell)
+
+
+func _flush_move() -> void:
+	if not _move_buf.is_empty():
+		events.append(_move_buf)
+		_move_buf = {}
 
 
 func _check_end() -> void:

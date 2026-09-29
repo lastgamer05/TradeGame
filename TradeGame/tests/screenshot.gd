@@ -32,8 +32,18 @@ func _initialize() -> void:
 		cells.sort_custom(func(a, c): return a.y < c.y)
 		b.move(u, cells[0])
 		b.end_player_turn()
+		view.speed = 20.0
+		await view._play_events()
+		view.speed = 1.0
 		view._select_next()
-		view.hover = b.active_units("enemy")[0].pos
+		# 선택 유닛의 이동 경로 미리보기
+		var sel: Dictionary = view._selected()
+		var reach: Dictionary = b.reachable(sel)
+		var far: Vector2i = sel.pos
+		for c in reach:
+			if reach[c].size() > reach.get(far, []).size():
+				far = c
+		view.hover = far
 		view._refresh()
 	elif args.size() > 1:
 		main._event_queue.append(root.get_node("GameData").events[args[1]])
