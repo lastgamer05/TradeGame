@@ -11,7 +11,9 @@ from PIL import Image
 OUTLINE = (24, 18, 28, 255)
 
 
-def pixelize(src, dst, height=None, width=None, size=None, colors=24, outline=False):
+def pixelize(src, dst, height=None, width=None, size=None, colors=24, outline=False, kmeans=0):
+    """kmeans > 0: 색 줄이기 뒤에 k-평균으로 팔레트를 다듬는다. 초상화처럼 작은 그림에서
+    눈빛·문신 같은 작은 강조색이 사라지지 않게 한다. 0이면 예전과 같다."""
     im = Image.open(src).convert("RGBA")
     if size:
         target = size
@@ -22,7 +24,7 @@ def pixelize(src, dst, height=None, width=None, size=None, colors=24, outline=Fa
     small = im.resize(target, Image.LANCZOS)
     alpha = small.getchannel("A").point(lambda a: 255 if a >= 128 else 0)
     rgb = small.convert("RGB")
-    q = rgb.quantize(colors=colors, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).convert("RGB")
+    q = rgb.quantize(colors=colors, method=Image.Quantize.MEDIANCUT, kmeans=kmeans, dither=Image.Dither.NONE).convert("RGB")
     out = q.convert("RGBA")
     out.putalpha(alpha)
     if outline:
@@ -54,6 +56,7 @@ if __name__ == "__main__":
     ap.add_argument("--size")
     ap.add_argument("--colors", type=int, default=24)
     ap.add_argument("--outline", action="store_true")
+    ap.add_argument("--kmeans", type=int, default=0)
     a = ap.parse_args()
     size = tuple(int(v) for v in a.size.split("x")) if a.size else None
-    print(pixelize(a.src, a.dst, a.height, a.width, size, a.colors, a.outline))
+    print(pixelize(a.src, a.dst, a.height, a.width, size, a.colors, a.outline, a.kmeans))
