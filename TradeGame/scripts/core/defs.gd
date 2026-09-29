@@ -15,13 +15,17 @@ const GOOD_CATEGORIES := ["necessity", "tech", "strategic", "info", "contraband"
 ## 판정 결과 3단계. 판정이 없는 선택지는 success만 쓴다.
 const OUTCOMES := ["success", "partial", "failure"]
 
-const EVENT_TRIGGERS := ["travel", "city", "ruin"]
+const EVENT_TRIGGERS := ["travel", "city", "ruin", "arrival", "location"]
 
-const REQUIREMENT_TYPES := ["cargo", "module", "reputation", "faction_reputation", "flag", "companion", "animal"]
+const REQUIREMENT_TYPES := [
+	"cargo", "module", "reputation", "faction_reputation", "flag", "companion", "animal",
+	"crisis", "faction_share", "quest", "day", "power",
+]
 
 const COST_TYPES := ["power", "cargo"]
 
 const EFFECT_TYPES := [
 	"reputation", "power", "cargo_add", "cargo_remove", "vehicle_damage",
 	"companion_trust", "flag_set", "flag_clear", "start_combat",
+	"start_dialogue", "recruit", "dismiss", "quest_start", "quest_complete", "trust", "faction_strength",
 ]

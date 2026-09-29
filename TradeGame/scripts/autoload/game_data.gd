@@ -186,8 +186,8 @@ func _validate_requirement(where: String, req: Dictionary) -> void:
 			_check_ref(where, "requires.city", req.get("city"), cities)
 		"faction_reputation":
 			_check_ref(where, "requires.faction", req.get("faction"), factions)
-		"flag", "companion", "animal":
-			pass
+		"flag", "companion", "animal", "crisis", "faction_share", "quest", "day", "power":
+			pass  # 세부 검증은 엔진 담당 (docs/city_spec.md 2.4)
 		_:
 			errors.append("%s: 알 수 없는 requirement '%s'" % [where, req.get("type")])
 
