@@ -6,21 +6,30 @@ extends Control
 
 signal finished(battle: Battle)
 
-const R := 24.0  # 육각형 외접원 반지름. 칸 폭 = sqrt(3) * R
+const R := 26.0  # 육각형 외접원 반지름. 칸 폭 = sqrt(3) * R
+## 세로 눌림 비율. 1.0 = 위에서 내려다본 정육각형, 1보다 작으면 비스듬히 본 시점.
+const TILT := 0.58
+## 전장 회전 (도). 0 = 왼쪽→오른쪽 가로 배치, 음수면 오른쪽 위로 기운 대각선 배치.
+const ROT_DEG := -30.0
 const TH := 20.0  # 스프라이트 발밑 보정용
 const HALF_H := 12.0
 const FULL_H := 30.0
 const UNIT_H := 56.0
 const UNIT_SPRITE := "res://assets/combat/units/%s.png"
 const PROP_SPRITE := "res://assets/combat/props/%s.png"
-const HALF_PROPS := ["barrier", "crates", "sandbags"]
-const FULL_PROPS := ["wall", "wreck", "container"]
+const GROUND := "res://assets/combat/ground/%s.png"
+## 좌우로 뒤집어도 되는 소품. 줄로 늘어서는 소품은 뒤집으면 긴 축이 어긋난다.
+const FLIPPABLE := ["crates", "tires", "rubble", "scrap", "rocks", "boulder", "barrel"]
 ## 스프라이트 표시 크기 (px). 유닛은 키, 소품은 폭 기준.
 const UNIT_HEIGHTS := { "raider_brute": 66.0, "war_machine": 64.0 }
 const PROP_WIDTHS := {
 	"barrier": 50.0, "crates": 48.0, "sandbags": 52.0, "wall": 42.0, "wreck": 64.0,
 	"container": 50.0, "barrel": 20.0, "car": 118.0,
+	"rubble": 46.0, "tires": 32.0, "brick": 52.0, "scrap": 48.0, "boulder": 50.0, "rocks": 42.0,
+	"tank": 100.0, "bus": 108.0,
 }
+## 두 칸짜리로 놓였을 때의 폭
+const LONG_WIDTHS := { "container": 88.0, "tank": 100.0, "bus": 108.0 }
 const RESULT_NAMES := { "victory": "승리", "surrender": "항복을 받아냈다", "escaped": "도주 성공", "wiped": "분대 전멸" }
 
 const FLOOR_COLORS := {
@@ -157,9 +166,9 @@ func _layout_origin() -> void:
 	var max_p := Vector2(-INF, -INF)
 	for y in battle.h:
 		for x in battle.w:
-			var p := Battle.to_plane(Vector2i(x, y)) * R
-			min_p = min_p.min(p - Vector2(R, R))
-			max_p = max_p.max(p + Vector2(R, R))
+			var p := _project(Battle.to_plane(Vector2i(x, y)) * R)
+			min_p = min_p.min(p - Vector2(R, R * TILT))
+			max_p = max_p.max(p + Vector2(R, R * TILT))
 	var area := Rect2(0, 100, 1280, 720 - 100 - 136)
 	origin = (area.get_center() - (min_p + max_p) / 2).round()
 
@@ -167,11 +176,16 @@ func _layout_origin() -> void:
 # --- 좌표 ---
 
 func tile_center(c: Vector2i) -> Vector2:
-	return origin + Battle.to_plane(c) * R
+	return origin + _project(Battle.to_plane(c) * R)
+
+
+## 평면 좌표 -> 화면: 회전한 뒤 세로로 눌러 비스듬한 시점을 만든다.
+func _project(v: Vector2) -> Vector2:
+	return v.rotated(deg_to_rad(ROT_DEG)) * Vector2(1, TILT)
 
 
 func cell_at(p: Vector2) -> Vector2i:
-	var l := (p - origin) / R
+	var l := ((p - origin) / Vector2(1, TILT)).rotated(-deg_to_rad(ROT_DEG)) / R
 	var q := sqrt(3.0) / 3.0 * l.x - l.y / 3.0
 	var r := 2.0 / 3.0 * l.y
 	return Battle.from_cube(Battle._cube_round(Vector3(q, r, -q - r)))
@@ -182,7 +196,7 @@ func _hex_at(center: Vector2, scale := 1.0) -> PackedVector2Array:
 	var pts := PackedVector2Array()
 	for i in 6:
 		var a := deg_to_rad(60.0 * i - 30.0)
-		pts.append(center + Vector2(cos(a), sin(a)) * R * scale)
+		pts.append(center + _project(Vector2(cos(a), sin(a)) * R * scale))
 	return pts
 
 
@@ -562,17 +576,30 @@ func _draw_board() -> void:
 		reach = battle.reachable(sel)
 	var colors: Array = FLOOR_COLORS.get(battle.encounter.location, FLOOR_COLORS.highway)
 
-	# 바닥
+	# 바닥: 장소 지형 그림을 화면 전체에 어둡게 깔고, 칸 안에는 같은 그림을 밝게 비춘다.
+	var ground := _tex(GROUND % battle.encounter.location)
+	var bg_rect := _cover_rect(ground.get_size()) if ground else Rect2()
+	if ground:
+		_board.draw_texture_rect(ground, bg_rect, false, Color(0.32, 0.3, 0.34))
 	for y in battle.h:
 		for x in battle.w:
 			var c := Vector2i(x, y)
 			var shade := float((x * 7 + y * 13) % 5) / 4.0
-			_board.draw_colored_polygon(_hex(c), colors[0].lerp(colors[1], shade))
+			var poly := _hex(c)
+			if ground:
+				var uvs := PackedVector2Array()
+				for pt in poly:
+					uvs.append((pt - bg_rect.position) / bg_rect.size)
+				_board.draw_colored_polygon(poly, Color(1, 1, 1), uvs, ground)
+				_board.draw_colored_polygon(poly, Color(0, 0, 0, 0.06 * shade))
+			else:
+				_board.draw_colored_polygon(poly, colors[0].lerp(colors[1], shade))
 			if c in battle.escape_cells:
 				_board.draw_colored_polygon(_hex(c, 0.88), COL_ESCAPE)
 			if reach.has(c):
 				_board.draw_colored_polygon(_hex(c, 0.88), COL_REACH)
-			_board.draw_polyline(_closed(_hex(c)), Color(0, 0, 0, 0.3), 1.0)
+			_board.draw_polyline(_closed(poly), Color(0, 0, 0, 0.28), 1.0)
+			_board.draw_polyline(_closed(_hex(c, 0.97)), Color(1, 0.9, 0.7, 0.06), 1.0)
 	# 공격 가능한 적 표시
 	if not sel.is_empty() and battle.can_act(sel) and not playing:
 		for e in battle.active_units("enemy"):
@@ -596,9 +623,17 @@ func _draw_board() -> void:
 	var items := []
 	for y in battle.h:
 		for x in battle.w:
-			var t := battle.tile(Vector2i(x, y))
-			if t != Battle.Tile.FLOOR:
-				items.append({ "d": tile_center(Vector2i(x, y)).y, "k": "tile", "c": Vector2i(x, y), "t": t })
+			var c := Vector2i(x, y)
+			var t := battle.tile(c)
+			if t == Battle.Tile.FLOOR:
+				continue
+			var prop: Dictionary = battle.props.get(c, { "name": "", "anchor": true, "cells": [c] })
+			if not prop.anchor:
+				continue
+			var d := -INF
+			for pc in prop.cells:
+				d = maxf(d, tile_center(pc).y)
+			items.append({ "d": d, "k": "tile", "c": c, "t": t, "prop": prop })
 	items.append({ "d": _car_ground().y, "k": "car" })
 	for u in battle.units:
 		if disp_boarded[u.id]:
@@ -608,7 +643,7 @@ func _draw_board() -> void:
 	items.sort_custom(func(a, b): return a.d < b.d)
 	for it in items:
 		match it.k:
-			"tile": _draw_tile_object(it.c, it.t)
+			"tile": _draw_tile_object(it.c, it.t, it.prop)
 			"car": _draw_car()
 			"unit": _draw_unit(it.u)
 
@@ -700,12 +735,28 @@ func _draw_prism(ground: Vector2, scale: float, height: float, col: Color) -> vo
 	_board.draw_polyline(_closed(top), Color(0, 0, 0, 0.5), 1.0)
 
 
-func _draw_tile_object(c: Vector2i, t: int) -> void:
-	var names: Array = HALF_PROPS if t == Battle.Tile.HALF else FULL_PROPS
-	var prop: String = "barrel" if t == Battle.Tile.BARREL else names[(c.x * 3 + c.y * 5) % names.size()]
-	var tex := _tex(PROP_SPRITE % prop)
+## 화면을 꽉 채우도록 비율을 유지해 늘린 사각형
+func _cover_rect(tex_size: Vector2) -> Rect2:
+	var screen := Vector2(1280, 720)
+	var s := maxf(screen.x / tex_size.x, screen.y / tex_size.y)
+	var sz := tex_size * s
+	return Rect2((screen - sz) / 2, sz)
+
+
+func _draw_tile_object(c: Vector2i, t: int, info: Dictionary) -> void:
+	var prop: String = info.name
+	var cells: Array = info.cells
+	var tex := _tex(PROP_SPRITE % prop) if prop != "" else null
 	if tex:
-		_draw_sprite(tex, tile_center(c), PROP_WIDTHS[prop], (c.x + c.y) % 2 == 1)
+		var ground := Vector2.ZERO
+		for pc in cells:
+			ground += tile_center(pc)
+		ground /= cells.size()
+		var width: float = LONG_WIDTHS.get(prop, PROP_WIDTHS.get(prop, 48.0)) if cells.size() > 1 else PROP_WIDTHS.get(prop, 48.0)
+		if prop in FLIPPABLE:
+			# 같은 소품이 반복돼 보이지 않게 칸마다 크기를 조금씩 다르게
+			width *= 0.85 + 0.3 * float((c.x * 37 + c.y * 71) % 10) / 9.0
+		_draw_sprite(tex, ground, width, prop in FLIPPABLE and (c.x + c.y) % 2 == 1)
 		return
 	match t:
 		Battle.Tile.HALF:

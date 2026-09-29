@@ -5,6 +5,8 @@
 - `art/cities/*.png`: 8 city backgrounds, generated with VARCO (model gpt-image-2-medium), then resized to 1280x720 and reduced to a 256-color palette.
 - `icons/goods/*.png`, `icons/ui/*.png`: cut from one generated 5x5 icon sheet (VARCO, gpt-image-2-medium). Background removed, resized to 96x96.
 - `combat/units/*.png`, `combat/props/*.png`: cut from two generated 4x2 sprite sheets (VARCO, gpt-image-2-medium, magenta background removed), resized to 2x their in-game size.
+- `combat/props/` also has a second 4x2 sheet (rubble, tires, brick wall, scrap, boulder, rocks, tank hull, bus). `combat/ground/*.png`: 5 battlefield ground images, one per location (1280x720, 256 colors).
+- `art_src/slice_sheet.py` cuts magenta-background sheets into sprites.
 - Full-resolution originals and the icon sheet are kept outside the Godot project in `art_src/` so they are not exported.
 
 ## Font — Galmuri (SIL Open Font License 1.1)

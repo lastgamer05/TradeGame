@@ -56,11 +56,16 @@
 		}
 	},
 	"locations": {
-		"highway": { "name": "무너진 고속도로", "half": 14, "full": 8, "barrels": 2 },
-		"checkpoint": { "name": "검문소", "half": 16, "full": 6, "barrels": 1 },
-		"canyon": { "name": "황무지 협곡", "half": 8, "full": 14, "barrels": 0 },
-		"alley": { "name": "도시 외곽 골목", "half": 12, "full": 12, "barrels": 2 },
-		"gas_station": { "name": "폐허 주유소", "half": 12, "full": 8, "barrels": 5 }
+		"highway": { "name": "무너진 고속도로", "half": 14, "full": 8, "barrels": 2,
+			"props": { "half": ["barrier", "tires", "rubble", "scrap"], "half_line": ["barrier"], "full": ["wreck", "wall"], "full_long": ["bus", "tank"] } },
+		"checkpoint": { "name": "검문소", "half": 16, "full": 6, "barrels": 1,
+			"props": { "half": ["crates", "sandbags", "barrier"], "half_line": ["sandbags", "barrier"], "full": ["wall", "container"], "full_long": ["container", "tank"] } },
+		"canyon": { "name": "황무지 협곡", "half": 8, "full": 14, "barrels": 0,
+			"props": { "half": ["rocks", "rubble"], "half_line": ["rocks"], "full": ["boulder"], "full_long": [] } },
+		"alley": { "name": "도시 외곽 골목", "half": 12, "full": 12, "barrels": 2,
+			"props": { "half": ["crates", "tires", "scrap", "brick"], "half_line": ["brick"], "full": ["wall", "container"], "full_long": ["bus", "container"] } },
+		"gas_station": { "name": "폐허 주유소", "half": 12, "full": 8, "barrels": 5,
+			"props": { "half": ["tires", "scrap", "crates"], "half_line": ["barrier"], "full": ["wreck", "container"], "full_long": ["tank", "bus"] } }
 	},
 	"car": {
 		"defense": 8,

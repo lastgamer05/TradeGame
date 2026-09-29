@@ -20,6 +20,8 @@ var w: int
 var h: int
 var tiles: Array = []  # tiles[y][x]
 var car_cells: Array = []
+## 장애물 그림 배치. 칸 -> { name, anchor, cells }. 여러 칸짜리 구조물은 anchor 칸에만 cells가 있다.
+var props: Dictionary = {}
 var escape_cells: Array = []
 ## 유닛: { id, side, name, pos, hp, max_hp, aim, might, weapon, melee_weapon, ap, hidden, overwatch, boarded, down, ai, defense }
 var units: Array = []
@@ -83,41 +85,111 @@ func _try_generate() -> void:
 		for n in neighbors(c):
 			if n not in car_cells and n not in escape_cells:
 				escape_cells.append(n)
-	# 위쪽 절반에 뿌리고 아래쪽에 거울처럼 옮긴 뒤 일부를 흩뜨린다 (양쪽 측면 밀도 맞추기).
-	_scatter(Tile.FULL, int(location.full) / 2)
-	_scatter(Tile.HALF, int(location.half) / 2)
-	_scatter(Tile.BARREL, int(location.barrels) / 2 + int(location.barrels) % 2)
-	for y in h / 2:
-		for x in w:
-			var t: int = tiles[y][x]
-			if t == Tile.FLOOR:
-				continue
-			var my := h - 1 - y
-			var mx := clampi(x + rng.randi_range(-1, 1), 0, w - 1)
-			var m := Vector2i(mx, my)
-			if tiles[my][mx] == Tile.FLOOR and not _reserved(m):
-				tiles[my][mx] = t
+	props = {}
+	# 위쪽 절반에 구조물을 놓고 아래쪽에 거울처럼 옮긴다 (양쪽 측면 밀도 맞추기).
+	var placed := []
+	var budget_full := int(location.full) / 2
+	var budget_half := int(location.half) / 2
+	var tries := 0
+	while (budget_full > 0 or budget_half > 0) and tries < 300:
+		tries += 1
+		var st := _random_structure(budget_full > 0 and (budget_half <= 0 or rng.randf() < 0.45))
+		if st.is_empty() or not _structure_fits(st.cells, true):
+			continue
+		_place_structure(st)
+		placed.append(st)
+		if st.tile == Tile.FULL:
+			budget_full -= st.cells.size()
+		else:
+			budget_half -= st.cells.size()
+	for st in placed:
+		var shift := rng.randi_range(-1, 1)
+		var mirrored := []
+		for c in st.cells:
+			mirrored.append(Vector2i(c.x + shift, h - 1 - c.y))
+		if _structure_fits(mirrored, false):
+			# 모양과 엄폐 종류는 같게, 그림은 같은 풀에서 새로 골라 쌍둥이처럼 보이지 않게 한다.
+			var pool: Dictionary = location.props
+			var name: String = st.name
+			if st.long:
+				name = _pick(pool.full_long)
+			elif st.tile == Tile.FULL:
+				name = _pick(pool.full)
+			elif name != "":
+				name = _pick(pool.half_line)
+			_place_structure({ "cells": mirrored, "tile": st.tile, "name": name, "long": st.long })
+	# 폭발물 통은 한 칸씩
+	var barrels := 0
+	tries = 0
+	while barrels < int(location.barrels) and tries < 200:
+		tries += 1
+		var b := Vector2i(rng.randi_range(4, w - 5), rng.randi_range(0, h - 1))
+		if _near_cells(b, _player_spawn_cells(), 2) or _near_cells(b, _enemy_spawn_cells(), 2):
+			continue
+		if _structure_fits([b], false):
+			_place_structure({ "cells": [b], "tile": Tile.BARREL, "name": "barrel", "long": false })
+			barrels += 1
 	# 시작 지점 근처 엄폐 보장
 	for zone in [_player_spawn_cells(), _enemy_spawn_cells()]:
 		var need := 2 - _cover_near(zone)
 		for i in maxi(need, 0):
 			var spot := _free_near(zone)
 			if spot != Vector2i(-1, -1):
-				tiles[spot.y][spot.x] = Tile.HALF
+				_place_structure({ "cells": [spot], "tile": Tile.HALF, "name": _pick(location.props.half), "long": false })
 
 
-func _scatter(t: int, count: int) -> void:
-	var placed := 0
-	var tries := 0
-	while placed < count and tries < 400:
-		tries += 1
-		var p := Vector2i(rng.randi_range(4, w - 4), rng.randi_range(0, h / 2 - 1))
-		if tiles[p.y][p.x] != Tile.FLOOR or _reserved(p):
-			continue
-		if t == Tile.BARREL and (_near_cells(p, _player_spawn_cells(), 2) or _near_cells(p, _enemy_spawn_cells(), 2)):
-			continue
-		tiles[p.y][p.x] = t
-		placed += 1
+## 구조물 하나를 고른다: 긴 완전 엄폐(2칸), 완전 엄폐 1칸, 반 엄폐 줄(2~3칸), 반 엄폐 뭉치(2~3칸), 반 엄폐 1칸.
+## 줄은 동쪽 방향(화면에서 오른쪽 위로 기운 선)으로 이어져 소품 그림의 긴 축과 맞는다.
+func _random_structure(full: bool) -> Dictionary:
+	var pool: Dictionary = location.props
+	var start := Vector2i(rng.randi_range(3, w - 5), rng.randi_range(0, h / 2 - 1))
+	if full:
+		if not pool.full_long.is_empty() and rng.randf() < 0.45:
+			return { "cells": [start, start + Vector2i(1, 0)], "tile": Tile.FULL, "name": _pick(pool.full_long), "long": true }
+		return { "cells": [start], "tile": Tile.FULL, "name": _pick(pool.full), "long": false }
+	var roll := rng.randf()
+	if roll < 0.4:
+		var n := rng.randi_range(2, 3)
+		var cells := []
+		for i in n:
+			cells.append(start + Vector2i(i, 0))
+		return { "cells": cells, "tile": Tile.HALF, "name": _pick(pool.half_line), "long": false }
+	if roll < 0.7:
+		var cells := [start]
+		for i in rng.randi_range(1, 2):
+			var nb := neighbors(cells[cells.size() - 1])
+			cells.append(nb[rng.randi_range(0, nb.size() - 1)])
+		return { "cells": cells, "tile": Tile.HALF, "name": "", "long": false }
+	return { "cells": [start], "tile": Tile.HALF, "name": "", "long": false }
+
+
+func _pick(list: Array) -> String:
+	return list[rng.randi_range(0, list.size() - 1)]
+
+
+func _structure_fits(cells: Array, top_half: bool) -> bool:
+	for c in cells:
+		if not _in_bounds(c) or c.x < 3 or c.x > w - 4 or tiles[c.y][c.x] != Tile.FLOOR or _reserved(c):
+			return false
+		if top_half and c.y >= h / 2:
+			return false
+		if cells.count(c) > 1:
+			return false
+	return true
+
+
+## 구조물을 맵에 놓는다. 이름이 빈 반 엄폐 뭉치는 칸마다 소품을 따로 고른다.
+func _place_structure(st: Dictionary) -> void:
+	for c in st.cells:
+		tiles[c.y][c.x] = st.tile
+	if st.long:
+		props[st.cells[0]] = { "name": st.name, "anchor": true, "cells": st.cells }
+		for i in range(1, st.cells.size()):
+			props[st.cells[i]] = { "name": st.name, "anchor": false }
+		return
+	for c in st.cells:
+		var name: String = st.name if st.name != "" else _pick(location.props.half)
+		props[c] = { "name": name, "anchor": true, "cells": [c] }
 
 
 func _reserved(p: Vector2i) -> bool:
@@ -667,8 +739,10 @@ func _explode(at: Vector2i, blast: Dictionary) -> void:
 			_damage(u, dmg, "폭발: %s %d 피해" % [u.name, dmg])
 		if tile(p) == Tile.HALF:
 			tiles[p.y][p.x] = Tile.FLOOR
+			props.erase(p)
 		elif tile(p) == Tile.BARREL:
 			tiles[p.y][p.x] = Tile.FLOOR
+			props.erase(p)
 			chain.append(p)
 	for p in chain:
 		messages.append("통이 연쇄 폭발한다!")

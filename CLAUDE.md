@@ -37,7 +37,7 @@
 - `scripts/core/defs.gd`: 데이터에서 쓰는 고정 식별자 (능력치, 도로 종류, 요구 조건·효과 타입). 새 타입은 여기와 `GameData` 검증에 같이 추가한다.
 - `scripts/core/game_state.gd`, `market.gd`: 한 판의 상태(전력, 화물, 날짜, 이동)와 도시별 시세. UI와 분리돼 있어 테스트에서 직접 쓴다.
 - `scripts/core/politics.gd`, `data/politics.json`: 진영 세력과 정세 사건. 거래가 세력을 키우고, 점유율이 문턱을 넘으면 사건이 시작돼 시세 배율이 바뀐다.
-- `scripts/combat/battle.gd`, `data/combat.json`: 전투 규칙 (맵 생성, 이동, 시야, 엄폐, 명중, 적 AI, 차량 저격, 종료 조건). 전투 격자는 정육각형(pointy-top, odd-r 오프셋 좌표, 거리·시야는 큐브 좌표). `battle_view.gd`는 전투 화면으로, `Battle.events`(이동, 사격, 피해, 폭발 등)를 차례대로 애니메이션 재생한다. 스프라이트는 `assets/combat/`, 없으면 도형으로 그린다. `tests/balance_sim.gd`로 조우별 승률을 확인한다.
+- `scripts/combat/battle.gd`, `data/combat.json`: 전투 규칙 (맵 생성, 이동, 시야, 엄폐, 명중, 적 AI, 차량 저격, 종료 조건). 전투 격자는 정육각형(pointy-top, odd-r 오프셋 좌표, 거리·시야는 큐브 좌표). `battle_view.gd`는 전투 화면으로, `Battle.events`(이동, 사격, 피해, 폭발 등)를 차례대로 애니메이션 재생한다. 스프라이트는 `assets/combat/`, 없으면 도형으로 그린다. 화면은 30도 회전·세로 0.58 눌림(`ROT_DEG`, `TILT`)이고, 장소별 바닥 그림(`assets/combat/ground/`)을 칸 안에만 밝게 비춘다. 장애물 풀은 `combat.json`의 `locations.*.props`. 바르코 스프라이트 시트는 `art_src/slice_sheet.py`로 자른다. `tests/balance_sim.gd`로 조우별 승률을 확인한다.
 - `scripts/core/event_runner.gd`: 이벤트 선택(이동 후 도로 종류, 도시 도착), 선택지 조건·비용 확인, d20 판정, 효과 적용. `start_combat` 효과는 전투를 띄우고, `vehicle_damage`는 차량 부위를 파손시킨다.
 - `scripts/ui/`, `scenes/main.tscn`: 교역 루프 프로토타입 화면. UI는 코드로 만든다.
 - `data/routes.json`: 임시 지도 (도시 좌표, 도로). 월드맵 초안이 정해지면 교체한다.
