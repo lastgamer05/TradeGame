@@ -1,0 +1,187 @@
+{
+	"id": "crane_mechanic_ivo",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "음… 손님인가. 천천히 말해도 되지. 이 크레인들도 천천히 녹슬었어. 이보라고 하네. 차 고칠 거면 저기 두고.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_crane_mechanic_ivo"
+				}
+			],
+			"choices": [
+				{
+					"text": "크레인 보정을 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "calib_ok",
+					"fail_next": "calib_fail",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 3
+						},
+						{
+							"type": "power",
+							"delta": 10
+						}
+					]
+				},
+				{
+					"text": "저 크레인은 아직 돌아가?",
+					"next": "crane"
+				},
+				{
+					"text": "전쟁 전 얘기를 듣는다",
+					"next": "old"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "음… 또 왔군. 차가 어디 아픈가, 자네가 어디 아픈가.",
+			"choices": [
+				{
+					"text": "저 크레인은 아직 돌아가?",
+					"next": "crane"
+				},
+				{
+					"text": "전쟁 전 얘기를 듣는다",
+					"next": "old"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "요즘 크레인 꼭대기에 망보는 애들을 올려. 약탈자 먼지가 보이면 종을 치지. 크레인이 다시 쓸모가 생겼어. 슬픈 쓸모지만.",
+			"choices": [
+				{
+					"text": "저 크레인은 아직 돌아가?",
+					"next": "crane"
+				},
+				{
+					"text": "전쟁 전 얘기를 듣는다",
+					"next": "old"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"crane": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "한 대는 돌아가. 전력만 있으면. 우리 셀로는 하루에 한 번 들어 올리지. 전쟁 전엔 하루에 삼백 번이었어.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"old": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "내 스승은 발전소를 짓던 사람이야. 헬리오스 그 발전로. 설계 수명이 사십 년이라고 했지. 올해가… 음, 몇 년째더라. 손가락이 모자라는군.",
+			"choices": [
+				{
+					"text": "사십 년이 지나면 어떻게 되지?",
+					"next": "old_life"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"old_life": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "손보면 더 가. 손볼 부품과 손이 있으면. 없으면… 이 크레인들처럼 서 있는 거지. 헬리오스는 알아서 하겠지. 거긴 뭐든 있잖나.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "ivo_reactor_lifespan"
+				}
+			],
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"calib_ok": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "오… 손끝이 좋군. 몇 년 만에 균형이 맞았어. 조합에 말해서 수고비를 챙겨 주지.",
+			"choices": [
+				{
+					"text": "저 크레인은 아직 돌아가?",
+					"next": "crane"
+				},
+				{
+					"text": "전쟁 전 얘기를 듣는다",
+					"next": "old"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"calib_fail": {
+			"speaker": "crane_mechanic_ivo",
+			"text": "천천히, 천천히. 서두르면 쇠가 화를 내. 다음에 다시 해 보게.",
+			"choices": [
+				{
+					"text": "저 크레인은 아직 돌아가?",
+					"next": "crane"
+				},
+				{
+					"text": "전쟁 전 얘기를 듣는다",
+					"next": "old"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_crane_mechanic_ivo"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_crane_mechanic_ivo"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

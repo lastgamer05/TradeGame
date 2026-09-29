@@ -1,0 +1,309 @@
+{
+	"id": "gale",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "gale",
+			"text": "어서 와. 게일이다. 조합장이라고들 부르지. 거창한 건 아니고, 고물꾼들 몫을 제값에 파는 사람이야. 앉아. 차는 없지만 말은 많아.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_gale"
+				}
+			],
+			"choices": [
+				{
+					"text": "조합은 누구 편이지?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "gale_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "gale",
+			"text": "우리 운반꾼. 오늘은 무슨 바람이 불어서?",
+			"choices": [
+				{
+					"text": "조합은 누구 편이지?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "gale_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "gale",
+			"text": "헬리오스가 검문을 늘렸어. 억제제가 끊겨서 조합원 의체가 하나둘 멈춰. 억제제 들고 오면 내가 제일 비싸게 사 주지. 어디서 났는지는 안 묻고.",
+			"choices": [
+				{
+					"text": "조합은 누구 편이지?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "gale_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_blockade": {
+			"speaker": "gale",
+			"text": "소하 원로가 제대로 한 방 먹였지. 이제 헬리오스도 우릴 무시 못 해. 이럴 때 값을 올려야 해. 고물이든, 편이든.",
+			"choices": [
+				{
+					"text": "조합은 누구 편이지?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "gale_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"side": {
+			"speaker": "gale",
+			"text": "배고프지 않은 편. 헬리오스가 값을 잘 쳐주면 헬리오스, 언더그리드가 잘 쳐주면 언더그리드. 부끄럽냐고? 고물로 산 지 십 년이야. 자존심은 제일 먼저 팔았지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"job": {
+			"speaker": "gale",
+			"text": "조합 견본을 스왑밋의 아다에게 넘겨 줘. 고물 전자부품 여덟 개. 그 값이 기준이 돼서 황무지 고물 시세가 정해져. 조합 몫을 지키는 일이야.",
+			"choices": [
+				{
+					"text": "맡겠다",
+					"next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "gale_first_job"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 8
+						}
+					]
+				},
+				{
+					"text": "보수를 먼저 듣자",
+					"next": "job_pay"
+				},
+				{
+					"text": "생각해 보겠다",
+					"next": ""
+				}
+			]
+		},
+		"job_pay": {
+			"speaker": "gale",
+			"text": "아다가 치를 거야. 조합이 맡겨 뒀어. 떼먹을 생각이면 그만둬. 고물상은 기억력이 좋아.",
+			"choices": [
+				{
+					"text": "맡겠다",
+					"next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "gale_first_job"
+						},
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 8
+						}
+					]
+				},
+				{
+					"text": "생각해 보겠다",
+					"next": ""
+				}
+			]
+		},
+		"job_ok": {
+			"speaker": "gale",
+			"text": "짐칸에 실어 뒀어. 스왑밋까지 간선도로로 이틀. 약탈자 조심하고.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"waiting": {
+			"speaker": "gale",
+			"text": "견본은 아직 짐칸에 있나? 아다가 기다려. 잃어버렸으면 장터에서 채워 넣어. 조합은 결과만 봐.",
+			"choices": [
+				{
+					"text": "곧 가겠다",
+					"next": ""
+				}
+			]
+		},
+		"after": {
+			"speaker": "gale",
+			"text": "아다가 기준가를 매겼더군. 잘했어. …그리고 하나 알려 주지. 요즘 네 이름을 묻는 사람이 있어. 아직 안 팔았어. 아직은.",
+			"choices": [
+				{
+					"text": "누가 묻지?",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 30
+						}
+					],
+					"next": "who"
+				},
+				{
+					"text": "그 말은 협박인가?",
+					"next": "threat"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"who": {
+			"speaker": "gale",
+			"text": "(셀을 세며) 게이트 7 장교. 운전병 출신 탈영병 명단을 들고 다니더군. 네 얼굴이 거기 있는지는 몰라. 알고 싶지도 않고.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "gale_named_voss"
+				}
+			],
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"threat": {
+			"speaker": "gale",
+			"text": "협박이면 값을 불렀겠지. 이건 정보야. 친구한테는 공짜로, 한 번만.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "gale_first_job",
+					"state": "active"
+				}
+			],
+			"start": "waiting"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_gale"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_gale"
+				},
+				{
+					"type": "crisis",
+					"crisis": "greenhouse_blockade",
+					"active": true
+				}
+			],
+			"start": "again_blockade"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "gale_first_job",
+					"state": "done"
+				}
+			],
+			"start": "after"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_gale"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

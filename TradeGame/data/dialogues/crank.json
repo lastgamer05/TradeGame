@@ -1,0 +1,626 @@
+{
+	"id": "crank",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "crank",
+			"text": "(폐차 왕좌에서 다리를 꼰다) 운반꾼이 제 발로 요새까지 왔네. 배짱은 합격. 크랭크다. 여기 왕이지. 왕관은 없지만.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_crank"
+				}
+			],
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"greet_known": {
+			"speaker": "crank",
+			"text": "보급대 운전병! 입구에서 들었다. 버려진 놈끼리는 반갑지. 나도 헬리오스 군복 입었었어. 마지막 작전 때 부대가 버려지는 걸 봤지. 넌 운전해서 나왔고, 난 총 들고 나왔고.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_crank"
+				}
+			],
+			"choices": [
+				{
+					"text": "그 작전을 기억하나?",
+					"next": "known_op"
+				},
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"known_op": {
+			"speaker": "crank",
+			"text": "잊을 수가 있나. 보급로를 끊으라는 명령. 누구 보급로였는지는 너도 알잖아. 누구는 명령이라 했고, 누구는 학살이라 했지. 난 그날 헬리오스를 버렸다.",
+			"choices": [
+				{
+					"text": "…그 얘기는 하지 마",
+					"next": "known_hush"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"known_hush": {
+			"speaker": "crank",
+			"text": "하하. 과거가 무섭나? 걱정 마. 여긴 과거를 묻지 않아. 대신 쓸 줄은 알지.",
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"greet_morae": {
+			"speaker": "crank",
+			"text": "(동승자를 힐끗 본다) 입구에서 네 얘기 들었다. 반갑군. 옛날 얘기는… 다음에 하지. 둘이 있을 때.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_crank"
+				},
+				{
+					"type": "flag_set",
+					"flag": "morae_noticed_hint"
+				}
+			],
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "crank",
+			"text": "왔군. 오늘은 무슨 선물?",
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "crank",
+			"text": "봐라, 황무지가 우리 거야. 헬리오스 트럭도, 반란군 트럭도 여기 앞에선 똑같이 세금을 내. 이게 공평이다. 칼 앞에 모두가 평등하지.",
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_low": {
+			"speaker": "crank",
+			"text": "요즘 애들이 굶어. 장물이 안 돌아. 헬리오스가 길을 틀어막았지. 괜찮아. 배고픈 늑대가 제일 멀리 달려.",
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "crank_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"freedom": {
+			"speaker": "crank",
+			"text": "누구 명령도 안 듣는 거. 누구 배급표도 안 받는 거. 대신 누가 널 지켜 주지도 않지. 약한 놈은 뺏겨. 그게 공평이야. 적어도 거짓말은 안 하잖아.",
+			"choices": [
+				{
+					"text": "약한 사람은 어떡하고?",
+					"next": "freedom_weak"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"freedom_weak": {
+			"speaker": "crank",
+			"text": "강해지든가, 강한 놈 밑에 붙든가. 헬리오스도 똑같아. 걔들은 그걸 질서라고 부를 뿐이지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"job": {
+			"speaker": "crank",
+			"text": "탄약 여덟 상자. 요새 탄창이 비었어. 레드 메사가 싸지. 가져오면 셀도 주고, 코어도 하나 주지. 장물이라 헬리오스엔 들고 가지 말고.",
+			"choices": [
+				{
+					"text": "맡겠다",
+					"next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "crank_first_job"
+						}
+					]
+				},
+				{
+					"text": "그 탄약으로 누굴 쏘지?",
+					"next": "job_who"
+				},
+				{
+					"text": "생각해 보겠다",
+					"next": ""
+				}
+			]
+		},
+		"job_who": {
+			"speaker": "crank",
+			"text": "트럭. 게이트 7 보급 트럭, 반란군 트럭, 가리지 않아. 네 트럭은 빼 주지. 그게 거래야. 싫으면 관둬. 다른 운반꾼은 많아.",
+			"choices": [
+				{
+					"text": "맡겠다",
+					"next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "crank_first_job"
+						}
+					]
+				},
+				{
+					"text": "관둔다",
+					"next": ""
+				}
+			]
+		},
+		"job_ok": {
+			"speaker": "crank",
+			"text": "좋아. 게이트 7 늙은이한테는 말하지 마. 보스. 내 옛 상관이지. 그 얼굴 아직도 꿈에 나와.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"waiting": {
+			"speaker": "crank",
+			"text": "탄약 여덟 상자. 기다리는 건 질색이야.",
+			"choices": [
+				{
+					"text": "곧 가져오겠다",
+					"next": ""
+				}
+			]
+		},
+		"turnin": {
+			"speaker": "crank",
+			"text": "냄새가 난다. 화약 냄새. 가져왔군.",
+			"choices": [
+				{
+					"text": "탄약 8개를 넘긴다",
+					"requires": [
+						{
+							"type": "quest_ready",
+							"quest": "crank_first_job"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "turnin_done",
+					"effects": [
+						{
+							"type": "quest_complete",
+							"quest": "crank_first_job"
+						}
+					]
+				},
+				{
+					"text": "아직 넘기지 않는다",
+					"next": ""
+				}
+			]
+		},
+		"turnin_done": {
+			"speaker": "crank",
+			"text": "(상자를 발로 툭툭 차 본다) 좋아. 셀이고, 이건 코어. 요새 식구가 된 걸 환영한다. 다음 트럭 털 때 네 몫도 생각해 두지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"han": {
+			"speaker": "crank",
+			"text": "한! 배신자 녀석. 네 옆에 앉아 있군. 그 목에 현상금이 붙어 있는 거 알지? 여기서 넘기면 셀이 두둑하다.",
+			"choices": [
+				{
+					"text": "[전력 80셀] 현상금을 내가 사겠다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 80
+						}
+					],
+					"next": "han_buy",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "han_bounty_cleared"
+						},
+						{
+							"type": "trust",
+							"delta": 10
+						}
+					]
+				},
+				{
+					"text": "넘길 생각 없다",
+					"check": {
+						"stat": "might",
+						"dc": 15
+					},
+					"next": "han_refuse",
+					"fail_next": "han_fight",
+					"effects": [
+						{
+							"type": "trust",
+							"delta": 5
+						}
+					],
+					"fail_effects": [
+						{
+							"type": "start_combat",
+							"encounter": "raider_roadblock"
+						}
+					]
+				},
+				{
+					"text": "화제를 돌린다",
+					"next": ""
+				}
+			]
+		},
+		"han_buy": {
+			"speaker": "crank",
+			"text": "하하! 동승자 몸값을 사 주는 운반꾼이라니. 좋아. 한은 이제 자유다. 자유는 원래 비싼 거야.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"han_refuse": {
+			"speaker": "crank",
+			"text": "(한참 노려보다가 웃는다) 눈빛 좋네. 오늘은 봐주지. 나가는 길에 뒤는 조심하고.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"han_fight": {
+			"speaker": "crank",
+			"text": "싫다고? 그럼 가져가는 수밖에. 얘들아!",
+			"choices": [
+				{
+					"text": "싸운다",
+					"next": ""
+				}
+			]
+		},
+		"after": {
+			"speaker": "crank",
+			"text": "요새 식구 왔군. 게이트 7 트럭이 탄약 떨어져서 벌벌 떨더라. 네 덕이야. 기분 어때?",
+			"choices": [
+				{
+					"text": "자유라는 게 뭐지?",
+					"next": "freedom"
+				},
+				{
+					"text": "[한 동승] 한의 현상금 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "companion",
+							"companion": "han"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "han"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "quest_ready",
+					"quest": "crank_first_job"
+				}
+			],
+			"start": "turnin"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "crank_first_job",
+					"state": "active"
+				}
+			],
+			"start": "waiting"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_crank"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_crank"
+				},
+				{
+					"type": "faction_share",
+					"faction": "lawless",
+					"max": 0.15
+				}
+			],
+			"start": "again_low"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "crank_first_job",
+					"state": "done"
+				}
+			],
+			"start": "after"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_crank"
+				}
+			],
+			"start": "again"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "crank_knows_past"
+				},
+				{
+					"type": "companion",
+					"companion": "morae"
+				}
+			],
+			"start": "greet_morae"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "crank_knows_past"
+				}
+			],
+			"start": "greet_known"
+		}
+	]
+}

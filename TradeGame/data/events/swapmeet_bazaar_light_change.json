@@ -1,0 +1,68 @@
+{
+	"id": "swapmeet_bazaar_light_change",
+	"title": "가벼운 거스름돈",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"swapmeet_bazaar"
+		],
+		"requires": [],
+		"weight": 5
+	},
+	"text": "거스름돈으로 받은 셀 몇 개가 유난히 가볍다. 상인은 벌써 다른 손님을 보고 있다.",
+	"choices": [
+		{
+			"id": "check",
+			"text": "셀을 하나하나 달아 본다",
+			"check": {
+				"stat": "tech",
+				"dc": 12
+			},
+			"outcomes": {
+				"success": {
+					"text": "위조 셀을 골라내 상인 앞에 내민다. 상인이 멋쩍게 진짜로 바꿔 준다.",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "knows_forged_cell_dealer"
+						}
+					]
+				},
+				"failure": {
+					"text": "구분이 안 간다. 결국 가벼운 셀을 그대로 받는다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "forged_cell",
+							"amount": 2
+						},
+						{
+							"type": "power",
+							"delta": -10
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "keep",
+			"text": "모른 척 받아 둔다",
+			"outcomes": {
+				"success": {
+					"text": "위조 셀 두 개가 주머니에 들어온다. 쓸 데가 있을지도 모른다. 헬리오스만 아니면.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "forged_cell",
+							"amount": 2
+						},
+						{
+							"type": "power",
+							"delta": -10
+						}
+					]
+				}
+			}
+		}
+	]
+}

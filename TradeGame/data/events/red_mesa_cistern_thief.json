@@ -1,0 +1,72 @@
+{
+	"id": "red_mesa_cistern_thief",
+	"title": "밤의 물도둑",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"red_mesa_cistern"
+		],
+		"requires": [],
+		"weight": 5
+	},
+	"text": "밤, 저수조 밸브 옆에 아이가 물통을 대고 있다. 당신과 눈이 마주치자 굳는다.",
+	"choices": [
+		{
+			"id": "catch",
+			"text": "붙잡아 웬에게 데려간다",
+			"check": {
+				"stat": "might",
+				"dc": 12
+			},
+			"outcomes": {
+				"success": {
+					"text": "웬이 아이 이름을 부르며 한숨을 쉰다. \"물은 모두의 것이라 누구의 것도 아니란다.\"",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 3
+						}
+					]
+				},
+				"failure": {
+					"text": "아이가 손을 물고 달아난다. 물통만 남았다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "give",
+			"text": "물 한 통을 쥐여 준다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "water",
+					"amount": 1
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "아이가 두 손으로 통을 안고 사라진다. 다음 날 웬이 당신에게 고개를 숙인다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 4
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "ignore",
+			"text": "못 본 척한다",
+			"outcomes": {
+				"success": {
+					"text": "밸브 도는 소리가 짧게 들리고, 멎는다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

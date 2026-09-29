@@ -1,0 +1,176 @@
+{
+	"id": "quartermaster_ro",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "quartermaster_ro",
+			"text": "로 보급관이다. 모든 셀은 장부에 적힌다. 네가 판 탄약 한 발, 산 칩 한 장까지. 불만 있나?",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_quartermaster_ro"
+				}
+			],
+			"choices": [
+				{
+					"text": "군용 칩을 싸게 넘겨 줄 수 있나?",
+					"check": {
+						"stat": "negotiation",
+						"dc": 14
+					},
+					"next": "chips",
+					"fail_next": "chips_no",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "chip_military",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "지금 뭐가 부족하지?",
+					"next": "short"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "quartermaster_ro",
+			"text": "장부 펴 놨다. 뭘 적을까.",
+			"choices": [
+				{
+					"text": "지금 뭐가 부족하지?",
+					"next": "short"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_licensed": {
+			"speaker": "quartermaster_ro",
+			"text": "인가 상인이군. 이제 한 줄로 적힌다. 축하한다. 탄약 들어왔으면 먼저 여기로.",
+			"choices": [
+				{
+					"text": "지금 뭐가 부족하지?",
+					"next": "short"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_blockade": {
+			"speaker": "quartermaster_ro",
+			"text": "식량 재고가 사흘치다. 병사들이 벨트를 한 칸씩 조이고 있어. 생식량이든 합성식품이든 두 배 쳐준다.",
+			"choices": [
+				{
+					"text": "지금 뭐가 부족하지?",
+					"next": "short"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "quartermaster_ro",
+			"text": "보급 트럭이 또 털렸다. 탄약은 부르는 게 값이야. 레드 메사에서 싸게 떼 와. 어디서 왔는지는 장부에 안 적어 주지.",
+			"choices": [
+				{
+					"text": "지금 뭐가 부족하지?",
+					"next": "short"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"short": {
+			"speaker": "quartermaster_ro",
+			"text": "탄약과 식량. 늘 그렇다. 레드 메사 탄약이 가장 싸지만 반란 동조 도시야. 거기 갔다 왔다는 소리는 지휘관 앞에서 하지 마.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"chips": {
+			"speaker": "quartermaster_ro",
+			"text": "(장부를 덮는다) 폐기 처리 대기분이 두 장 있다. 불량이라고 적어 두지. 내 이름은 잊어.",
+			"choices": [
+				{
+					"text": "챙긴다",
+					"next": ""
+				}
+			]
+		},
+		"chips_no": {
+			"speaker": "quartermaster_ro",
+			"text": "장부에 없는 거래는 없다. 사고 싶으면 창구에서 제값 내.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_quartermaster_ro"
+				},
+				{
+					"type": "crisis",
+					"crisis": "greenhouse_blockade",
+					"active": true
+				}
+			],
+			"start": "again_blockade"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_quartermaster_ro"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "gate7_license"
+				}
+			],
+			"start": "again_licensed"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_quartermaster_ro"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

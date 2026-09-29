@@ -1,0 +1,60 @@
+{
+	"id": "arrival_red_mesa",
+	"start": "cliff",
+	"nodes": {
+		"cliff": {
+			"speaker": "narrator",
+			"text": "붉은 절벽을 깎아 만든 요새 마을. 절벽 틈마다 탄피를 녹이는 화덕이 붉다. 바람에 화약 냄새와 먼지가 섞여 있다.",
+			"choices": [
+				{
+					"text": "절벽 길을 오른다",
+					"next": "sentry"
+				}
+			]
+		},
+		"sentry": {
+			"speaker": "ammo_trader_sol",
+			"text": "멈춰. 어디서 왔지. …헬리오스 번호판은 아니군. 좋아. 레드 메사는 탄약을 팔고 물을 산다. 그게 전부야.",
+			"choices": [
+				{
+					"text": "탄약이 싸다던데",
+					"next": "trade"
+				},
+				{
+					"text": "헬리오스 사람이면 어떻게 되지?",
+					"next": "helios"
+				}
+			]
+		},
+		"trade": {
+			"speaker": "ammo_trader_sol",
+			"text": "여기서 사면 황무지 어디서든 두 배. 게이트 7이든 스크랩야드든. 누가 쏘든 탄은 탄이지. 대신 의약품이랑 물은 부르는 값에 산다.",
+			"choices": [
+				{
+					"text": "올라간다",
+					"next": "inside"
+				}
+			]
+		},
+		"helios": {
+			"speaker": "ammo_trader_sol",
+			"text": "성벽 친구는 여기서 아무것도 못 사. 원로가 정한 규칙이야. 전쟁 때 헬리오스가 우리 우물을 막았거든.",
+			"choices": [
+				{
+					"text": "올라간다",
+					"next": "inside"
+				}
+			]
+		},
+		"inside": {
+			"speaker": "narrator",
+			"text": "모닥불 둘레에 용병들이 앉아 있다. 절벽 꼭대기 저수조에서 물지기가 수위를 잰다. 이 마을에서 물은 탄약보다 무겁다.",
+			"choices": [
+				{
+					"text": "주위를 둘러본다",
+					"next": ""
+				}
+			]
+		}
+	}
+}

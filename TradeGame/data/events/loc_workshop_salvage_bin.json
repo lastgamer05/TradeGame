@@ -1,0 +1,71 @@
+{
+	"id": "loc_workshop_salvage_bin",
+	"title": "폐품 통",
+	"trigger": {
+		"on": "location",
+		"kinds": [
+			"workshop"
+		],
+		"requires": [],
+		"weight": 4
+	},
+	"text": "정비소 뒤편 폐품 통에 뜯어낸 부품이 수북하다. 정비공은 가져갈 거면 알아서 고르라고 손짓한다.",
+	"choices": [
+		{
+			"id": "sort",
+			"text": "쓸 만한 걸 골라낸다",
+			"check": {
+				"stat": "tech",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "타지 않은 회로 기판 세 장을 건진다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 3
+						}
+					]
+				},
+				"failure": {
+					"text": "전부 타 버린 기판이다. 손가락만 베였다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "buy",
+			"text": "정비공에게 골라 달라고 한다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 10
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "정비공이 두 개를 골라 준다. \"이건 살아 있어.\"",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "그냥 간다",
+			"outcomes": {
+				"success": {
+					"text": "폐품 통 위로 파리가 난다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

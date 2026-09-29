@@ -1,0 +1,498 @@
+{
+	"id": "sergeant_kade",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "sergeant_kade",
+			"text": "멈춰. 운반꾼? 화물 목록부터 내. …좋아. 광장에서는 뛰지 말고, 싸우지 말고, 줄 서.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_sergeant_kade"
+				}
+			],
+			"choices": [
+				{
+					"text": "검문 규칙을 묻는다",
+					"next": "rules"
+				},
+				{
+					"text": "벽의 수배 전단을 본다",
+					"next": "wanted"
+				},
+				{
+					"text": "[부패 병사] 간선도로 검문소 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "corrupt_soldier"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "corrupt"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "sergeant_kade",
+			"text": "또 너군. 짐칸 열 준비는 됐겠지.",
+			"choices": [
+				{
+					"text": "검문 규칙을 묻는다",
+					"next": "rules"
+				},
+				{
+					"text": "벽의 수배 전단을 본다",
+					"next": "wanted"
+				},
+				{
+					"text": "[부패 병사] 간선도로 검문소 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "corrupt_soldier"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "corrupt"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "sergeant_kade",
+			"text": "위에서 단속 강화 명령이 내려왔다. 오늘은 봐주는 거 없다. 억제제 싣고 있으면 지금 신고해.",
+			"choices": [
+				{
+					"text": "[억제제] 자진 신고한다",
+					"requires": [
+						{
+							"type": "cargo",
+							"good": "suppressant",
+							"amount": 1
+						}
+					],
+					"next": "declare",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "suppressant",
+							"amount": "all"
+						},
+						{
+							"type": "power",
+							"delta": 10
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 5
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": -5
+						}
+					]
+				},
+				{
+					"text": "검문 규칙을 묻는다",
+					"next": "rules"
+				},
+				{
+					"text": "벽의 수배 전단을 본다",
+					"next": "wanted"
+				},
+				{
+					"text": "[부패 병사] 간선도로 검문소 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "corrupt_soldier"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "corrupt"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_rebel": {
+			"speaker": "sergeant_kade",
+			"text": "반란군 전령이 성벽 근처를 얼쩡댄다. 헬멧에 회로 문양 보이면 알려. 포상금 있다.",
+			"choices": [
+				{
+					"text": "검문 규칙을 묻는다",
+					"next": "rules"
+				},
+				{
+					"text": "벽의 수배 전단을 본다",
+					"next": "wanted"
+				},
+				{
+					"text": "[부패 병사] 간선도로 검문소 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "corrupt_soldier"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "corrupt"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"record": {
+			"speaker": "sergeant_kade",
+			"text": "네 이름, 단말에 빨간 줄이 있다. 오늘은 짐칸 전부 연다.",
+			"choices": [
+				{
+					"text": "그 기록은 오해다",
+					"check": {
+						"stat": "negotiation",
+						"dc": 15
+					},
+					"next": "record_clear",
+					"fail_next": "record_stay",
+					"effects": [
+						{
+							"type": "flag_clear",
+							"flag": "helios_criminal_record"
+						}
+					],
+					"fail_effects": [
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -3
+						}
+					]
+				},
+				{
+					"text": "순순히 짐칸을 연다",
+					"next": "record_open",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 2
+						}
+					]
+				},
+				{
+					"text": "자리를 뜬다",
+					"next": ""
+				}
+			]
+		},
+		"record_clear": {
+			"speaker": "sergeant_kade",
+			"text": "…단말이 가끔 헛것을 찍긴 하지. 지워 둔다. 두 번은 없다.",
+			"choices": [
+				{
+					"text": "검문 규칙을 묻는다",
+					"next": "rules"
+				},
+				{
+					"text": "벽의 수배 전단을 본다",
+					"next": "wanted"
+				},
+				{
+					"text": "[부패 병사] 간선도로 검문소 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "corrupt_soldier"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "corrupt"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"record_stay": {
+			"speaker": "sergeant_kade",
+			"text": "오해는 법정에서 풀어. 여기선 짐칸으로 풀고.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"record_open": {
+			"speaker": "sergeant_kade",
+			"text": "(짐칸을 한참 뒤지고 나서) 깨끗하군. 기록은 그대로지만, 내 수첩에는 좋게 적어 두지.",
+			"choices": [
+				{
+					"text": "검문 규칙을 묻는다",
+					"next": "rules"
+				},
+				{
+					"text": "벽의 수배 전단을 본다",
+					"next": "wanted"
+				},
+				{
+					"text": "[부패 병사] 간선도로 검문소 얘기를 꺼낸다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "corrupt_soldier"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "corrupt"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"declare": {
+			"speaker": "sergeant_kade",
+			"text": "현명하군. 신고 포상금이다. 러스트벨 쪽에서는 너를 곱게 안 보겠지만.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"rules": {
+			"speaker": "sergeant_kade",
+			"text": "해킹 툴, 위조 셀, 장물은 무조건 압수. 억제제는 인가증 없이 성 밖으로 나가면 밀수다. 셀은 정품만 쓴다. 재생 셀 내밀면 웃음거리 된다.",
+			"choices": [
+				{
+					"text": "단속은 누가 정하지?",
+					"next": "rules_who"
+				},
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"rules_who": {
+			"speaker": "sergeant_kade",
+			"text": "전력청. 난 명령을 받고, 넌 짐칸을 연다. 세상이 그렇게 굴러가.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"wanted": {
+			"speaker": "narrator",
+			"text": "전단 속 얼굴은 마른 젊은 남자다. '발전소 기술자 이안. 기밀 반출. 생포 시 코어 1개.'",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "saw_ian_wanted"
+				}
+			],
+			"choices": [
+				{
+					"text": "기술자 하나에 코어를 걸어?",
+					"next": "wanted_talk"
+				},
+				{
+					"text": "[이안을 안다] 본 적 있다고 말한다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "met_ian"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"min": 10
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "report"
+				},
+				{
+					"text": "모른 척한다",
+					"next": ""
+				}
+			]
+		},
+		"wanted_talk": {
+			"speaker": "sergeant_kade",
+			"text": "뭘 들고 튀었는지 알 게 뭐냐. 청장이 직접 붙인 전단이다. 그 정도면 보통 일은 아니지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"report": {
+			"speaker": "sergeant_kade",
+			"text": "어디서?",
+			"choices": [
+				{
+					"text": "그린하우스 정수탑",
+					"next": "report_done",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "reported_ian"
+						},
+						{
+							"type": "power",
+							"delta": 30
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 8
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": -5
+						}
+					]
+				},
+				{
+					"text": "…잘못 봤다",
+					"next": "report_cancel"
+				}
+			]
+		},
+		"report_done": {
+			"speaker": "sergeant_kade",
+			"text": "그린하우스라. 원로 땅에는 병력을 못 보내지만, 방법은 있다. 선금이다. 나머지는 잡히면 준다.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"report_cancel": {
+			"speaker": "sergeant_kade",
+			"text": "잘못 본 거면 다행이군. 괜히 원로 땅에 병력 보낼 뻔했다.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"corrupt": {
+			"speaker": "sergeant_kade",
+			"text": "간선도로에 뒷돈 받는 놈이 있다는 소문은 들었다. 이름 알아?",
+			"choices": [
+				{
+					"text": "이름을 댄다",
+					"next": "corrupt_named",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "reported_corrupt_soldier"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "모른다",
+					"next": "corrupt_no"
+				}
+			]
+		},
+		"corrupt_named": {
+			"speaker": "sergeant_kade",
+			"text": "(수첩에 적는다) 군복 더럽히는 놈은 내가 처리한다. 고맙다, 운반꾼.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"corrupt_no": {
+			"speaker": "sergeant_kade",
+			"text": "그래. 모르는 게 오래 사는 길이긴 하지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "helios_criminal_record"
+				}
+			],
+			"start": "record"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_sergeant_kade"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_sergeant_kade"
+				},
+				{
+					"type": "crisis",
+					"crisis": "rebel_uprising",
+					"active": true
+				}
+			],
+			"start": "again_rebel"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_sergeant_kade"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

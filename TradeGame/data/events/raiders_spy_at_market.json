@@ -1,0 +1,77 @@
+{
+	"id": "raiders_spy_at_market",
+	"title": "탄약 큰손",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"red_mesa_market"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "raider_surge",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "탄약 교역소에 낯선 사내가 탄약을 트럭째 사겠다고 한다. 팔뚝에 스크랩야드 문신이 보인다. 솔은 모르는 눈치다.",
+	"choices": [
+		{
+			"id": "tell_sol",
+			"text": "솔에게 문신을 알려 준다",
+			"outcomes": {
+				"success": {
+					"text": "솔이 거래를 끊는다. 사내가 당신에게 침을 뱉고 간다. \"기억해 두지.\"",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 5
+						},
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": -5
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "broker",
+			"text": "중간에서 거래를 붙여 준다",
+			"outcomes": {
+				"success": {
+					"text": "사내가 수수료를 쥐여 준다. 그 탄약이 어느 길목에서 쓰일지는 모른다. 알고 싶지 않다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 40
+						},
+						{
+							"type": "reputation",
+							"city": "scrapyard",
+							"delta": 3
+						},
+						{
+							"type": "faction_strength",
+							"faction": "lawless",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "ignore",
+			"text": "상관하지 않는다",
+			"outcomes": {
+				"success": {
+					"text": "탄약 상자가 트럭에 실려 남쪽으로 간다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

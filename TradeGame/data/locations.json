@@ -4,7 +4,7 @@
 		"city": "helios",
 		"kind": "market",
 		"name": "배급 시장",
-		"description": "",
+		"description": "배급표 줄과 거래 창구가 나란히 선 시장. 억제제와 정밀 공산품이 나오고, 식량은 늘 모자라다.",
 		"services": [
 			"trade"
 		],
@@ -15,7 +15,7 @@
 		"city": "helios",
 		"kind": "hq",
 		"name": "전력청",
-		"description": "",
+		"description": "발전소 굴뚝 아래 흰 청사. 전력이 어디로 흐를지 여기서 정한다.",
 		"services": [],
 		"npc": "aurel_beck"
 	},
@@ -24,7 +24,7 @@
 		"city": "helios",
 		"kind": "plaza",
 		"name": "검문 광장",
-		"description": "",
+		"description": "성문 안쪽 검문 광장. 게시판마다 포고문과 수배 전단이 붙는다.",
 		"services": [
 			"rumors"
 		],
@@ -35,7 +35,7 @@
 		"city": "helios",
 		"kind": "slum",
 		"name": "성벽 밖 판자촌",
-		"description": "",
+		"description": "성벽 밖 판잣집 골목. 불은 저녁에만 들어오고, 요즘은 더 일찍 꺼진다.",
 		"services": [],
 		"npc": "lina"
 	},
@@ -44,7 +44,7 @@
 		"city": "gate7",
 		"kind": "market",
 		"name": "보급창",
-		"description": "",
+		"description": "모든 셀이 장부에 적히는 보급창. 탄약과 식량을 사고 군용 칩을 판다.",
 		"services": [
 			"trade"
 		],
@@ -55,7 +55,7 @@
 		"city": "gate7",
 		"kind": "workshop",
 		"name": "정비고",
-		"description": "",
+		"description": "군용 트럭이 줄지어 선 정비고. 여기서 고친 차는 확실하게 달린다.",
 		"services": [
 			"repair"
 		],
@@ -66,7 +66,7 @@
 		"city": "gate7",
 		"kind": "tavern",
 		"name": "막사 식당",
-		"description": "",
+		"description": "기름 냄새 나는 막사 식당. 병사들의 불평과 소문이 국과 함께 끓는다.",
 		"services": [
 			"rumors"
 		],
@@ -77,7 +77,7 @@
 		"city": "gate7",
 		"kind": "hq",
 		"name": "지휘소",
-		"description": "",
+		"description": "탐조등 아래 콘크리트 지휘소. 상인 인가 도장이 여기서 찍힌다.",
 		"services": [],
 		"npc": "commander_voss"
 	},
@@ -86,7 +86,7 @@
 		"city": "undergrid",
 		"kind": "market",
 		"name": "암시장",
-		"description": "",
+		"description": "지하철 승강장을 메운 암시장. 해킹 툴과 개조 무기가 재생 셀에 팔린다.",
 		"services": [
 			"trade"
 		],
@@ -97,7 +97,7 @@
 		"city": "undergrid",
 		"kind": "hq",
 		"name": "작전실",
-		"description": "",
+		"description": "모니터 불빛만 켜진 작전실. 벽 지도에 헬리오스 발전소가 표시돼 있다.",
 		"services": [],
 		"npc": "nova"
 	},
@@ -106,7 +106,7 @@
 		"city": "undergrid",
 		"kind": "tavern",
 		"name": "해커 소굴",
-		"description": "",
+		"description": "케이블이 뒤엉킨 해커 소굴. 방화벽 내기와 소문이 오간다.",
 		"services": [
 			"rumors"
 		],
@@ -117,7 +117,7 @@
 		"city": "undergrid",
 		"kind": "workshop",
 		"name": "조립 공장",
-		"description": "",
+		"description": "재생 셀로 프레스를 돌리는 조립 공장. 차량 모듈과 무기가 나온다.",
 		"services": [
 			"repair"
 		],
@@ -128,7 +128,7 @@
 		"city": "red_mesa",
 		"kind": "market",
 		"name": "탄약 교역소",
-		"description": "",
+		"description": "절벽 틈의 탄약 교역소. 탄피를 녹이는 화덕이 밤새 붉다.",
 		"services": [
 			"trade"
 		],
@@ -139,7 +139,7 @@
 		"city": "red_mesa",
 		"kind": "tavern",
 		"name": "용병 모닥불",
-		"description": "",
+		"description": "용병들이 둘러앉은 모닥불. 총 드는 일은 여기서 흥정한다.",
 		"services": [
 			"recruit"
 		],
@@ -150,7 +150,7 @@
 		"city": "red_mesa",
 		"kind": "special",
 		"name": "절벽 저수조",
-		"description": "",
+		"description": "절벽 꼭대기 저수조. 이 마을에서 물은 탄약보다 무겁다.",
 		"services": [],
 		"npc": "keeper_wen"
 	},
@@ -159,7 +159,7 @@
 		"city": "red_mesa",
 		"kind": "hq",
 		"name": "원로 회당",
-		"description": "",
+		"description": "바위를 파낸 원로 회당. 헬리오스의 이름은 여기서 환영받지 못한다.",
 		"services": [],
 		"npc": "elder_tarr"
 	},
@@ -168,7 +168,7 @@
 		"city": "rustbelt",
 		"kind": "market",
 		"name": "고물 장터",
-		"description": "",
+		"description": "고철 더미 사이 물물교환 장터. 고물과 저급 칩, 금속이 가장 싸다.",
 		"services": [
 			"trade"
 		],
@@ -179,7 +179,7 @@
 		"city": "rustbelt",
 		"kind": "hq",
 		"name": "고물상 조합",
-		"description": "",
+		"description": "녹슨 깃발이 걸린 조합 건물. 고물꾼들의 몫과 값이 여기서 정해진다.",
 		"services": [],
 		"npc": "gale"
 	},
@@ -188,7 +188,7 @@
 		"city": "rustbelt",
 		"kind": "slum",
 		"name": "판자촌",
-		"description": "",
+		"description": "크레인 그늘 아래 판자촌. 아이들이 전선을 벗겨 구리를 모은다.",
 		"services": [],
 		"npc": "morae"
 	},
@@ -197,7 +197,7 @@
 		"city": "rustbelt",
 		"kind": "workshop",
 		"name": "크레인 정비소",
-		"description": "",
+		"description": "멈춘 크레인들 사이 정비소. 전쟁 전 기계를 아는 마지막 손들이 있다.",
 		"services": [
 			"repair"
 		],
@@ -208,7 +208,7 @@
 		"city": "greenhouse",
 		"kind": "market",
 		"name": "수확물 창고",
-		"description": "",
+		"description": "흙냄새 나는 수확물 창고. 생식량과 정수된 물이 가장 싸다.",
 		"services": [
 			"trade"
 		],
@@ -219,7 +219,7 @@
 		"city": "greenhouse",
 		"kind": "hq",
 		"name": "원로의 온실",
-		"description": "",
+		"description": "금 간 유리 돔 한가운데 원로의 온실. 헬리오스 식량줄이 여기서 쥐어진다.",
 		"services": [],
 		"npc": "soha"
 	},
@@ -228,7 +228,7 @@
 		"city": "greenhouse",
 		"kind": "special",
 		"name": "정수탑",
-		"description": "",
+		"description": "삐걱대는 정수탑. 떠돌이 기술자가 밤새 펌프를 고친다.",
 		"services": [],
 		"npc": "ian"
 	},
@@ -237,7 +237,7 @@
 		"city": "greenhouse",
 		"kind": "tavern",
 		"name": "농부 숙소",
-		"description": "",
+		"description": "농부 숙소. 저녁 연기와 함께 소문과 불만이 오른다.",
 		"services": [
 			"rumors"
 		],
@@ -248,7 +248,7 @@
 		"city": "swapmeet",
 		"kind": "market",
 		"name": "대시장",
-		"description": "",
+		"description": "교차로 아래 천막 대시장. 거의 모든 물건이 평균가에 돈다. 위조 셀이 섞여 있다.",
 		"services": [
 			"trade"
 		],
@@ -259,7 +259,7 @@
 		"city": "swapmeet",
 		"kind": "hq",
 		"name": "정보 부스",
-		"description": "",
+		"description": "찻잔과 단말이 놓인 정보 부스. 황무지 소문은 모두 여기로 모인다.",
 		"services": [
 			"rumors"
 		],
@@ -270,7 +270,7 @@
 		"city": "swapmeet",
 		"kind": "tavern",
 		"name": "운반꾼 여관",
-		"description": "",
+		"description": "운반꾼 여관. 호위와 용병, 길 소식을 구할 수 있다.",
 		"services": [
 			"recruit"
 		],
@@ -281,7 +281,7 @@
 		"city": "swapmeet",
 		"kind": "special",
 		"name": "주차장 경매",
-		"description": "",
+		"description": "주차장 경매장. 봉인 상자를 열기 전까지는 아무도 모른다.",
 		"services": [],
 		"npc": "auctioneer_fin"
 	},
@@ -290,7 +290,7 @@
 		"city": "scrapyard",
 		"kind": "market",
 		"name": "장물 시장",
-		"description": "",
+		"description": "폐차 탑 아래 장물 시장. 코어와 모듈이 헐값이지만 평판이 깎인다.",
 		"services": [
 			"trade"
 		],
@@ -301,7 +301,7 @@
 		"city": "scrapyard",
 		"kind": "hq",
 		"name": "크랭크의 요새",
-		"description": "",
+		"description": "폐차를 쌓은 크랭크의 요새. 황무지의 세금이 여기로 모인다.",
 		"services": [],
 		"npc": "crank"
 	},
@@ -310,7 +310,7 @@
 		"city": "scrapyard",
 		"kind": "special",
 		"name": "투기장",
-		"description": "",
+		"description": "철창 투기장. 판돈과 함성, 가끔은 피.",
 		"services": [],
 		"npc": "arena_master_gus"
 	},
@@ -319,7 +319,7 @@
 		"city": "scrapyard",
 		"kind": "special",
 		"name": "전쟁 기계 무덤",
-		"description": "",
+		"description": "쓰러진 전쟁 기계들이 잠든 무덤. 가끔 하나씩 깨어난다.",
 		"services": [],
 		"npc": "scavenger_nim"
 	}

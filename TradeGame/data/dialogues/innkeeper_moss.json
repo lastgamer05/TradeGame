@@ -1,0 +1,201 @@
+{
+	"id": "innkeeper_moss",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "innkeeper_moss",
+			"text": "어서 와요. 신발은 신고 들어와도 돼요. 총은 맡기고. 모스예요. 여긴 운반꾼들이 쉬었다 가는 곳이죠. 이야기도 쉬었다 가고요.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_innkeeper_moss"
+				}
+			],
+			"choices": [
+				{
+					"text": "[전력 10셀] 운반꾼들에게 한 잔씩 돌린다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 10
+						}
+					],
+					"next": "round",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "swapmeet",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "용병을 구할 수 있나?",
+					"next": "mercs"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "innkeeper_moss",
+			"text": "또 왔네요. 늘 앉던 자리 비어 있어요.",
+			"choices": [
+				{
+					"text": "[전력 10셀] 운반꾼들에게 한 잔씩 돌린다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 10
+						}
+					],
+					"next": "round",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "swapmeet",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "용병을 구할 수 있나?",
+					"next": "mercs"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "innkeeper_moss",
+			"text": "요즘 방이 모자라요. 약탈자 때문에 다들 호위를 구하느라 여기서 며칠씩 묵거든요. 총 쏠 줄 아는 사람은 부르는 게 값이에요.",
+			"choices": [
+				{
+					"text": "[전력 10셀] 운반꾼들에게 한 잔씩 돌린다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 10
+						}
+					],
+					"next": "round",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "swapmeet",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "용병을 구할 수 있나?",
+					"next": "mercs"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "innkeeper_moss",
+			"text": "헬리오스 단속 얘기로 떠들썩해요. 밀수칸 달린 차가 있으면 여기서 일감이 넘쳐요. 난 못 들은 걸로 할게요.",
+			"choices": [
+				{
+					"text": "[전력 10셀] 운반꾼들에게 한 잔씩 돌린다",
+					"cost": [
+						{
+							"type": "power",
+							"amount": 10
+						}
+					],
+					"next": "round",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "swapmeet",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "용병을 구할 수 있나?",
+					"next": "mercs"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"round": {
+			"speaker": "innkeeper_moss",
+			"text": "다들 잔을 들었네요. 한 운반꾼이 말하길, 게이트 7이랑 러스트벨 사이 황무지 길에서 보급 트럭이 자꾸 털린대요. 탄약 값이 오를 거래요.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "rumor_gate7_ammo_shortage"
+				}
+			],
+			"choices": [
+				{
+					"text": "고맙다",
+					"next": ""
+				}
+			]
+		},
+		"mercs": {
+			"speaker": "innkeeper_moss",
+			"text": "임시 용병이야 늘 있어요. 전투 분대에 한 자리 채워 주죠. 제대로 된 동승자를 원하면 레드 메사 모닥불의 한을 찾아가 봐요. 비싸지만 값은 해요.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_innkeeper_moss"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_innkeeper_moss"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_innkeeper_moss"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

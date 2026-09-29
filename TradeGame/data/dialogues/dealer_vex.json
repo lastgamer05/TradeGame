@@ -1,0 +1,211 @@
+{
+	"id": "dealer_vex",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "dealer_vex",
+			"text": "왔다, 왔어! 첫 거래는 특별 대우지. 뭐 찾아? 모듈? 툴? 아니면 사람 찾아? 사람은 비싸.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_dealer_vex"
+				}
+			],
+			"choices": [
+				{
+					"text": "해킹 툴 견본을 좀 보자",
+					"check": {
+						"stat": "negotiation",
+						"dc": 15
+					},
+					"next": "sample",
+					"fail_next": "sample_no",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "hacking_tool",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"text": "요즘 뭐가 돈이 되지?",
+					"next": "hot"
+				},
+				{
+					"text": "위조 셀은 어디다 넘기지?",
+					"next": "forged"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "dealer_vex",
+			"text": "단골 왔네! 오늘은 뭘 팔아 줄까, 뭘 사 줄까?",
+			"choices": [
+				{
+					"text": "요즘 뭐가 돈이 되지?",
+					"next": "hot"
+				},
+				{
+					"text": "위조 셀은 어디다 넘기지?",
+					"next": "forged"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "dealer_vex",
+			"text": "헬리오스가 검문을 늘려서 억제제가 씨가 말랐어. 몇 상자만 있으면 네가 부르는 대로 줄게. 진짜야.",
+			"choices": [
+				{
+					"text": "[억제제 2개] 뒷거래로 넘긴다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "suppressant",
+							"amount": 2
+						}
+					],
+					"next": "deal",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 180
+						},
+						{
+							"type": "faction_strength",
+							"faction": "rebel",
+							"delta": 2
+						}
+					]
+				},
+				{
+					"text": "요즘 뭐가 돈이 되지?",
+					"next": "hot"
+				},
+				{
+					"text": "위조 셀은 어디다 넘기지?",
+					"next": "forged"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_uprising": {
+			"speaker": "dealer_vex",
+			"text": "요즘 무기 부품이 금값이야. 공장이 전부 총만 찍어. 넌 운 좋은 거야. 폭동 날엔 운반꾼이 왕이거든.",
+			"choices": [
+				{
+					"text": "요즘 뭐가 돈이 되지?",
+					"next": "hot"
+				},
+				{
+					"text": "위조 셀은 어디다 넘기지?",
+					"next": "forged"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"hot": {
+			"speaker": "dealer_vex",
+			"text": "칩! 러스트벨 저급 칩은 여기서 두 배. 게이트 7 군용 칩은 세 배. 걸리면 목이 날아가지만. 발전기 부품은 노바가 뭐든 주고 산대.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"forged": {
+			"speaker": "dealer_vex",
+			"text": "스왑밋. 거긴 진짜랑 가짜가 섞여서 아무도 안 세. 헬리오스에 들고 가면 끝이야. 거기 단말은 셀 번호까지 읽어.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"sample": {
+			"speaker": "dealer_vex",
+			"text": "말 잘하네! 좋아, 견본이야. 검문 드론 앞에서 꺼내지만 마. 드론은 농담을 몰라.",
+			"choices": [
+				{
+					"text": "챙긴다",
+					"next": ""
+				}
+			]
+		},
+		"sample_no": {
+			"speaker": "dealer_vex",
+			"text": "견본은 단골한테만. 넌 아직 단골 아니야. 곧 되겠지만!",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"deal": {
+			"speaker": "dealer_vex",
+			"text": "(상자를 열어 보고 휘파람) 진짜 전력청 봉인이네. 받아. 이 정도면 노바가 나한테 뽀뽀해 줄 거야. 안 해 주겠지만.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_dealer_vex"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_dealer_vex"
+				},
+				{
+					"type": "crisis",
+					"crisis": "rebel_uprising",
+					"active": true
+				}
+			],
+			"start": "again_uprising"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_dealer_vex"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

@@ -1,0 +1,105 @@
+{
+	"id": "loc_market_bulk_lot",
+	"title": "파산한 운반꾼의 떨이",
+	"trigger": {
+		"on": "location",
+		"kinds": [
+			"market"
+		],
+		"requires": [],
+		"weight": 4
+	},
+	"text": "엔진이 나간 트럭 앞에서 운반꾼이 합성식품 상자를 떨이로 내놓는다. \"집에 갈 셀만 있으면 돼.\"",
+	"choices": [
+		{
+			"id": "buy",
+			"text": "부르는 값에 산다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 40
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "운반꾼이 고개를 숙인다. 합성식품이 짐칸에 실린다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "synth_food",
+							"amount": 8
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "haggle",
+			"text": "값을 더 깎는다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 25
+				}
+			],
+			"check": {
+				"stat": "negotiation",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "\"…그래, 그래.\" 운반꾼이 체념한 듯 상자를 민다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "synth_food",
+							"amount": 8
+						}
+					]
+				},
+				"failure": {
+					"text": "운반꾼이 화를 내며 절반만 판다. \"나머지는 다른 사람한테 팔겠어.\"",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "synth_food",
+							"amount": 4
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "help",
+			"text": "그냥 셀 몇 개를 쥐여 준다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 15
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "운반꾼이 한참 말이 없다가 합성식품 두 상자를 억지로 안겨 준다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "synth_food",
+							"amount": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "지나간다",
+			"outcomes": {
+				"success": {
+					"text": "뒤에서 다른 상인이 벌써 값을 후려치고 있다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

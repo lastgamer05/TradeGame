@@ -1,0 +1,97 @@
+{
+	"id": "rustbelt_barter_swarm",
+	"title": "물물교환 아이들",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"rustbelt"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "차가 서자마자 아이들이 몰려와 창문에 고물을 들이민다. \"칩! 칩이랑 밥 바꿔요!\"",
+	"choices": [
+		{
+			"id": "trade",
+			"text": "합성식품과 바꾼다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "synth_food",
+					"amount": 2
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "아이들이 합성식품을 끌어안고 흩어진다. 짐칸에 고물과 칩이 남는다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "scrap_electronics",
+							"amount": 4
+						},
+						{
+							"type": "cargo_add",
+							"good": "chip_low",
+							"amount": 1
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "drive",
+			"text": "천천히 차를 빼낸다",
+			"check": {
+				"stat": "driving",
+				"dc": 11
+			},
+			"outcomes": {
+				"success": {
+					"text": "아이들이 차를 따라 뛰다 멈춘다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "아이 하나가 차 앞에 뛰어든다. 급정거. 적재함 문이 열려 짐 일부가 쏟아진다.",
+					"effects": [
+						{
+							"type": "vehicle_damage",
+							"part": "cargo_bay"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "morae",
+			"text": "모래가 아이들 이름을 부른다",
+			"requires": [
+				{
+					"type": "companion",
+					"companion": "morae"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "아이들이 모래에게 매달린다. 모래가 처음으로 웃는다.",
+					"effects": [
+						{
+							"type": "trust",
+							"delta": 5
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 2
+						}
+					]
+				}
+			}
+		}
+	]
+}

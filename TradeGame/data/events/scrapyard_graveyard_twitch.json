@@ -1,0 +1,76 @@
+{
+	"id": "scrapyard_graveyard_twitch",
+	"title": "꿈틀대는 기계",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"scrapyard_graveyard"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "쓰러진 전쟁 기계 하나가 삐걱이며 팔을 든다. 가슴판 틈으로 붉은 불빛이 켜진다. 님이 속삭인다. \"깼다.\"",
+	"choices": [
+		{
+			"id": "shutdown",
+			"text": "가슴판을 열고 전원을 끊는다",
+			"check": {
+				"stat": "tech",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "불빛이 꺼진다. 가슴판 안에서 멀쩡한 발전기 부품을 꺼낸다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "generator_parts",
+							"amount": 2
+						}
+					]
+				},
+				"failure": {
+					"text": "손이 닿기 전에 기계가 일어선다.",
+					"effects": [
+						{
+							"type": "start_combat",
+							"encounter": "stray_war_machine"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "scan",
+			"text": "스캐너로 약점을 찾는다",
+			"requires": [
+				{
+					"type": "module",
+					"module": "scanner"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "스캐너가 전원 배선을 짚어 준다. 한 번에 끊는다. 부품 하나를 챙긴다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "back",
+			"text": "천천히 물러난다",
+			"outcomes": {
+				"success": {
+					"text": "기계가 몇 걸음 걷다 다시 쓰러진다. 님이 기계를 토닥인다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

@@ -1,0 +1,237 @@
+{
+	"id": "scavenger_nim",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "scavenger_nim",
+			"text": "쉬이. 깨우지 마. 다들 자고 있어. (쓰러진 전쟁 기계를 쓰다듬는다) 님이야. 이 아이들 돌보는 사람. 너는 손님? 도둑? 둘 다 괜찮아.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_scavenger_nim"
+				}
+			],
+			"choices": [
+				{
+					"text": "고물을 뒤진다",
+					"check": {
+						"stat": "survival",
+						"dc": 14
+					},
+					"next": "dig_ok",
+					"fail_next": "dig_fail",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "generator_parts",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"text": "여기 기계들은 뭐지?",
+					"next": "machines"
+				},
+				{
+					"text": "[의뢰] 발전로를 살펴본다",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "meter_first_job",
+							"state": "active"
+						}
+					],
+					"hide_if_blocked": true,
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "reactor_ok",
+					"fail_next": "reactor_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "inspected_dead_reactor"
+						}
+					]
+				},
+				{
+					"text": "[의뢰][전력 10셀] 님에게 길 안내를 부탁한다",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "meter_first_job",
+							"state": "active"
+						}
+					],
+					"hide_if_blocked": true,
+					"cost": [
+						{
+							"type": "power",
+							"amount": 10
+						}
+					],
+					"next": "reactor_guided",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "inspected_dead_reactor"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "scavenger_nim",
+			"text": "또 왔네. 아이들이 너 기억한대. 거짓말. 아이들은 아무것도 기억 못 해.",
+			"choices": [
+				{
+					"text": "여기 기계들은 뭐지?",
+					"next": "machines"
+				},
+				{
+					"text": "[의뢰] 발전로를 살펴본다",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "meter_first_job",
+							"state": "active"
+						}
+					],
+					"hide_if_blocked": true,
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "reactor_ok",
+					"fail_next": "reactor_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "inspected_dead_reactor"
+						}
+					]
+				},
+				{
+					"text": "[의뢰][전력 10셀] 님에게 길 안내를 부탁한다",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "meter_first_job",
+							"state": "active"
+						}
+					],
+					"hide_if_blocked": true,
+					"cost": [
+						{
+							"type": "power",
+							"amount": 10
+						}
+					],
+					"next": "reactor_guided",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "inspected_dead_reactor"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"machines": {
+			"speaker": "scavenger_nim",
+			"text": "전쟁 기계. 전쟁 끝나고 주인이 없어서 여기서 잤어. 가끔 하나씩 깨서 황무지로 걸어 나가. 떠돌이가 되지. 불쌍해.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"reactor_ok": {
+			"speaker": "narrator",
+			"text": "기계의 가슴판을 연다. 발전로 명판에 헬리오스 발전소와 같은 제조 표시. 냉각관은 금이 가 굳었고, 연료봉은 멀쩡하다. 연료가 아니라 몸이 먼저 늙었다.",
+			"choices": [
+				{
+					"text": "님에게 묻는다",
+					"next": "sibling"
+				}
+			]
+		},
+		"reactor_guided": {
+			"speaker": "scavenger_nim",
+			"text": "이쪽. 이 아이 가슴 열어 봐. 조심. …봐, 명판. 헬리오스 거랑 같은 공장이야.",
+			"choices": [
+				{
+					"text": "냉각관을 본다",
+					"next": "sibling"
+				}
+			]
+		},
+		"reactor_fail": {
+			"speaker": "scavenger_nim",
+			"text": "아니, 거기 말고. 그건 팔이야. …다음에 다시 와. 아이들은 기다려 줘.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"sibling": {
+			"speaker": "scavenger_nim",
+			"text": "이 아이들 심장은 헬리오스 거랑 형제야. 같은 공장, 같은 해. 형들은 다 멈췄어. 연료가 남았는데도. 형제가 다 죽으면 막내도 곧 죽지. 그치?",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "nim_reactor_sibling"
+				}
+			],
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"dig_ok": {
+			"speaker": "scavenger_nim",
+			"text": "아, 그 코일 가져가. 그 아이는 이제 안 써. 발전기 부품이야. 그린하우스 사람들이 좋아하겠다.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"dig_fail": {
+			"speaker": "scavenger_nim",
+			"text": "앗, 조심! 그 아이는 아직 꿈꾸는 중이야. 손 치워.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_scavenger_nim"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

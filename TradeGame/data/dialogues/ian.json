@@ -1,0 +1,932 @@
+{
+	"id": "ian",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "ian",
+			"text": "아, 깜짝이야. …누구세요? 원로님 손님? 아, 운반꾼. 네. 저는 이안이에요. 여기 펌프 고치는 사람. 그냥 떠돌이예요. 정말로요.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_ian"
+				}
+			],
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "ian",
+			"text": "또 오셨네요. 펌프는 아직 삐걱대요. 저도 좀 그렇고요.",
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_fixed": {
+			"speaker": "ian",
+			"text": "펌프가 조용해요. 몇 달 만에 푹 잤어요. 고마워요, {player}.",
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"wary": {
+			"speaker": "ian",
+			"text": "(공구를 내려놓지 않는다) 헬리오스 사람들이 당신 이름을 좋게 말한대요. 그럼… 저는 당신 차에 못 타요. 미안해요. 펌프 얘기라면 얼마든지 하고요.",
+			"choices": [
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"gone": {
+			"speaker": "narrator",
+			"text": "정수탑 문이 열려 있다. 공구함은 비었고, 작업대에 긁힌 글씨만 남았다. '누가 팔았는지 알아요.'",
+			"choices": [
+				{
+					"text": "돌아선다",
+					"next": ""
+				}
+			]
+		},
+		"left": {
+			"speaker": "ian",
+			"text": "…다시 왔네요. 헬리오스 쪽 사람들이 당신 얘기를 너무 좋게 해서, 무서웠어요. 지금은 좀 나아졌나요?",
+			"choices": [
+				{
+					"text": "같이 다시 가자",
+					"next": "recruit"
+				},
+				{
+					"text": "그냥 들렀다",
+					"next": ""
+				}
+			]
+		},
+		"origin": {
+			"speaker": "ian",
+			"text": "…헬리오스요. 발전소 정비과. 거기 있으면 안 되는 걸 알게 돼서 나왔어요. 그 이상은 묻지 말아 주세요. 모르는 게 당신한테도 안전해요.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"fix_ok": {
+			"speaker": "ian",
+			"text": "그 밸브! 맞아요, 거기요. 역류가 잡혔어요. 와, 손이 빠르시네요. 기계랑 말이 통하는 사람 오랜만이에요.",
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"fix_fail": {
+			"speaker": "ian",
+			"text": "아, 아니, 그건 압력 밸브라서… 괜찮아요. 제가 할게요. 필터만 있으면 금방인데.",
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"fix_filter": {
+			"speaker": "ian",
+			"text": "필터 두 개! 이거면 겨울까지 버텨요. 그린하우스 사람들이 깨끗한 물을 마실 거예요. 정말 고마워요.",
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"warn": {
+			"speaker": "ian",
+			"text": "(얼굴이 하얘진다) 코어 하나요? 저한테? …그럼 곧 여기도 찾아오겠네요. 어떡하지. 어떡하지.",
+			"choices": [
+				{
+					"text": "내 차에 타면 아무도 못 찾아",
+					"check": {
+						"stat": "negotiation",
+						"dc": 13
+					},
+					"next": "warn_calm",
+					"fail_next": "warn_panic",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						}
+					]
+				},
+				{
+					"text": "조용히 지내라",
+					"next": "warn_quiet"
+				}
+			]
+		},
+		"warn_calm": {
+			"speaker": "ian",
+			"text": "…정말요? 황무지를 계속 돌아다니면, 그래요, 잡기 어렵겠죠. 알려 줘서 고마워요. 당신은 저를 팔 수도 있었는데.",
+			"choices": [
+				{
+					"text": "펌프 고치는 걸 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 14
+					},
+					"next": "fix_ok",
+					"fail_next": "fix_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "[필터 2개] 부품을 건넨다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "filter",
+							"amount": 2
+						}
+					],
+					"next": "fix_filter",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						}
+					]
+				},
+				{
+					"text": "[수배 전단] 헬리오스가 너를 찾고 있어",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "saw_ian_wanted"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "warn"
+				},
+				{
+					"text": "어디서 왔지?",
+					"next": "origin"
+				},
+				{
+					"text": "작업 노트를 흘끗 본다",
+					"check": {
+						"stat": "tech",
+						"dc": 16
+					},
+					"next": "notes_ok",
+					"fail_next": "notes_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_ian_notes"
+						}
+					]
+				},
+				{
+					"text": "같이 다니자",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "ian_trusts"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "recruit"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"warn_panic": {
+			"speaker": "ian",
+			"text": "차요? 차는 검문소를 지나잖아요. 안 돼요, 안 돼. 좀 생각해 볼게요.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"warn_quiet": {
+			"speaker": "ian",
+			"text": "네. 네. 조용히. 저 원래 조용해요.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"notes_ok": {
+			"speaker": "narrator",
+			"text": "압력 곡선과 숫자. 맨 위에 '헬리오스 1호로 냉각 계통 피로 누적. 추정 잔여 운전' 그다음 숫자는 이안의 손에 가려져 있다.",
+			"choices": [
+				{
+					"text": "그 숫자는 뭐지?",
+					"next": "notes_ask"
+				},
+				{
+					"text": "모른 척한다",
+					"next": ""
+				}
+			]
+		},
+		"notes_ask": {
+			"speaker": "ian",
+			"text": "보지 마세요. …제발요. 이건 제가 들고 나온 유일한 거예요. 아무한테도, 특히 스왑밋의 정보상 같은 사람한테는 절대로.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"notes_fail": {
+			"speaker": "ian",
+			"text": "(노트를 덮는다) 그냥 펌프 기록이에요. 재미없어요. 정말로요.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"recruit": {
+			"speaker": "ian",
+			"text": "당신 차에요? …좋아요. 대신 약속해 주세요. 헬리오스랑 너무 가까워지면 저는 내릴게요. 원망하지 마세요. 그리고 기계는 제가 봐요. 그건 잘해요.",
+			"choices": [
+				{
+					"text": "태운다",
+					"next": "recruited",
+					"effects": [
+						{
+							"type": "recruit",
+							"companion": "ian"
+						},
+						{
+							"type": "flag_set",
+							"flag": "recruited_ian"
+						}
+					]
+				},
+				{
+					"text": "다시 생각해 보겠다",
+					"next": ""
+				}
+			]
+		},
+		"recruited": {
+			"speaker": "ian",
+			"text": "공구함, 노트, 여벌 필터. 다 챙겼어요. 원로님께는 편지 남겼어요. 가요. …황무지는 처음이에요.",
+			"choices": [
+				{
+					"text": "출발하자",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "reported_ian"
+				}
+			],
+			"start": "gone"
+		},
+		{
+			"requires": [
+				{
+					"type": "reputation",
+					"city": "helios",
+					"min": 41
+				}
+			],
+			"start": "wary"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "companion_left_ian"
+				}
+			],
+			"start": "left"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_ian"
+				},
+				{
+					"type": "flag",
+					"flag": "ian_tower_fixed"
+				}
+			],
+			"start": "again_fixed"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_ian"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

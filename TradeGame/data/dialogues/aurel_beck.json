@@ -1,0 +1,632 @@
+{
+	"id": "aurel_beck",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "aurel_beck",
+			"text": "운반꾼 {player}. 성문 기록에서 이름을 봤네. 핸들 잡는 솜씨가 좋다더군. 어디서 배웠는지는 묻지 않겠네. 앉게.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_aurel_beck"
+				}
+			],
+			"choices": [
+				{
+					"text": "전력청은 무슨 일을 하지?",
+					"next": "about"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "aurel_beck",
+			"text": "다시 왔군. 전력청 문은 쓸모 있는 사람에게 늘 열려 있네.",
+			"choices": [
+				{
+					"text": "전력청은 무슨 일을 하지?",
+					"next": "about"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_rebel": {
+			"speaker": "aurel_beck",
+			"text": "언더그리드가 총을 들었다더군. 그쪽으로 탄약을 나르는 운반꾼은 검문소에서 다시 보게 될 걸세. 자네는 아니길 바라네.",
+			"choices": [
+				{
+					"text": "전력청은 무슨 일을 하지?",
+					"next": "about"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_blockade": {
+			"speaker": "aurel_beck",
+			"text": "소하가 식량줄을 쥐고 흔드네. 굶는 건 원로가 아니라 성 안 아이들이지. 식량을 싣고 오면 배급 시장이 웃돈을 얹을 걸세.",
+			"choices": [
+				{
+					"text": "전력청은 무슨 일을 하지?",
+					"next": "about"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "aurel_beck",
+			"text": "검문을 늘렸네. 불편하겠지. 질서에는 늘 값이 붙어. 그 값을 누가 치르는지가 문제일 뿐.",
+			"choices": [
+				{
+					"text": "전력청은 무슨 일을 하지?",
+					"next": "about"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_weak": {
+			"speaker": "aurel_beck",
+			"text": "요즘 전력청을 우습게 보는 도시가 늘었네. 기억해 두게. 불이 꺼지면 제일 먼저 우는 건 그들이야.",
+			"choices": [
+				{
+					"text": "전력청은 무슨 일을 하지?",
+					"next": "about"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"about": {
+			"speaker": "aurel_beck",
+			"text": "발전소는 이 황무지에 남은 마지막 불빛이네. 우리는 그 불을 나누지. 공평하게가 아니라 질서 있게. 전력을 나누면 모두가 어둠에 빠지네.",
+			"choices": [
+				{
+					"text": "성벽 밖 판자촌은?",
+					"next": "outside"
+				},
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"outside": {
+			"speaker": "aurel_beck",
+			"text": "배급 명단은 기여한 만큼이네. 모두를 먹이려다 모두를 굶기는 것보다는 낫지. 냉정하다고 생각하나? 전쟁은 더 냉정했네.",
+			"choices": [
+				{
+					"text": "일거리가 있나?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "beck_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"job": {
+			"speaker": "aurel_beck",
+			"text": "성 안 식량이 빠듯하네. 생식량 열 짐을 전력청으로 가져오게. 그린하우스가 가장 싸지. 값은 정품 셀로 치르겠네.",
+			"choices": [
+				{
+					"text": "맡겠다",
+					"next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "beck_first_job"
+						}
+					]
+				},
+				{
+					"text": "선금이 필요하다",
+					"check": {
+						"stat": "negotiation",
+						"dc": 15
+					},
+					"next": "job_advance",
+					"fail_next": "job_no_advance",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "beck_first_job"
+						},
+						{
+							"type": "power",
+							"delta": 20
+						}
+					],
+					"fail_effects": [
+						{
+							"type": "quest_start",
+							"quest": "beck_first_job"
+						}
+					]
+				},
+				{
+					"text": "생각해 보겠다",
+					"next": ""
+				}
+			]
+		},
+		"job_ok": {
+			"speaker": "aurel_beck",
+			"text": "좋네. 전력청은 약속을 기록하고, 기록은 잊지 않네.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"job_advance": {
+			"speaker": "aurel_beck",
+			"text": "(서랍에서 정품 셀 두 줄을 꺼낸다) 선금이네. 도망치면 자네 이름도 기록에 남겠지.",
+			"choices": [
+				{
+					"text": "챙긴다",
+					"next": ""
+				}
+			]
+		},
+		"job_no_advance": {
+			"speaker": "aurel_beck",
+			"text": "선금은 믿음에서 나오네. 아직 자네를 모르지. 식량부터 가져오게.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"chart_ok": {
+			"speaker": "narrator",
+			"text": "벽의 발전소 출력표. 선이 몇 달째 조금씩 내려간다. 겨울 탓이라기엔 너무 곧다. 벡이 조용히 표 위에 서류를 얹는다.",
+			"choices": [
+				{
+					"text": "출력이 떨어지고 있나?",
+					"next": "chart_deny"
+				},
+				{
+					"text": "모른 척한다",
+					"next": ""
+				}
+			]
+		},
+		"chart_deny": {
+			"speaker": "aurel_beck",
+			"text": "숫자는 계절마다 흔들리네. 운반꾼이 신경 쓸 일은 아니지. 그 표 얘기는 여기서 끝내게.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"chart_fail": {
+			"speaker": "narrator",
+			"text": "숫자와 기호가 빽빽하다. 무슨 표인지 알아보기도 전에 벡이 자리에서 일어나 커튼을 친다.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"waiting": {
+			"speaker": "aurel_beck",
+			"text": "생식량 열 짐이네. 그린하우스 수확물 창고가 가장 싸고, 간선도로로 하루면 오네.",
+			"choices": [
+				{
+					"text": "곧 가져오겠다",
+					"next": ""
+				}
+			]
+		},
+		"turnin": {
+			"speaker": "aurel_beck",
+			"text": "약속한 생식량이군. 짐칸 냄새만 맡아도 알겠네.",
+			"choices": [
+				{
+					"text": "생식량 10개를 넘긴다",
+					"requires": [
+						{
+							"type": "quest_ready",
+							"quest": "beck_first_job"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "turnin_done",
+					"effects": [
+						{
+							"type": "quest_complete",
+							"quest": "beck_first_job"
+						}
+					]
+				},
+				{
+					"text": "아직 넘기지 않는다",
+					"next": ""
+				}
+			]
+		},
+		"turnin_done": {
+			"speaker": "aurel_beck",
+			"text": "좋은 거래였네. 이 식량은 성 안 배급소로 가네.",
+			"choices": [
+				{
+					"text": "성벽 밖에도 조금 나눠 줄 수 없나?",
+					"check": {
+						"stat": "negotiation",
+						"dc": 15
+					},
+					"next": "share_ok",
+					"fail_next": "share_no",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "beck_shared_outskirts"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"share_ok": {
+			"speaker": "aurel_beck",
+			"text": "…한 수레만. 자네 이름으로 적어 두지. 판자촌이 자네를 기억하든 말든, 전력청은 기억하네.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"share_no": {
+			"speaker": "aurel_beck",
+			"text": "판자촌에는 판자촌의 몫이 있네. 자네 몫은 방금 받았고.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"after": {
+			"speaker": "aurel_beck",
+			"text": "자네 같은 운반꾼이 늘면 성벽 안이 조용해지지. 다른 일도 곧 생길 걸세. 발전기 부품을 보면 먼저 이리 가져오게.",
+			"choices": [
+				{
+					"text": "발전기 부품은 왜?",
+					"next": "parts"
+				},
+				{
+					"text": "벽의 출력 기록표를 훑어본다",
+					"check": {
+						"stat": "tech",
+						"dc": 15
+					},
+					"next": "chart_ok",
+					"fail_next": "chart_fail",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "saw_reactor_chart"
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"parts": {
+			"speaker": "aurel_beck",
+			"text": "큰 기계는 늘 손이 가네. 그뿐이네. 값은 후하게 치르지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "quest_ready",
+					"quest": "beck_first_job"
+				}
+			],
+			"start": "turnin"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "beck_first_job",
+					"state": "active"
+				}
+			],
+			"start": "waiting"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_aurel_beck"
+				},
+				{
+					"type": "crisis",
+					"crisis": "rebel_uprising",
+					"active": true
+				}
+			],
+			"start": "again_rebel"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_aurel_beck"
+				},
+				{
+					"type": "crisis",
+					"crisis": "greenhouse_blockade",
+					"active": true
+				}
+			],
+			"start": "again_blockade"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_aurel_beck"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_aurel_beck"
+				},
+				{
+					"type": "faction_share",
+					"faction": "victor",
+					"max": 0.3
+				}
+			],
+			"start": "again_weak"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "beck_first_job",
+					"state": "done"
+				}
+			],
+			"start": "after"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_aurel_beck"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

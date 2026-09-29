@@ -1,0 +1,315 @@
+{
+	"id": "ammo_trader_sol",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "ammo_trader_sol",
+			"text": "솔이다. 한 발 한 발 세어서 판다. 덤은 없어. …처음 온 거면 한 줌은 덤으로 주지. 그게 여기 인사야.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_ammo_trader_sol"
+				}
+			],
+			"choices": [
+				{
+					"text": "한 줌 받는다",
+					"next": "gift",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"text": "탄약은 어디다 팔면 좋지?",
+					"next": "where"
+				},
+				{
+					"text": "[의약품 2개] 탄약과 맞바꾼다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "swap",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 5
+						},
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"gift": {
+			"speaker": "ammo_trader_sol",
+			"text": "받아. 다음엔 제값 내.",
+			"choices": [
+				{
+					"text": "탄약은 어디다 팔면 좋지?",
+					"next": "where"
+				},
+				{
+					"text": "[의약품 2개] 탄약과 맞바꾼다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "swap",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 5
+						},
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "ammo_trader_sol",
+			"text": "몇 발?",
+			"choices": [
+				{
+					"text": "탄약은 어디다 팔면 좋지?",
+					"next": "where"
+				},
+				{
+					"text": "[의약품 2개] 탄약과 맞바꾼다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "swap",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 5
+						},
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"refuse": {
+			"speaker": "ammo_trader_sol",
+			"text": "성벽 냄새가 너무 진해. 헬리오스가 널 반기는 동안엔 여기서 아무것도 못 사. 원로 규칙이야.",
+			"choices": [
+				{
+					"text": "원로를 만나 보겠다",
+					"next": "refuse_tarr"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"refuse_tarr": {
+			"speaker": "ammo_trader_sol",
+			"text": "원로 회당은 위쪽이야. 기대는 하지 마.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "ammo_trader_sol",
+			"text": "약탈이 늘었어. 다들 탄약을 사재기해. 오늘은 한 사람당 스무 발까지. 나도 절벽 입구에 총을 두 배로 세웠어.",
+			"choices": [
+				{
+					"text": "탄약은 어디다 팔면 좋지?",
+					"next": "where"
+				},
+				{
+					"text": "[의약품 2개] 탄약과 맞바꾼다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "swap",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 5
+						},
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_uprising": {
+			"speaker": "ammo_trader_sol",
+			"text": "언더그리드가 사가는 탄약이 매일 두 트럭이야. 값은 올랐고 화덕은 밤새 돌아. 이게 혁명인지 장사인지는 모르겠군.",
+			"choices": [
+				{
+					"text": "탄약은 어디다 팔면 좋지?",
+					"next": "where"
+				},
+				{
+					"text": "[의약품 2개] 탄약과 맞바꾼다",
+					"cost": [
+						{
+							"type": "cargo",
+							"good": "medicine",
+							"amount": 2
+						}
+					],
+					"next": "swap",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "ammo",
+							"amount": 5
+						},
+						{
+							"type": "reputation",
+							"city": "red_mesa",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"where": {
+			"speaker": "ammo_trader_sol",
+			"text": "게이트 7, 스크랩야드. 둘 다 목이 마르지. 한쪽은 병사고 한쪽은 약탈자야. 누구한테 파느냐는 네 몫이다.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편이지?",
+					"next": "side"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"side": {
+			"speaker": "ammo_trader_sol",
+			"text": "물 주는 편. 우리가 판 탄약이 누굴 쏘는지는 묻지 않아. 물을 사야 하니까.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"swap": {
+			"speaker": "ammo_trader_sol",
+			"text": "의약품. 좋아. 저수조 아이들 기침약이 떨어졌거든. 다섯 발이다. 덤은 없어.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "reputation",
+					"city": "helios",
+					"min": 30
+				}
+			],
+			"start": "refuse"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_ammo_trader_sol"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_ammo_trader_sol"
+				},
+				{
+					"type": "crisis",
+					"crisis": "rebel_uprising",
+					"active": true
+				}
+			],
+			"start": "again_uprising"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_ammo_trader_sol"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

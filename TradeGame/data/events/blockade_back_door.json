@@ -1,0 +1,83 @@
+{
+	"id": "blockade_back_door",
+	"title": "창고 뒷문",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"greenhouse_market"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "greenhouse_blockade",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "봉쇄 중인 창고 뒷문에서 상인 하나가 헬리오스행 트럭에 몰래 생식량을 싣는다. 눈이 마주치자 손가락을 입에 댄다.",
+	"choices": [
+		{
+			"id": "join",
+			"text": "한몫 끼어 싣는다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 40
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "생식량 열 짐이 당신 짐칸에도 실린다. 헬리오스에선 두 배 값이다. 그린하우스 누군가는 이 일을 기억할 것이다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "raw_food",
+							"amount": 10
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": -5
+						},
+						{
+							"type": "flag_set",
+							"flag": "broke_blockade"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "report",
+			"text": "소하에게 알린다",
+			"outcomes": {
+				"success": {
+					"text": "상인이 끌려간다. 원로 온실에서 소하가 조용히 고개를 끄덕인다. 상인의 아내가 당신을 오래 쳐다본다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						},
+						{
+							"type": "faction_strength",
+							"faction": "displaced",
+							"delta": 1
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "ignore",
+			"text": "못 본 척한다",
+			"outcomes": {
+				"success": {
+					"text": "트럭이 어둠 속으로 사라진다. 헬리오스 어느 집이 오늘은 먹을 것이다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

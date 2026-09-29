@@ -1,0 +1,381 @@
+{
+	"id": "elder_tarr",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "elder_tarr",
+			"text": "앉게. 늙은이 눈은 느리지만 정확하지. 자네 손은 짐을 나르는 손이고, 눈은 뭔가를 두고 온 눈이군. 뭐, 여기 온 사람은 다 그래.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_elder_tarr"
+				}
+			],
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있습니까?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "tarr_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "elder_tarr",
+			"text": "왔나. 바람이 동쪽에서 부는군. 좋은 소식은 늘 서쪽에서 오는데.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있습니까?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "tarr_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"refuse": {
+			"speaker": "elder_tarr",
+			"text": "헬리오스가 자네 이름을 반긴다고 들었네. 전쟁 때 그들이 우리 우물을 막았지. 우물을 막은 손과 악수하는 사람과는 거래하지 않네. 나가게.",
+			"choices": [
+				{
+					"text": "그건 오해입니다",
+					"check": {
+						"stat": "negotiation",
+						"dc": 17
+					},
+					"next": "refuse_talk",
+					"fail_next": "refuse_fail"
+				},
+				{
+					"text": "[웬의 보증] 물지기 웬이 저를 압니다",
+					"requires": [
+						{
+							"type": "flag",
+							"flag": "wen_trust"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "refuse_wen"
+				},
+				{
+					"text": "물러난다",
+					"next": ""
+				}
+			]
+		},
+		"refuse_wen": {
+			"speaker": "elder_tarr",
+			"text": "웬이? …그 아이는 물을 아는 사람만 믿지. 좋네. 오늘은 앉게.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있습니까?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "tarr_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"refuse_talk": {
+			"speaker": "elder_tarr",
+			"text": "…말은 잘하는군. 오늘은 들어 주지. 그러나 저수조에 물 한 통이라도 붓기 전까지는 믿지 않네.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있습니까?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "tarr_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"refuse_fail": {
+			"speaker": "elder_tarr",
+			"text": "오해는 헬리오스가 제일 잘 만드는 물건이지. 나가게.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_uprising": {
+			"speaker": "elder_tarr",
+			"text": "언더그리드 아이들이 우리 탄약으로 무장을 했네. 노바는 불을 나누겠다지. 나는 전쟁 전에도 그런 말을 들었네. 그때도 불은 누군가 쥐고 있었지.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있습니까?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "tarr_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_crackdown": {
+			"speaker": "elder_tarr",
+			"text": "헬리오스가 검문을 늘렸네. 우리 의약품 트럭이 돌아왔어. 억제제 없이 의체 쓰는 아이들이 밤새 앓네. 약을 가져오는 자는 이 마을의 친구일세.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "일거리가 있습니까?",
+					"requires": [
+						{
+							"type": "quest",
+							"quest": "tarr_first_job",
+							"state": "none"
+						}
+					],
+					"hide_if_blocked": true,
+					"next": "job"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"side": {
+			"speaker": "elder_tarr",
+			"text": "물 편일세. 우리는 탄약을 팔아 물을 사네. 언더그리드에 팔고, 게이트 7에도 팔고, 약탈자에게도 팔지. 부끄럽냐고? 목마른 적 있나?",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"job": {
+			"speaker": "elder_tarr",
+			"text": "저수조가 석 달 치밖에 없네. 정수된 물 열 통을 절벽 저수조의 웬에게 가져다주게. 그린하우스 물이 가장 맑지. 보수는 웬에게 맡겨 두겠네.",
+			"choices": [
+				{
+					"text": "맡겠습니다",
+					"next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "tarr_first_job"
+						}
+					]
+				},
+				{
+					"text": "물값이 비쌀 텐데요",
+					"check": {
+						"stat": "negotiation",
+						"dc": 14
+					},
+					"next": "job_haggle",
+					"fail_next": "job_ok",
+					"effects": [
+						{
+							"type": "quest_start",
+							"quest": "tarr_first_job"
+						},
+						{
+							"type": "power",
+							"delta": 20
+						}
+					],
+					"fail_effects": [
+						{
+							"type": "quest_start",
+							"quest": "tarr_first_job"
+						}
+					]
+				},
+				{
+					"text": "생각해 보겠습니다",
+					"next": ""
+				}
+			]
+		},
+		"job_ok": {
+			"speaker": "elder_tarr",
+			"text": "고맙네. 물을 나르는 자는 이 절벽에서 총보다 귀하네.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"job_haggle": {
+			"speaker": "elder_tarr",
+			"text": "셈이 밝군. 좋네. 선금일세. 물이 오면 나머지를 주지.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"waiting": {
+			"speaker": "elder_tarr",
+			"text": "물 열 통. 웬에게 가져다주게. 수위가 매일 내려가네.",
+			"choices": [
+				{
+					"text": "곧 가져오겠습니다",
+					"next": ""
+				}
+			]
+		},
+		"after": {
+			"speaker": "elder_tarr",
+			"text": "웬이 자네 이야기를 하더군. 물을 아는 운반꾼. 레드 메사는 친구를 잊지 않네. 모닥불의 한에게도 말해 두지. 싸게 해 주라고. …그 녀석이 들을지는 모르겠지만.",
+			"choices": [
+				{
+					"text": "레드 메사는 누구 편입니까?",
+					"next": "side"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "reputation",
+					"city": "helios",
+					"min": 30
+				},
+				{
+					"type": "reputation",
+					"city": "red_mesa",
+					"max": 19
+				}
+			],
+			"start": "refuse"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "tarr_first_job",
+					"state": "active"
+				}
+			],
+			"start": "waiting"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_elder_tarr"
+				},
+				{
+					"type": "crisis",
+					"crisis": "rebel_uprising",
+					"active": true
+				}
+			],
+			"start": "again_uprising"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_elder_tarr"
+				},
+				{
+					"type": "crisis",
+					"crisis": "crackdown",
+					"active": true
+				}
+			],
+			"start": "again_crackdown"
+		},
+		{
+			"requires": [
+				{
+					"type": "quest",
+					"quest": "tarr_first_job",
+					"state": "done"
+				}
+			],
+			"start": "after"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_elder_tarr"
+				}
+			],
+			"start": "again"
+		}
+	]
+}

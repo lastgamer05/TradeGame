@@ -1,0 +1,121 @@
+{
+	"id": "crackdown_plaza_search",
+	"title": "광장 수색",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"helios_plaza"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "crackdown",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "광장 단속반이 운반꾼 짐칸을 하나씩 뒤진다. 케이드 하사가 명단을 들고 서 있다.",
+	"choices": [
+		{
+			"id": "open",
+			"text": "순순히 짐칸을 연다",
+			"outcomes": {
+				"success": {
+					"text": "금지품은 전부 압수된다. 깨끗한 짐칸이면 하사가 고개를 끄덕인다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "hacking_tool",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_core",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_module",
+							"amount": "all"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "compartment",
+			"text": "밀수칸을 믿는다",
+			"requires": [
+				{
+					"type": "module",
+					"module": "smuggle_compartment"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "단속반이 짐칸을 두드리고 지나간다. 밀수칸은 조용하다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "talk",
+			"text": "전력청 납품 영수증을 흔든다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 15
+			},
+			"outcomes": {
+				"success": {
+					"text": "하사가 영수증을 흘끗 본다. \"다음.\"",
+					"effects": []
+				},
+				"failure": {
+					"text": "\"영수증은 짐칸과 상관없다.\" 금지품이 압수되고 이름이 적힌다.",
+					"effects": [
+						{
+							"type": "cargo_remove",
+							"good": "hacking_tool",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "forged_cell",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_core",
+							"amount": "all"
+						},
+						{
+							"type": "cargo_remove",
+							"good": "stolen_module",
+							"amount": "all"
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -5
+						},
+						{
+							"type": "flag_set",
+							"flag": "helios_criminal_record"
+						}
+					]
+				}
+			}
+		}
+	]
+}

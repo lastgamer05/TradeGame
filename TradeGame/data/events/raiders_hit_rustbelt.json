@@ -1,0 +1,85 @@
+{
+	"id": "raiders_hit_rustbelt",
+	"title": "러스트벨 습격",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"rustbelt"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "raider_surge",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "크레인 꼭대기에서 종이 울린다. 약탈자 트럭 셋이 판자촌 쪽으로 달려든다. 고물꾼들이 쇠파이프를 들고 뛰쳐나온다.",
+	"choices": [
+		{
+			"id": "fight",
+			"text": "차를 돌려 약탈자를 막는다",
+			"outcomes": {
+				"success": {
+					"text": "엔진을 올린다. 약탈자들이 이쪽을 본다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 10
+						},
+						{
+							"type": "faction_strength",
+							"faction": "displaced",
+							"delta": 1
+						},
+						{
+							"type": "start_combat",
+							"encounter": "raider_roadblock"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "arm",
+			"text": "고물꾼들에게 탄약을 나눠 준다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "ammo",
+					"amount": 5
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "쇠파이프 대신 총이 불을 뿜는다. 약탈자들이 물러간다. 조합이 당신 이름을 적는다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 7
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "hide",
+			"text": "크레인 뒤에 차를 숨긴다",
+			"outcomes": {
+				"success": {
+					"text": "약탈자들이 판잣집 몇 채를 털고 떠난다. 누군가 당신 차를 봤다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": -3
+						}
+					]
+				}
+			}
+		}
+	]
+}

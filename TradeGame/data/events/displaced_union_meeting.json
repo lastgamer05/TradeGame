@@ -1,0 +1,93 @@
+{
+	"id": "displaced_union_meeting",
+	"title": "밀려난 사람들의 회의",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"greenhouse_bunk",
+			"rustbelt_shanty"
+		],
+		"requires": [
+			{
+				"type": "faction_share",
+				"faction": "displaced",
+				"min": 0.25
+			}
+		],
+		"weight": 8
+	},
+	"text": "숙소에 농부와 고물꾼이 섞여 앉았다. \"식량과 고물을 합치면 헬리오스와 대등하게 말할 수 있다.\" 누군가 운반꾼 의견을 묻는다.",
+	"choices": [
+		{
+			"id": "speak",
+			"text": "연합을 지지하는 연설을 한다",
+			"check": {
+				"stat": "negotiation",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "박수가 터진다. 그린하우스 농부와 러스트벨 고물꾼이 처음으로 같은 잔을 든다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 4
+						},
+						{
+							"type": "reputation",
+							"city": "rustbelt",
+							"delta": 4
+						},
+						{
+							"type": "faction_strength",
+							"faction": "displaced",
+							"delta": 2
+						}
+					]
+				},
+				"failure": {
+					"text": "말이 꼬인다. 누군가 \"운반꾼은 운반이나 해\"라고 외친다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "donate",
+			"text": "회의 기금에 셀을 보탠다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 20
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "장부에 당신 이름이 첫 줄에 적힌다.",
+					"effects": [
+						{
+							"type": "faction_strength",
+							"faction": "displaced",
+							"delta": 2
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 2
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "warn",
+			"text": "헬리오스가 가만있지 않을 거라고 경고한다",
+			"outcomes": {
+				"success": {
+					"text": "방이 조용해진다. 소하의 전령이 당신 말을 받아 적는다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

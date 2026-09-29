@@ -1,0 +1,85 @@
+{
+	"id": "greenhouse_water_day",
+	"title": "물 배급일",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"greenhouse"
+		],
+		"requires": [],
+		"weight": 6
+	},
+	"text": "정수탑 아래 물 배급 줄이 길다. 노인들이 물통을 끌고 온다. 탑 위에서 이안이 밸브를 돌린다.",
+	"choices": [
+		{
+			"id": "carry",
+			"text": "노인들 물통을 날라 준다",
+			"check": {
+				"stat": "might",
+				"dc": 12
+			},
+			"outcomes": {
+				"success": {
+					"text": "해 질 무렵 어깨가 빠질 것 같다. 원로 온실에서 물 두 통을 보내 준다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "water",
+							"amount": 2
+						},
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 3
+						}
+					]
+				},
+				"failure": {
+					"text": "통을 엎는다. 노인이 혀를 찬다. 남은 물이라도 챙겨 준다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "filter",
+			"text": "필터 하나를 탑에 올려 보낸다",
+			"cost": [
+				{
+					"type": "cargo",
+					"good": "filter",
+					"amount": 1
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "탑 위에서 이안이 손을 흔든다. 물줄기가 맑아진다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "greenhouse",
+							"delta": 5
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_tower_fixed"
+						},
+						{
+							"type": "flag_set",
+							"flag": "ian_trusts"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "pass",
+			"text": "줄을 지나친다",
+			"outcomes": {
+				"success": {
+					"text": "아이 하나가 빈 물통을 두드리며 노래를 부른다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

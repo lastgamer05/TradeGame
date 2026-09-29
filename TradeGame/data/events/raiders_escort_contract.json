@@ -1,0 +1,86 @@
+{
+	"id": "raiders_escort_contract",
+	"title": "호위 계약",
+	"trigger": {
+		"on": "arrival",
+		"cities": [
+			"swapmeet",
+			"rustbelt",
+			"gate7"
+		],
+		"requires": [
+			{
+				"type": "crisis",
+				"crisis": "raider_surge",
+				"active": true
+			}
+		],
+		"weight": 10
+	},
+	"text": "약탈자 때문에 상단들이 발이 묶였다. 한 상단주가 호위 겸 길잡이를 구한다. \"하루 길만 앞장서 주면 돼.\"",
+	"choices": [
+		{
+			"id": "escort",
+			"text": "앞장선다",
+			"check": {
+				"stat": "driving",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "약탈자 먼지를 피해 샛길로 빠진다. 상단주가 약속한 셀을 센다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 50
+						}
+					]
+				},
+				"failure": {
+					"text": "매복에 걸려 급히 빠져나온다. 적재함에 총알이 박혔다.",
+					"effects": [
+						{
+							"type": "vehicle_damage",
+							"part": "cargo_bay"
+						},
+						{
+							"type": "power",
+							"delta": 10
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "turret",
+			"text": "터렛으로 호위한다",
+			"requires": [
+				{
+					"type": "module",
+					"module": "turret"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "터렛이 돌아가는 소리만으로 약탈자들이 물러선다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 50
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "decline",
+			"text": "거절한다",
+			"outcomes": {
+				"success": {
+					"text": "상단주가 다른 운반꾼을 찾는다. 그 운반꾼은 돌아오지 않을지도 모른다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

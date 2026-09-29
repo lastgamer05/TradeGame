@@ -1,0 +1,363 @@
+{
+	"id": "mechanic_juno",
+	"start": "greet",
+	"nodes": {
+		"greet": {
+			"speaker": "mechanic_juno",
+			"text": "와, 이 차대! 잠깐만, 잠깐만. 이거 보급 수송대 차대 맞지? 서스펜션 거는 방식이 딱 그거야. 어디서 구했어?",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_mechanic_juno"
+				}
+			],
+			"choices": [
+				{
+					"text": "고물상에서 샀다",
+					"check": {
+						"stat": "negotiation",
+						"dc": 12
+					},
+					"next": "chassis_lie",
+					"fail_next": "chassis_doubt"
+				},
+				{
+					"text": "예전에 몰던 차다",
+					"next": "chassis_truth",
+					"effects": [
+						{
+							"type": "flag_set",
+							"flag": "juno_knows_chassis"
+						}
+					]
+				},
+				{
+					"text": "대답하지 않는다",
+					"next": "chassis_silent"
+				}
+			]
+		},
+		"greet_morae": {
+			"speaker": "mechanic_juno",
+			"text": "와, 이 차대! 이거 혹시… (동승자를 힐끗 보고 입을 다문다) 아, 아니다. 좋은 차네! 고칠 데 있으면 불러. 사연은 안 물어.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "met_mechanic_juno"
+				},
+				{
+					"type": "flag_set",
+					"flag": "juno_knows_chassis"
+				}
+			],
+			"choices": [
+				{
+					"text": "밀린 엔진 조율을 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "tune_ok",
+					"fail_next": "tune_fail",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 15
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"chassis_lie": {
+			"speaker": "mechanic_juno",
+			"text": "고물상 운 좋았네! 이런 건 보통 헬리오스가 다 회수하거든. 아무튼 고칠 데 있으면 불러.",
+			"choices": [
+				{
+					"text": "밀린 엔진 조율을 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "tune_ok",
+					"fail_next": "tune_fail",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 15
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"chassis_doubt": {
+			"speaker": "mechanic_juno",
+			"text": "고물상에서? 흐음. 번호판 떼어 낸 자리가 너무 깔끔한데. …뭐, 내 알 바 아니지! 고칠 데 있으면 불러.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "juno_knows_chassis"
+				}
+			],
+			"choices": [
+				{
+					"text": "밀린 엔진 조율을 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "tune_ok",
+					"fail_next": "tune_fail",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 15
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"chassis_truth": {
+			"speaker": "mechanic_juno",
+			"text": "수송대 출신이구나! 그럼 마지막 작전 때…. 아냐, 안 물을게. 여기 그런 사람 많아. 아무튼 고칠 데 있으면 불러.",
+			"choices": [
+				{
+					"text": "밀린 엔진 조율을 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "tune_ok",
+					"fail_next": "tune_fail",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 15
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"chassis_silent": {
+			"speaker": "mechanic_juno",
+			"text": "알았어, 알았어. 비밀 많은 손님 환영이야. 비밀은 수리비에 안 붙거든.",
+			"choices": [
+				{
+					"text": "밀린 엔진 조율을 거든다",
+					"check": {
+						"stat": "tech",
+						"dc": 13
+					},
+					"next": "tune_ok",
+					"fail_next": "tune_fail",
+					"effects": [
+						{
+							"type": "power",
+							"delta": 15
+						},
+						{
+							"type": "reputation",
+							"city": "gate7",
+							"delta": 3
+						}
+					]
+				},
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again": {
+			"speaker": "mechanic_juno",
+			"text": "왔어? 오늘은 어디가 삐걱대?",
+			"choices": [
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"again_raiders": {
+			"speaker": "mechanic_juno",
+			"text": "요즘 들어오는 트럭마다 총구멍이야. 약탈자들이 늘었어. 장갑판 없으면 러스트벨 가는 길은 생각도 하지 마.",
+			"choices": [
+				{
+					"text": "차 좀 봐 줄 수 있어?",
+					"next": "car"
+				},
+				{
+					"text": "요즘 정비고는 어때?",
+					"next": "news"
+				},
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"car": {
+			"speaker": "mechanic_juno",
+			"text": "부위마다 값이 달라. 적재함, 엔진, 배터리, 모듈. 정비 창구에서 확인해. 언더그리드보단 비싸고 러스트벨보단 확실해.",
+			"choices": [
+				{
+					"text": "알겠다",
+					"next": ""
+				}
+			]
+		},
+		"news": {
+			"speaker": "mechanic_juno",
+			"text": "지휘관이 탄약 모자라다고 매일 소리 질러. 그리고 비밀인데, 헬리오스에서 발전기 부품 주문이 계속 와. 전초기지에 발전기가 몇 대나 있다고.",
+			"effects": [
+				{
+					"type": "flag_set",
+					"flag": "rumor_helios_buying_generator_parts"
+				}
+			],
+			"choices": [
+				{
+					"text": "흥미롭군",
+					"next": ""
+				}
+			]
+		},
+		"tune_ok": {
+			"speaker": "mechanic_juno",
+			"text": "손 좋네! 덕분에 한 대 더 뺐어. 수고비 받아. 다음에도 들러.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		},
+		"tune_fail": {
+			"speaker": "mechanic_juno",
+			"text": "어어, 그 볼트 아니야! …괜찮아, 괜찮아. 내가 할게. 구경만 해.",
+			"choices": [
+				{
+					"text": "대화를 끝낸다",
+					"next": ""
+				}
+			]
+		}
+	},
+	"variants": [
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_mechanic_juno"
+				},
+				{
+					"type": "crisis",
+					"crisis": "raider_surge",
+					"active": true
+				}
+			],
+			"start": "again_raiders"
+		},
+		{
+			"requires": [
+				{
+					"type": "flag",
+					"flag": "met_mechanic_juno"
+				}
+			],
+			"start": "again"
+		},
+		{
+			"requires": [
+				{
+					"type": "companion",
+					"companion": "morae"
+				}
+			],
+			"start": "greet_morae"
+		}
+	]
+}

@@ -1,0 +1,72 @@
+{
+	"id": "victor_victory_ration",
+	"title": "승전 기념 배급",
+	"trigger": {
+		"on": "location",
+		"locations": [
+			"helios_hq"
+		],
+		"requires": [
+			{
+				"type": "faction_share",
+				"faction": "victor",
+				"min": 0.5
+			}
+		],
+		"weight": 8
+	},
+	"text": "전력청 앞에서 '질서의 승리' 기념 배급을 한다. 스피커에서 벡의 목소리. \"빛은 질서를 따른다.\"",
+	"choices": [
+		{
+			"id": "take",
+			"text": "배급을 받는다",
+			"outcomes": {
+				"success": {
+					"text": "합성식품 꾸러미가 손에 쥐어진다. 줄 끝에서 판자촌 사람들은 성문 밖에 서 있다.",
+					"effects": [
+						{
+							"type": "cargo_add",
+							"good": "synth_food",
+							"amount": 3
+						},
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": 1
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "pass_on",
+			"text": "받은 꾸러미를 성문 밖으로 넘긴다",
+			"outcomes": {
+				"success": {
+					"text": "병사가 눈살을 찌푸린다. 성문 밖에서 리나가 꾸러미를 받아 든다.",
+					"effects": [
+						{
+							"type": "reputation",
+							"city": "helios",
+							"delta": -2
+						},
+						{
+							"type": "flag_set",
+							"flag": "lina_friend"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "leave",
+			"text": "지나간다",
+			"outcomes": {
+				"success": {
+					"text": "스피커 소리가 성벽을 타고 멀리까지 울린다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

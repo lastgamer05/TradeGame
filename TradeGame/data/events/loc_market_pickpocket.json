@@ -1,0 +1,69 @@
+{
+	"id": "loc_market_pickpocket",
+	"title": "짐칸 도둑",
+	"trigger": {
+		"on": "location",
+		"kinds": [
+			"market"
+		],
+		"requires": [],
+		"weight": 5
+	},
+	"text": "흥정하는 사이 아이 하나가 운전석 문을 열고 셀 주머니를 낚아채 뛴다.",
+	"choices": [
+		{
+			"id": "chase",
+			"text": "좌판 사이로 쫓아간다",
+			"check": {
+				"stat": "survival",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "골목 끝에서 아이의 옷깃을 잡는다. 주머니는 무사하다. 아이는 울지도 않고 노려본다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "좌판 두 개를 넘어뜨리고 놓친다. 주머니도, 아이도 없다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": -15
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "toss",
+			"text": "셀 몇 개를 던져 준다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 5
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "아이가 멈춰서 셀을 줍고 주머니를 바닥에 놓고 간다. 몇 셀로 주머니를 샀다.",
+					"effects": []
+				}
+			}
+		},
+		{
+			"id": "let_go",
+			"text": "보내 준다",
+			"outcomes": {
+				"success": {
+					"text": "주머니는 사라졌다. 이 시장의 아이들은 오늘 저녁을 먹을 것이다.",
+					"effects": [
+						{
+							"type": "power",
+							"delta": -15
+						}
+					]
+				}
+			}
+		}
+	]
+}
