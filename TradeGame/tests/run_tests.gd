@@ -17,6 +17,16 @@ func _initialize() -> void:
 	test_battle_map()
 	test_battle_rules()
 	test_battle_simulation()
+	test_city_locations()
+	test_requirements()
+	test_city_effects()
+	test_city_triggers()
+	test_dialogue_flow()
+	test_quests()
+	test_companions()
+	test_city_validation()
+	test_all_dialogues_run()
+	test_dialogue_view()
 	print("\n%s" % ("ALL PASSED" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -313,6 +323,429 @@ func test_battle_simulation() -> void:
 			_expect(false, "전투 뒤 전력이 음수")
 	_expect(not results.has(""), "모든 전투가 끝난다 %s" % results)
 	data.free()
+
+
+# --- 도시 탐방 (docs/city_spec.md) ---
+
+func test_city_locations() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_expect(data.locations.size() == 32 and data.npcs.size() == 32, "구역 32곳, NPC 32명")
+	var s := GameState.new(data, 20)
+	var here := s.locations_here()
+	_expect(here.size() == 4 and here.all(func(l): return l.city == "greenhouse"), "지금 도시의 구역 4곳")
+	_expect(here[0].id == "greenhouse_market", "구역은 데이터 순서")
+	s.enter_location("greenhouse_tower")
+	_expect(s.location == "greenhouse_tower", "구역에 들어간다")
+	s.leave_location()
+	_expect(s.location == "", "허브로 돌아온다")
+	_expect(s.npc_at("greenhouse_tower").get("id") == "ian", "정수탑에는 이안")
+	s.recruit("ian")
+	_expect(s.npc_at("greenhouse_tower").is_empty(), "태운 동료의 NPC는 구역에서 사라진다")
+	s.dismiss_companion()
+	_expect(s.npc_at("greenhouse_tower").get("id") == "ian", "내리면 다시 나타난다")
+	data.npcs.ian["requires"] = [{ "type": "flag", "flag": "tower_open" }]
+	_expect(s.npc_at("greenhouse_tower").is_empty(), "NPC requires가 안 맞으면 없다")
+	s.flags["tower_open"] = true
+	_expect(not s.npc_at("greenhouse_tower").is_empty(), "NPC requires가 맞으면 나타난다")
+	_expect(s.npc_at("no_such_place").is_empty(), "없는 구역은 {}")
+	data.free()
+
+
+func test_requirements() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_add_test_content(data)
+	var s := GameState.new(data, 21)
+	var met := func(r: Dictionary) -> bool: return EventRunner.requirements_met(s, [r])
+
+	_expect(not met.call({ "type": "crisis", "crisis": "rebel_uprising" }), "사건 없음: crisis 불충족")
+	_expect(met.call({ "type": "crisis", "crisis": "rebel_uprising", "active": false }), "사건 없음: active false 충족")
+	s.politics.active["rebel_uprising"] = data.politics.crises[0]
+	_expect(met.call({ "type": "crisis", "crisis": "rebel_uprising" }), "사건 중: crisis 충족")
+
+	var share := s.politics.share("victor")
+	_expect(met.call({ "type": "faction_share", "faction": "victor", "min": share - 0.01, "max": share + 0.01 }), "점유율 범위 안")
+	_expect(not met.call({ "type": "faction_share", "faction": "victor", "min": share + 0.01 }), "점유율 min 미달")
+	_expect(not met.call({ "type": "faction_share", "faction": "victor", "max": share - 0.01 }), "점유율 max 초과")
+
+	_expect(met.call({ "type": "quest", "quest": "t_deliver", "state": "none" }), "의뢰 받기 전: none")
+	_expect(not met.call({ "type": "quest", "quest": "t_deliver" }), "state 기본값은 active")
+	s.quests["t_deliver"] = "active"
+	_expect(met.call({ "type": "quest", "quest": "t_deliver" }), "의뢰 active")
+	s.quests["t_deliver"] = "done"
+	_expect(met.call({ "type": "quest", "quest": "t_deliver", "state": "done" }), "의뢰 done")
+
+	_expect(not met.call({ "type": "companion", "companion": "" }), "동료 없음: 아무나 불충족")
+	s.recruit("piece")
+	_expect(met.call({ "type": "companion", "companion": "" }), "동료 있음: 아무나 충족")
+	_expect(met.call({ "type": "companion", "companion": "piece" }), "그 동료가 타고 있다")
+	_expect(not met.call({ "type": "companion", "companion": "ian" }), "다른 동료는 불충족")
+
+	s.day = 10
+	_expect(met.call({ "type": "day", "min": 5, "max": 10 }), "날짜 범위 안")
+	_expect(not met.call({ "type": "day", "max": 9 }), "날짜 max 초과")
+	s.power = 100
+	_expect(met.call({ "type": "power", "min": 100 }) and not met.call({ "type": "power", "min": 101 }), "전력 min")
+	_expect(met.call({ "type": "power", "max": 100 }) and not met.call({ "type": "power", "max": 99 }), "전력 max")
+
+	s.reputation.helios = 20
+	_expect(met.call({ "type": "reputation", "city": "helios", "max": 20 }), "평판 max 충족")
+	_expect(not met.call({ "type": "reputation", "city": "helios", "max": 19 }), "평판 max 초과")
+	_expect(not met.call({ "type": "faction_reputation", "faction": "victor", "max": 9 }), "진영 평판 max 초과 (헬리오스 20, 게이트7 0)")
+	s.reputation.gate7 = 20
+	_expect(met.call({ "type": "faction_reputation", "faction": "victor", "min": 20, "max": 20 }), "진영 평판 min과 max")
+
+	var blocker := EventRunner.choice_blocker(s, { "requires": [{ "type": "companion", "companion": "ian" }] })
+	_expect(blocker.contains("이안"), "막힌 이유에 조건이 드러난다 (%s)" % blocker)
+	_expect(EventRunner.choice_tags(s, { "requires": [{ "type": "companion", "companion": "ian" }] }) == "[이안] ", "동료 조건 태그")
+	_expect(EventRunner.josa("이안", "이", "가") == "이안이" and EventRunner.josa("피스", "이", "가") == "피스가", "조사 받침 처리")
+	data.free()
+
+
+func test_city_effects() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_add_test_content(data)
+	var s := GameState.new(data, 22)
+	EventRunner.apply_effect(s, { "type": "start_dialogue", "dialogue": "t_other" })
+	_expect(s.pending_dialogue == "t_other", "start_dialogue는 pending_dialogue에 남는다")
+
+	var line := EventRunner.apply_effect(s, { "type": "recruit", "companion": "ian" })
+	_expect(s.companion == "ian" and line.contains("이안"), "동료 영입 (%s)" % line)
+	var lines := EventRunner.apply_effects(s, [{ "type": "recruit", "companion": "han" }])
+	_expect(s.companion == "han" and lines.size() == 2, "다른 동료를 태우면 기존 동료는 내린다 %s" % [lines])
+	EventRunner.apply_effect(s, { "type": "trust", "delta": 5 })
+	EventRunner.apply_effect(s, { "type": "trust", "delta": -2 })
+	_expect(s.trust.han == 3, "지금 동료의 신뢰 변화")
+	EventRunner.apply_effect(s, { "type": "dismiss" })
+	_expect(s.companion == "", "동료를 내린다")
+	_expect(EventRunner.apply_effect(s, { "type": "trust", "delta": 5 }) == "", "동료가 없으면 신뢰 변화 없음")
+
+	EventRunner.apply_effect(s, { "type": "quest_start", "quest": "t_deliver" })
+	_expect(s.quest_state("t_deliver") == "active", "의뢰 시작")
+	s.add_cargo("raw_food", 12)
+	var p := s.power
+	lines = EventRunner.apply_effects(s, [{ "type": "quest_complete", "quest": "t_deliver" }])
+	_expect(s.quest_state("t_deliver") == "done", "의뢰 완료")
+	_expect(s.cargo.raw_food == 2 and s.power == p + 120 and s.reputation.helios == 10, "납품 화물 차감과 보상 적용")
+	_expect(lines.size() == 4, "완료 줄: 전달, 완료, 보상 둘 %s" % [lines])
+	EventRunner.apply_effect(s, { "type": "quest_complete", "quest": "t_deliver" })
+	_expect(s.power == p + 120, "끝난 의뢰는 보상을 두 번 주지 않는다")
+
+	var before := s.politics.share("rebel")
+	line = EventRunner.apply_effect(s, { "type": "faction_strength", "faction": "rebel", "delta": 200 })
+	_expect(s.politics.share("rebel") > before and line.contains("+200"), "진영 세력 변화 (%s)" % line)
+	_expect(s.politics.active.has("rebel_uprising") and not s.pending_news.is_empty(), "세력 변화로 정세 사건 시작")
+	data.free()
+
+
+func test_city_triggers() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	data.events = {}
+	var ev := func(id: String, trigger: Dictionary) -> void:
+		data.events[id] = { "id": id, "title": id, "text": "", "trigger": trigger,
+			"choices": [{ "id": "ok", "text": "확인", "outcomes": { "success": { "text": "" } } }] }
+	ev.call("legacy", { "on": "city", "cities": ["helios"] })
+	ev.call("anywhere", { "on": "arrival" })
+	ev.call("loc_market", { "on": "location", "kinds": ["market"] })
+	ev.call("loc_tower", { "on": "location", "locations": ["greenhouse_tower"] })
+	ev.call("loc_crisis", { "on": "location", "requires": [{ "type": "crisis", "crisis": "greenhouse_blockade" }] })
+	data.economy.events.city_chance = 1.0
+	var s := GameState.new(data, 23)
+	var seen := {}
+	for i in 30:
+		seen[EventRunner.pick_arrival_event(s).get("id", "")] = true
+	_expect(seen.has("anywhere") and not seen.has("legacy"), "cities가 비면 모든 도시, 다른 도시 이벤트는 안 뜬다")
+	s.city = "helios"
+	seen = {}
+	for i in 30:
+		seen[EventRunner.pick_arrival_event(s).get("id", "")] = true
+	_expect(seen.has("legacy") and seen.has("anywhere"), "옛 trigger city는 arrival과 같다")
+	data.economy.events.city_chance = 0.0
+	_expect(EventRunner.pick_arrival_event(s).is_empty(), "확률이 0이면 도착 이벤트 없음")
+
+	data.economy.events["location_chance"] = 1.0
+	s.city = "greenhouse"
+	seen = {}
+	for i in 30:
+		seen[EventRunner.pick_location_event(s, "greenhouse_market").get("id", "")] = true
+	_expect(seen.has("loc_market") and not seen.has("loc_tower") and not seen.has("loc_crisis"), "구역 종류로 고른다 %s" % [seen.keys()])
+	seen = {}
+	for i in 30:
+		seen[EventRunner.pick_location_event(s, "greenhouse_tower").get("id", "")] = true
+	_expect(seen.has("loc_tower") and not seen.has("loc_market"), "구역 id로 고른다")
+	s.politics.active["greenhouse_blockade"] = data.politics.crises[1]
+	seen = {}
+	for i in 30:
+		seen[EventRunner.pick_location_event(s, "greenhouse_bunk").get("id", "")] = true
+	_expect(seen.has("loc_crisis"), "정세 사건 중에만 뜨는 구역 이벤트")
+	data.economy.events.erase("location_chance")
+	var hits := 0
+	for i in 200:
+		if not EventRunner.pick_location_event(s, "greenhouse_market").is_empty():
+			hits += 1
+	_expect(hits > 40 and hits < 120, "location_chance 기본값 0.4 (%d/200)" % hits)
+	data.free()
+
+
+func test_dialogue_flow() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_add_test_content(data)
+	var s := GameState.new(data, 24)
+	s.player_name = "카이"
+	s.power = 100
+	var d := DialogueRunner.new(s, "t_dlg")
+	var cur := d.current()
+	_expect(d.node_id == "hello" and cur.speaker_name == "배급관 오르", "시작 노드와 화자 이름")
+	_expect(cur.text == "어서 와, 카이.", "{player} 치환")
+	_expect(s.flags.has("t_seen") and s.power == 105 and cur.entry_lines == ["전력 +5셀"], "노드에 들어서면 노드 효과 적용")
+	_expect(cur.choices.size() == 5, "hide_if_blocked 선택지는 숨는다")
+	_expect(cur.choices[0].tags == "[교섭 DC 15] ", "판정 태그")
+	_expect(not cur.choices[2].enabled and cur.choices[2].blocker.contains("이안"), "막힌 선택지는 보이되 이유가 붙는다")
+	_expect(d.choose(2).effect_lines.is_empty() and d.node_id == "hello", "막힌 선택지는 골라도 그대로")
+
+	s.stats.negotiation = 30
+	var r := d.choose(0)
+	_expect(r.success and r.roll_text.contains("성공") and d.node_id == "win", "판정 성공은 next")
+	_expect(s.reputation.helios == 3 and r.effect_lines == ["헬리오스 평판 +3"], "성공 효과")
+	cur = d.current()
+	_expect(cur.speaker_name == "카이" and cur.choices.is_empty(), "player 화자, 선택지 없는 노드")
+	d.choose(0)
+	_expect(d.is_finished() and d.current().is_empty(), "선택지 없는 노드는 계속하면 끝")
+
+	# 다시 말을 걸면 variants로 시작한다.
+	d = DialogueRunner.new(s, "t_dlg")
+	_expect(d.node_id == "again", "조건이 맞는 variant로 시작")
+	s.stats.negotiation = -30
+	d = DialogueRunner.new(s, "t_dlg")
+	d._enter("hello")
+	r = d.choose(0)
+	_expect(not r.success and d.node_id == "lose" and s.reputation.helios == 0, "판정 실패는 fail_next와 fail_effects")
+	_expect(d.current().speaker_name == "" and d.current().speaker == "narrator", "narrator는 이름이 없다")
+	d.choose(0)
+	_expect(d.node_id == "hello", "선택지 없는 노드의 next")
+
+	var p := s.power
+	r = d.choose(1)
+	_expect(s.power == p - 50 + 5 and d.node_id == "hello", "비용을 치르고 다음 노드 효과까지 적용")
+	s.power = 10
+	_expect(not d.current().choices[1].enabled, "전력이 모자라면 비용 선택지가 막힌다")
+
+	s.recruit("ian")
+	s.stats.tech = 1
+	cur = d.current()
+	_expect(cur.choices[2].enabled, "동료가 타면 동료 선택지가 열린다")
+	r = d.choose(3)
+	_expect(r.roll_text.contains("이안 2"), "동료 보너스가 판정에 붙는다 (%s)" % r.roll_text)
+
+	d = DialogueRunner.new(s, "t_dlg")
+	d._enter("hello")
+	r = d.choose(4)
+	_expect(d.dialogue_id == "t_other" and d.node_id == "start" and s.pending_dialogue == "", "대화 안의 start_dialogue는 바로 이어진다")
+	d.choose(0)
+	_expect(d.is_finished(), "next가 빈 문자열이면 끝")
+
+	_expect(DialogueRunner.new(s, "no_such_dialogue").is_finished(), "없는 대화는 바로 끝")
+
+	# 실제 데이터의 배급관 대화: 처음엔 greet, 다음엔 again
+	var t := GameState.new(data, 25)
+	d = DialogueRunner.new(t, "ration_clerk")
+	_expect(d.node_id == "greet" and t.flags.has("met_ration_clerk"), "배급관 첫 대화")
+	_expect(DialogueRunner.new(t, "ration_clerk").node_id == "again", "배급관 다시 대화")
+	data.free()
+
+
+func test_quests() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_add_test_content(data)
+	var s := GameState.new(data, 26)
+	_expect(not s.quest_ready("t_deliver"), "맡기 전에는 준비 안 됨")
+	s.quests["t_deliver"] = "active"
+	s.quests["t_visit"] = "active"
+	s.quests["t_flag"] = "active"
+	s.add_cargo("raw_food", 10)
+	_expect(not s.quest_ready("t_deliver"), "납품: 목표 구역 밖이면 안 됨")
+	s.city = "helios"
+	s.enter_location("helios_hq")
+	_expect(s.quest_ready("t_deliver"), "납품: 목표 구역에서 화물이 있으면 됨")
+	_expect(EventRunner.requirements_met(s, [{ "type": "quest_ready", "quest": "t_deliver" }]), "quest_ready 조건")
+	_expect(EventRunner.requirements_met(s, [{ "type": "quest", "quest": "t_deliver", "state": "ready" }]), "quest state ready 조건")
+	s.remove_cargo("raw_food", 1)
+	_expect(not s.quest_ready("t_deliver"), "납품: 화물이 모자라면 안 됨")
+
+	_expect(not s.quest_ready("t_visit"), "방문: 가기 전")
+	s.leave_location()
+	s.enter_location("helios_plaza")
+	s.leave_location()
+	_expect(s.quest_ready("t_visit"), "방문: 한 번 들르면 됨")
+
+	_expect(not s.quest_ready("t_flag"), "플래그: 서기 전")
+	s.flags["t_goal"] = true
+	_expect(s.quest_ready("t_flag"), "플래그: 서면 됨")
+	s.quests["t_flag"] = "done"
+	_expect(not s.quest_ready("t_flag"), "끝난 의뢰는 준비 상태가 아니다")
+	data.free()
+
+
+func test_companions() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	var s := GameState.new(data, 27)
+	_expect(s.battle_squad()[1].name == data.combat.mercenary.name, "동료가 없으면 임시 용병")
+	s.recruit("morae")
+	var mate: Dictionary = s.battle_squad()[1]
+	_expect(mate.name == "모래" and mate.hp == 16 and mate.weapon == "rifle", "동료가 용병 자리를 대신한다")
+	_expect(s.start_battle("raider_roadblock").units.any(func(u): return u.get("name") == "모래"), "전투에 동료가 나간다")
+	_expect(s.stat_bonus("survival") == 2 and s.stat_bonus("tech") == 0, "동료 보너스는 bonus_stat에만")
+
+	s.recruit("han")
+	s.power = 100
+	s._advance_day()
+	_expect(s.companion == "han" and s.pending_notices.is_empty(), "조건이 안 맞으면 동료는 남는다")
+	s.power = 20
+	s._advance_day()
+	_expect(s.companion == "" and s.flags.has("companion_left_han"), "leave_if가 맞으면 하루가 지날 때 떠난다")
+	var n: Dictionary = s.pending_notices[0] if not s.pending_notices.is_empty() else {}
+	_expect(n.get("type") == "companion_left" and n.get("companion") == "han" and n.get("text") == data.companions.han.leave_text, "동료 이탈 알림")
+	_expect(s.battle_squad()[1].name == data.combat.mercenary.name, "떠나면 다시 임시 용병")
+
+	# 여러 날 이동해도 한 번만 떠난다.
+	var t := GameState.new(data, 28)
+	t.recruit("ian")
+	t.reputation.helios = 80
+	t.travel("undergrid")
+	_expect(t.companion == "" and t.pending_notices.size() == 1, "이동 중 하루에 한 번 확인, 알림 하나")
+	data.free()
+
+
+func test_city_validation() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_add_test_content(data)
+	data.errors.clear()
+	data.validate()
+	var own := Array(data.errors).filter(func(e): return e.contains("/t_"))
+	_expect(own.is_empty(), "테스트용 대화·의뢰는 검증 통과 %s" % [own])
+
+	data.dialogues["t_bad"] = { "id": "t_bad", "start": "nowhere", "nodes": {
+		"a": { "speaker": "stranger", "text": "x", "choices": [
+			{ "text": "가기", "next": "missing", "check": { "stat": "luck", "dc": 10 } },
+			{ "text": "효과", "next": "", "requires": [{ "type": "quest", "quest": "no_quest" }],
+				"effects": [{ "type": "recruit", "companion": "nobody" }, { "type": "start_dialogue", "dialogue": "no_dlg" }] },
+		] } } }
+	data.quests["t_badq"] = { "id": "t_badq", "giver": "nobody", "title": "나쁜 의뢰",
+		"objective": { "type": "deliver", "good": "gold", "qty": 0 }, "reward": [{ "type": "power" }] }
+	data.companions["t_badc"] = { "id": "t_badc", "npc": "ration_clerk", "combat": { "hp": 1, "focus": 1, "might": 1, "weapon": "laser" } }
+	data.errors.clear()
+	data.validate()
+	var text := "\n".join(data.errors)
+	var expect_err := func(needle: String, label: String) -> void:
+		_expect(text.contains(needle), "검증: %s" % label)
+	expect_err.call("dialogues/t_bad: start가 없는 노드", "start 노드")
+	expect_err.call("speaker가 NPC id도", "speaker")
+	expect_err.call("next가 없는 노드를 가리킨다 'missing'", "next 노드")
+	expect_err.call("알 수 없는 stat 'luck'", "check stat")
+	expect_err.call("requires.quest가 없는 id", "quest 조건")
+	expect_err.call("effect.companion가 없는 id", "recruit 효과")
+	expect_err.call("effect.dialogue가 없는 대화", "start_dialogue 효과")
+	expect_err.call("quests/t_badq: giver", "의뢰 giver")
+	expect_err.call("objective.good", "의뢰 목표 물품")
+	expect_err.call("objective.qty", "의뢰 목표 수량")
+	expect_err.call("quests/t_badq/reward: power 효과에 delta가 없다", "보상 효과")
+	expect_err.call("companions/t_badc: combat.weapon", "동료 무기")
+	expect_err.call("companions/t_badc: npc 'ration_clerk'의 companion", "동료와 NPC 연결")
+	data.free()
+
+
+## 실제 대화 데이터의 모든 노드, 모든 선택지가 오류 없이 실행된다.
+func test_all_dialogues_run() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	var count := 0
+	for id in data.dialogues:
+		for node_id in data.dialogues[id].get("nodes", {}):
+			var n: int = maxi(1, data.dialogues[id].nodes[node_id].get("choices", []).size())
+			for i in n:
+				var s := GameState.new(data, 30 + count)
+				s.power = 1000
+				var d := DialogueRunner.new(s, id)
+				d._enter(node_id)
+				d.current()
+				d.choose(i)
+				d.current()
+				count += 1
+	_expect(count > 0, "모든 대화 선택지 실행 (%d개)" % count)
+	data.free()
+
+
+func test_dialogue_view() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_add_test_content(data)
+	var s := GameState.new(data, 31)
+	var view: Control = load("res://scripts/ui/dialogue_view.gd").new()
+	root.add_child(view)
+	var done := [false]
+	view.finished.connect(func(): done[0] = true)
+	view.start(s, "t_dlg")
+	_expect(view._name_label.text == "배급관 오르" and view._text_label.text.contains("운반꾼"), "대화 창: 이름과 대사")
+	_expect(view._buttons.size() == 5 and view._buttons[2].disabled, "대화 창: 선택지 버튼, 막힌 선택지는 비활성")
+	_expect(view._portrait_frame.get_child_count() == 1, "대화 창: 초상화 또는 첫 글자 틀")
+	_expect(view._result_box.get_child_count() == 1, "대화 창: 첫 노드 효과 줄")
+	s.stats.negotiation = 30
+	view._buttons[0].pressed.emit()
+	_expect(view._buttons.size() == 1 and view._result_box.get_child_count() >= 2, "대화 창: 판정 뒤 결과와 계속 버튼")
+	view._buttons[0].pressed.emit()
+	_expect(view._text_label.text == "좋아.", "대화 창: 계속하면 다음 노드")
+	view._buttons[0].pressed.emit()
+	_expect(done[0], "대화 창: 끝나면 finished")
+	data.free()
+
+
+## 테스트용 의뢰와 대화. 실제 이야기 데이터와 겹치지 않게 t_ 로 시작한다.
+func _add_test_content(data: Node) -> void:
+	data.quests["t_deliver"] = { "id": "t_deliver", "giver": "aurel_beck", "title": "시험 납품", "summary": "",
+		"objective": { "type": "deliver", "good": "raw_food", "qty": 10, "location": "helios_hq" },
+		"reward": [{ "type": "power", "delta": 120 }, { "type": "reputation", "city": "helios", "delta": 10 }] }
+	data.quests["t_visit"] = { "id": "t_visit", "giver": "aurel_beck", "title": "시험 방문", "summary": "",
+		"objective": { "type": "visit", "location": "helios_plaza" }, "reward": [] }
+	data.quests["t_flag"] = { "id": "t_flag", "giver": "aurel_beck", "title": "시험 플래그", "summary": "",
+		"objective": { "type": "flag", "flag": "t_goal" }, "reward": [] }
+	data.dialogues["t_dlg"] = { "id": "t_dlg", "start": "hello",
+		"variants": [{ "requires": [{ "type": "flag", "flag": "t_seen" }, { "type": "day", "min": 1 }], "start": "again" }],
+		"nodes": {
+			"hello": { "speaker": "ration_clerk", "text": "어서 와, {player}.",
+				"effects": [{ "type": "flag_set", "flag": "t_seen" }, { "type": "power", "delta": 5 }],
+				"choices": [
+					{ "text": "설득한다", "check": { "stat": "negotiation", "dc": 15 }, "next": "win", "fail_next": "lose",
+						"effects": [{ "type": "reputation", "city": "helios", "delta": 3 }],
+						"fail_effects": [{ "type": "reputation", "city": "helios", "delta": -3 }] },
+					{ "text": "돈을 낸다", "cost": [{ "type": "power", "amount": 50 }], "next": "hello" },
+					{ "text": "이안에게 맡긴다", "requires": [{ "type": "companion", "companion": "ian" }], "next": "" },
+					{ "text": "고친다", "check": { "stat": "tech", "dc": 1 }, "next": "", "fail_next": "" },
+					{ "text": "숨은 선택지", "requires": [{ "type": "flag", "flag": "t_never" }], "hide_if_blocked": true, "next": "" },
+					{ "text": "다른 이야기", "next": "", "effects": [{ "type": "start_dialogue", "dialogue": "t_other" }] },
+				] },
+			"win": { "speaker": "player", "text": "좋아." },
+			"lose": { "speaker": "narrator", "text": "말이 통하지 않았다.", "next": "hello" },
+			"again": { "speaker": "ration_clerk", "text": "또 왔나.", "choices": [{ "text": "끝", "next": "" }] },
+		} }
+	data.dialogues["t_other"] = { "id": "t_other", "start": "start", "nodes": {
+		"start": { "speaker": "narrator", "text": "다른 대화.", "choices": [{ "text": "끝", "next": "" }] } } }
 
 
 func _expect(cond: bool, label: String) -> void:

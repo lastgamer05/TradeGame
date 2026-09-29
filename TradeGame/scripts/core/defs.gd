@@ -19,8 +19,11 @@ const EVENT_TRIGGERS := ["travel", "city", "ruin", "arrival", "location"]
 
 const REQUIREMENT_TYPES := [
 	"cargo", "module", "reputation", "faction_reputation", "flag", "companion", "animal",
-	"crisis", "faction_share", "quest", "day", "power",
+	"crisis", "faction_share", "quest", "quest_ready", "day", "power",
 ]
+
+## quest 조건의 state. ready는 맡고 있고 목표를 채운 상태 (quest_ready 조건과 같다).
+const QUEST_STATES := ["none", "active", "done", "ready"]
 
 const COST_TYPES := ["power", "cargo"]
 
@@ -29,3 +32,12 @@ const EFFECT_TYPES := [
 	"companion_trust", "flag_set", "flag_clear", "start_combat",
 	"start_dialogue", "recruit", "dismiss", "quest_start", "quest_complete", "trust", "faction_strength",
 ]
+
+## 도시 구역 (docs/city_spec.md 2.1)
+const LOCATION_KINDS := ["market", "hq", "workshop", "tavern", "slum", "plaza", "special"]
+const LOCATION_SERVICES := ["trade", "repair", "rumors", "recruit"]
+
+const QUEST_OBJECTIVES := ["deliver", "visit", "flag"]
+
+## 대화 speaker 중 NPC id가 아닌 것
+const DIALOGUE_SPEAKERS := ["player", "narrator"]

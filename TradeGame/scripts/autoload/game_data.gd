@@ -3,6 +3,7 @@ extends Node
 
 const DATA_DIR := "res://data"
 const EVENTS_DIR := "res://data/events"
+const DIALOGUES_DIR := "res://data/dialogues"
 
 var factions: Dictionary = {}
 var goods: Dictionary = {}
@@ -49,11 +50,18 @@ func load_all() -> void:
 	companions = _index(_read_json(DATA_DIR + "/companions.json"), "companions")
 	quests = _index(_read_json(DATA_DIR + "/quests.json"), "quests")
 	dialogues = {}
-	for file in DirAccess.get_files_at(DATA_DIR + "/dialogues"):
-		if file.ends_with(".json"):
-			var dlg = _read_json(DATA_DIR + "/dialogues/" + file)
-			if dlg is Dictionary and dlg.has("id"):
-				dialogues[dlg.id] = dlg
+	for file in DirAccess.get_files_at(DIALOGUES_DIR):
+		if not file.ends_with(".json"):
+			continue
+		var dlg = _read_json(DIALOGUES_DIR + "/" + file)
+		if not dlg is Dictionary or not dlg.has("id"):
+			errors.append("dialogues/%s: 대화 id가 없다" % file)
+			continue
+		if dlg.id + ".json" != file:
+			errors.append("dialogues/%s: 파일 이름과 id '%s'가 다르다" % [file, dlg.id])
+		if dialogues.has(dlg.id):
+			errors.append("dialogues/%s: 대화 id 중복 '%s'" % [file, dlg.id])
+		dialogues[dlg.id] = dlg
 	var map = _read_json(DATA_DIR + "/routes.json")
 	routes = map.get("routes", []) if map is Dictionary else []
 	positions = {}
@@ -129,6 +137,165 @@ func validate() -> void:
 	for ev in events.values():
 		_validate_event(ev)
 
+	_validate_city_content()
+
+
+## 구역, NPC, 동료, 의뢰, 대화 (docs/city_spec.md 2절).
+func _validate_city_content() -> void:
+	var markets := {}
+	for loc in locations.values():
+		var where: String = "locations/" + loc.id
+		_check_ref(where, "city", loc.get("city"), cities)
+		if loc.get("kind") not in Defs.LOCATION_KINDS:
+			errors.append("%s: 알 수 없는 kind '%s'" % [where, loc.get("kind")])
+		if loc.get("kind") == "market":
+			markets[loc.get("city")] = markets.get(loc.get("city"), 0) + 1
+		for sv in loc.get("services", []):
+			if sv not in Defs.LOCATION_SERVICES:
+				errors.append("%s: 알 수 없는 service '%s'" % [where, sv])
+		_check_ref(where, "npc", loc.get("npc"), npcs)
+		var npc: Dictionary = npcs.get(loc.get("npc"), {})
+		if not npc.is_empty() and npc.get("location") != loc.id:
+			errors.append("%s: npc '%s'의 location이 이 구역이 아니다 ('%s')" % [where, npc.id, npc.get("location")])
+	if not locations.is_empty():
+		for id in cities:
+			if markets.get(id, 0) != 1:
+				errors.append("locations: 도시 '%s'의 거래 구역(kind market)이 %d곳이다 (1곳이어야 한다)" % [id, markets.get(id, 0)])
+
+	for npc in npcs.values():
+		var where: String = "npcs/" + npc.id
+		_check_ref(where, "city", npc.get("city"), cities)
+		_check_ref(where, "location", npc.get("location"), locations)
+		var loc: Dictionary = locations.get(npc.get("location"), {})
+		if not loc.is_empty() and loc.get("city") != npc.get("city"):
+			errors.append("%s: 구역 '%s'은 도시 '%s'에 있다" % [where, loc.id, loc.get("city")])
+		if not dialogues.has(npc.get("dialogue")):
+			errors.append("%s: 대화 파일이 없다 '%s' (data/dialogues/%s.json)" % [where, npc.get("dialogue"), npc.get("dialogue")])
+		if str(npc.get("companion", "")) != "":
+			_check_ref(where, "companion", npc.companion, companions)
+		if npc.has("faction"):
+			_check_ref(where, "faction", npc.faction, factions)
+		for req in npc.get("requires", []):
+			_validate_requirement(where, req)
+
+	for c in companions.values():
+		var where: String = "companions/" + c.id
+		_check_ref(where, "npc", c.get("npc"), npcs)
+		if npcs.has(c.get("npc")) and npcs[c.npc].get("companion") != c.id:
+			errors.append("%s: npc '%s'의 companion이 이 동료가 아니다" % [where, c.npc])
+		if c.has("origin"):
+			_check_ref(where, "origin", c.origin, factions)
+		var cb: Dictionary = c.get("combat", {})
+		for key in ["hp", "focus", "might", "weapon"]:
+			if not cb.has(key):
+				errors.append("%s: combat.%s가 없다" % [where, key])
+		if cb.has("weapon"):
+			_check_ref(where, "combat.weapon", cb.weapon, combat.get("weapons", {}))
+		if c.has("bonus_stat") and c.bonus_stat not in Defs.STATS:
+			errors.append("%s: 알 수 없는 bonus_stat '%s'" % [where, c.bonus_stat])
+		for req in c.get("leave_if", []):
+			_validate_requirement(where + "/leave_if", req)
+
+	for q in quests.values():
+		var where: String = "quests/" + q.id
+		_check_ref(where, "giver", q.get("giver"), npcs)
+		if str(q.get("title", "")) == "":
+			errors.append("%s: title이 없다" % where)
+		var obj: Dictionary = q.get("objective", {})
+		match obj.get("type"):
+			"deliver":
+				_check_ref(where, "objective.good", obj.get("good"), goods)
+				if int(obj.get("qty", 0)) <= 0:
+					errors.append("%s: objective.qty가 0 이하" % where)
+				if obj.has("location"):
+					_check_ref(where, "objective.location", obj.location, locations)
+			"visit":
+				_check_ref(where, "objective.location", obj.get("location"), locations)
+			"flag":
+				if str(obj.get("flag", "")) == "":
+					errors.append("%s: objective.flag가 없다" % where)
+			_:
+				errors.append("%s: 알 수 없는 objective.type '%s'" % [where, obj.get("type")])
+		for eff in q.get("reward", []):
+			_validate_effect(where + "/reward", eff)
+
+	for dlg in dialogues.values():
+		_validate_dialogue(dlg)
+
+
+func _validate_dialogue(dlg: Dictionary) -> void:
+	var where: String = "dialogues/" + dlg.id
+	var nodes = dlg.get("nodes")
+	if not nodes is Dictionary or nodes.is_empty():
+		errors.append("%s: nodes가 없다" % where)
+		return
+	if not nodes.has(dlg.get("start")):
+		errors.append("%s: start가 없는 노드를 가리킨다 '%s'" % [where, dlg.get("start")])
+	var variants: Array = dlg.get("variants", [])
+	for i in variants.size():
+		var v: Dictionary = variants[i]
+		var vw: String = "%s/variants[%d]" % [where, i]
+		if not nodes.has(v.get("start")):
+			errors.append("%s: start가 없는 노드를 가리킨다 '%s'" % [vw, v.get("start")])
+		for req in v.get("requires", []):
+			_validate_requirement(vw, req)
+	for node_id in nodes:
+		var node: Dictionary = nodes[node_id]
+		var nw: String = "%s/%s" % [where, node_id]
+		var speaker = node.get("speaker", "narrator")
+		if speaker not in Defs.DIALOGUE_SPEAKERS and not npcs.has(speaker):
+			errors.append("%s: speaker가 NPC id도 player/narrator도 아니다 '%s'" % [nw, speaker])
+		if str(node.get("text", "")) == "":
+			errors.append("%s: text가 없다" % nw)
+		for eff in node.get("effects", []):
+			_validate_effect(nw, eff)
+		if node.has("next"):
+			_check_next(nw, "next", node.next, nodes)
+		var choices: Array = node.get("choices", [])
+		for i in choices.size():
+			var ch: Dictionary = choices[i]
+			var cw: String = "%s/choices[%d]" % [nw, i]
+			if str(ch.get("text", "")) == "":
+				errors.append("%s: text가 없다" % cw)
+			if not ch.has("next"):
+				errors.append("%s: next가 없다 (대화를 끝내려면 빈 문자열)" % cw)
+			_check_next(cw, "next", ch.get("next", ""), nodes)
+			if ch.has("fail_next"):
+				_check_next(cw, "fail_next", ch.fail_next, nodes)
+			for req in ch.get("requires", []):
+				_validate_requirement(cw, req)
+			_validate_cost(cw, ch.get("cost", []))
+			if ch.has("check"):
+				_validate_check(cw, ch.check)
+			elif ch.has("fail_next") or ch.has("fail_effects"):
+				errors.append("%s: check가 없는데 fail_next/fail_effects가 있다" % cw)
+			for eff in ch.get("effects", []):
+				_validate_effect(cw, eff)
+			for eff in ch.get("fail_effects", []):
+				_validate_effect(cw + "/fail", eff)
+
+
+func _check_next(where: String, field: String, id, nodes: Dictionary) -> void:
+	if str(id) != "" and not nodes.has(id):
+		errors.append("%s: %s가 없는 노드를 가리킨다 '%s'" % [where, field, id])
+
+
+func _validate_cost(where: String, costs: Array) -> void:
+	for cost in costs:
+		if cost.get("type") not in Defs.COST_TYPES:
+			errors.append("%s: 알 수 없는 cost type '%s'" % [where, cost.get("type")])
+		if cost.get("type") == "cargo":
+			_check_ref(where, "cost.good", cost.get("good"), goods)
+		if int(cost.get("amount", 0)) <= 0:
+			errors.append("%s: cost.amount가 0 이하" % where)
+
+
+func _validate_check(where: String, check: Dictionary) -> void:
+	if check.get("stat") not in Defs.STATS:
+		errors.append("%s: 알 수 없는 stat '%s'" % [where, check.get("stat")])
+	if not check.has("dc"):
+		errors.append("%s: check에 dc가 없다" % where)
+
 
 func _validate_event(ev: Dictionary) -> void:
 	var where: String = "events/" + ev.id
@@ -138,6 +305,13 @@ func _validate_event(ev: Dictionary) -> void:
 	for road in trigger.get("road_types", []):
 		if road not in Defs.ROAD_TYPES:
 			errors.append("%s: 알 수 없는 road_type '%s'" % [where, road])
+	for id in trigger.get("cities", []):
+		_check_ref(where + "/trigger", "cities", id, cities)
+	for id in trigger.get("locations", []):
+		_check_ref(where + "/trigger", "locations", id, locations)
+	for kind in trigger.get("kinds", []):
+		if kind not in Defs.LOCATION_KINDS:
+			errors.append("%s: 알 수 없는 trigger.kinds '%s'" % [where, kind])
 	for req in trigger.get("requires", []):
 		_validate_requirement(where + "/trigger", req)
 
@@ -152,20 +326,13 @@ func _validate_event(ev: Dictionary) -> void:
 		seen[ch.get("id")] = true
 		for req in ch.get("requires", []):
 			_validate_requirement(cw, req)
-		for cost in ch.get("cost", []):
-			if cost.get("type") not in Defs.COST_TYPES:
-				errors.append("%s: 알 수 없는 cost type '%s'" % [cw, cost.get("type")])
-			if cost.get("type") == "cargo":
-				_check_ref(cw, "cost.good", cost.get("good"), goods)
+		_validate_cost(cw, ch.get("cost", []))
 
 		var outcomes: Dictionary = ch.get("outcomes", {})
 		if not outcomes.has("success"):
 			errors.append("%s: success 결과가 없다" % cw)
 		if ch.has("check"):
-			if ch.check.get("stat") not in Defs.STATS:
-				errors.append("%s: 알 수 없는 stat '%s'" % [cw, ch.check.get("stat")])
-			if not ch.check.has("dc"):
-				errors.append("%s: check에 dc가 없다" % cw)
+			_validate_check(cw, ch.check)
 			if not outcomes.has("failure"):
 				errors.append("%s: 판정 선택지에 failure 결과가 없다" % cw)
 		for key in outcomes:
@@ -177,19 +344,37 @@ func _validate_event(ev: Dictionary) -> void:
 
 
 func _validate_requirement(where: String, req: Dictionary) -> void:
-	match req.get("type"):
+	var t = req.get("type")
+	match t:
 		"cargo":
 			_check_ref(where, "requires.good", req.get("good"), goods)
 		"module":
 			_check_ref(where, "requires.module", req.get("module"), modules)
 		"reputation":
 			_check_ref(where, "requires.city", req.get("city"), cities)
-		"faction_reputation":
+		"faction_reputation", "faction_share":
 			_check_ref(where, "requires.faction", req.get("faction"), factions)
-		"flag", "companion", "animal", "crisis", "faction_share", "quest", "day", "power":
-			pass  # 세부 검증은 엔진 담당 (docs/city_spec.md 2.4)
+		"flag":
+			if str(req.get("flag", "")) == "":
+				errors.append("%s: flag 조건에 flag가 없다" % where)
+		"companion":
+			if str(req.get("companion", "")) != "":
+				_check_ref(where, "requires.companion", req.companion, companions)
+		"crisis":
+			var ids: Array = politics.get("crises", []).map(func(c): return c.get("id"))
+			if req.get("crisis") not in ids:
+				errors.append("%s: requires.crisis가 없는 정세 사건을 가리킨다 '%s'" % [where, req.get("crisis")])
+		"quest", "quest_ready":
+			_check_ref(where, "requires.quest", req.get("quest"), quests)
+			if t == "quest" and str(req.get("state", "active")) not in Defs.QUEST_STATES:
+				errors.append("%s: 알 수 없는 quest state '%s'" % [where, req.get("state")])
+		"day", "power", "animal":
+			pass
 		_:
-			errors.append("%s: 알 수 없는 requirement '%s'" % [where, req.get("type")])
+			errors.append("%s: 알 수 없는 requirement '%s'" % [where, t])
+			return
+	if t in ["reputation", "faction_reputation", "faction_share", "day", "power"] and not req.has("min") and not req.has("max"):
+		errors.append("%s: %s 조건에 min도 max도 없다" % [where, t])
 
 
 func _validate_effect(where: String, eff: Dictionary) -> void:
@@ -206,6 +391,21 @@ func _validate_effect(where: String, eff: Dictionary) -> void:
 			_check_ref(where, "effect.part", eff.get("part"), combat.get("car", {}).get("parts", {}))
 		"cargo_add", "cargo_remove":
 			_check_ref(where, "effect.good", eff.get("good"), goods)
+		"flag_set", "flag_clear":
+			if str(eff.get("flag", "")) == "":
+				errors.append("%s: %s 효과에 flag가 없다" % [where, t])
+		"start_dialogue":
+			if not dialogues.has(eff.get("dialogue")):
+				errors.append("%s: effect.dialogue가 없는 대화를 가리킨다 '%s' (data/dialogues/%s.json)" % [
+					where, eff.get("dialogue"), eff.get("dialogue")])
+		"recruit":
+			_check_ref(where, "effect.companion", eff.get("companion"), companions)
+		"quest_start", "quest_complete":
+			_check_ref(where, "effect.quest", eff.get("quest"), quests)
+		"faction_strength":
+			_check_ref(where, "effect.faction", eff.get("faction"), politics.get("start_strength", {}))
+	if t in ["reputation", "power", "trust", "companion_trust", "faction_strength"] and not eff.has("delta"):
+		errors.append("%s: %s 효과에 delta가 없다" % [where, t])
 
 
 func _check_ref(where: String, field: String, id, table: Dictionary) -> void:

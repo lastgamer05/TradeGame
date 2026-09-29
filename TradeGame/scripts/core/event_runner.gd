@@ -1,7 +1,8 @@
 class_name EventRunner
 extends RefCounted
 ## 이벤트 고르기, 선택지 조건 확인, d20 판정, 결과 적용.
-## 판정: d20 + 능력치 >= DC 이면 성공. 부분 성공은 아직 쓰지 않는다.
+## 판정: d20 + 능력치 (+ 동료 보너스) >= DC 이면 성공. 부분 성공은 아직 쓰지 않는다.
+## 요구 조건과 효과는 이벤트, 대화(DialogueRunner), NPC requires, 동료 leave_if가 같이 쓴다.
 
 
 ## 이동을 마친 뒤 호출. 확률에 걸리면 조건에 맞는 이동 이벤트 하나를 가중치로 고른다.
@@ -12,22 +13,36 @@ static func pick_travel_event(state: GameState) -> Dictionary:
 		return t.get("on") == "travel" and (not t.has("road_types") or state.last_road in t.road_types))
 
 
-## 도시에 도착했을 때 호출.
+## 옛 이름. pick_arrival_event와 같다.
 static func pick_city_event(state: GameState) -> Dictionary:
+	return pick_arrival_event(state)
+
+
+## 도시에 도착했을 때 호출 (docs/city_spec.md 2.6). trigger.on "arrival" 또는 옛 "city".
+## cities가 비어 있으면 모든 도시에서 뜬다.
+static func pick_arrival_event(state: GameState) -> Dictionary:
 	if state.rng.randf() >= float(state.data.economy.events.city_chance):
 		return {}
 	return _pick(state, func(t: Dictionary):
-		return t.get("on") == "city" and state.city in t.get("cities", []))
+		var cities: Array = t.get("cities", [])
+		return t.get("on") in ["arrival", "city"] and (cities.is_empty() or state.city in cities))
 
 
-## 도시 도착 (docs/city_spec.md 2.6). 틀: 엔진 담당이 확률과 조건을 채운다.
-static func pick_arrival_event(state: GameState) -> Dictionary:
-	return pick_city_event(state)
-
-
-## 구역에 들어갈 때 (docs/city_spec.md 2.6). 틀: 엔진 담당이 채운다.
+## 구역에 들어갈 때 호출. locations나 kinds 중 하나에 맞으면 후보, 둘 다 비면 모든 구역.
 static func pick_location_event(state: GameState, location_id: String) -> Dictionary:
-	return {}
+	var loc: Dictionary = state.data.locations.get(location_id, {})
+	if loc.is_empty():
+		return {}
+	if state.rng.randf() >= float(state.data.economy.events.get("location_chance", 0.4)):
+		return {}
+	return _pick(state, func(t: Dictionary):
+		if t.get("on") != "location":
+			return false
+		var ids: Array = t.get("locations", [])
+		var kinds: Array = t.get("kinds", [])
+		if ids.is_empty() and kinds.is_empty():
+			return true
+		return location_id in ids or loc.kind in kinds)
 
 
 static func _pick(state: GameState, match_trigger: Callable) -> Dictionary:
@@ -50,11 +65,18 @@ static func _pick(state: GameState, match_trigger: Callable) -> Dictionary:
 	return {}
 
 
+# --- 요구 조건 ---
+
 static func requirements_met(state: GameState, reqs: Array) -> bool:
+	return first_unmet(state, reqs).is_empty()
+
+
+## 맞지 않는 첫 조건. 모두 맞으면 {}.
+static func first_unmet(state: GameState, reqs: Array) -> Dictionary:
 	for r in reqs:
 		if not _requirement_met(state, r):
-			return false
-	return true
+			return r
+	return {}
 
 
 static func _requirement_met(state: GameState, r: Dictionary) -> bool:
@@ -64,13 +86,40 @@ static func _requirement_met(state: GameState, r: Dictionary) -> bool:
 		"module":
 			return r.module in state.modules
 		"reputation":
-			return state.reputation.get(r.city, 0) >= int(r.get("min", 0))
+			return _in_range(state.reputation.get(r.city, 0), r)
 		"faction_reputation":
-			return faction_reputation(state, r.faction) >= int(r.get("min", 0))
+			return _in_range(faction_reputation(state, r.faction), r)
 		"flag":
 			return state.flags.has(r.flag)
-	# 동승자, 동물은 아직 없다.
+		"crisis":
+			return state.politics.active.has(r.crisis) == bool(r.get("active", true))
+		"faction_share":
+			return _in_range(state.politics.share(r.faction), r)
+		"quest":
+			var want: String = r.get("state", "active")
+			if want == "ready":
+				return state.quest_ready(r.quest)
+			return state.quest_state(r.quest) == want
+		"quest_ready":
+			return state.quest_ready(r.quest)
+		"companion":
+			var id: String = r.get("companion", "")
+			return state.companion != "" if id == "" else state.companion == id
+		"day":
+			return _in_range(state.day, r)
+		"power":
+			return _in_range(state.power, r)
+	# 동물은 아직 없다.
 	return false
+
+
+## min, max 둘 다 받는다. 하나만 있어도 된다.
+static func _in_range(value: float, r: Dictionary) -> bool:
+	if r.has("min") and value < float(r.min):
+		return false
+	if r.has("max") and value > float(r.max):
+		return false
+	return true
 
 
 ## 같은 진영 도시 평판의 평균.
@@ -84,10 +133,70 @@ static func faction_reputation(state: GameState, faction: String) -> int:
 	return sum / n if n > 0 else 0
 
 
+## 조건을 플레이어에게 보여 줄 한 줄로. 선택지가 막힌 이유에 쓴다.
+static func requirement_text(state: GameState, r: Dictionary) -> String:
+	var d = state.data
+	match r.type:
+		"cargo":
+			return "%s %d개가 있어야 한다" % [d.goods[r.good].name, int(r.get("amount", 1))]
+		"module":
+			return "%s 모듈이 있어야 한다" % d.modules[r.module].name
+		"reputation":
+			return "%s 평판 %s" % [d.cities[r.city].name, _range_text(r)]
+		"faction_reputation":
+			return "%s 평판 %s" % [d.factions[r.faction].name, _range_text(r)]
+		"faction_share":
+			return "%s 점유율 %s" % [d.factions[r.faction].name, _range_text(r, true)]
+		"crisis":
+			var name: String = _crisis_name(state, r.crisis)
+			return "%s 중이어야 한다" % name if bool(r.get("active", true)) else "%s 중에는 안 된다" % name
+		"quest", "quest_ready":
+			var title: String = d.quests.get(r.quest, {}).get("title", r.quest)
+			match "ready" if r.type == "quest_ready" else str(r.get("state", "active")):
+				"none":
+					return "'%s' 의뢰를 받기 전이어야 한다" % title
+				"done":
+					return "'%s' 의뢰를 끝내야 한다" % title
+				"ready":
+					return "'%s' 의뢰 목표를 채워야 한다" % title
+			return "'%s' 의뢰를 맡고 있어야 한다" % title
+		"companion":
+			var id: String = r.get("companion", "")
+			if id == "":
+				return "동승자가 있어야 한다"
+			return "%s 타고 있어야 한다" % josa(d.companions[id].name, "이", "가")
+		"day":
+			return "날짜가 %s" % _range_text(r)
+		"power":
+			return "전력 %s" % _range_text(r)
+		"flag":
+			return "아직 때가 아니다"
+	return "조건이 맞지 않는다"
+
+
+static func _range_text(r: Dictionary, percent := false) -> String:
+	var f := func(v) -> String: return "%d%%" % roundi(float(v) * 100) if percent else str(int(v))
+	if r.has("min") and r.has("max"):
+		return "%s~%s 사이여야 한다" % [f.call(r.min), f.call(r.max)]
+	if r.has("max"):
+		return "%s 이하여야 한다" % f.call(r.max)
+	return "%s 이상이어야 한다" % f.call(r.get("min", 0))
+
+
+static func _crisis_name(state: GameState, crisis_id: String) -> String:
+	for c in state.data.politics.get("crises", []):
+		if c.id == crisis_id:
+			return c.name
+	return crisis_id
+
+
+# --- 선택지 ---
+
 ## 선택지를 고를 수 있으면 "", 아니면 이유.
 static func choice_blocker(state: GameState, choice: Dictionary) -> String:
-	if not requirements_met(state, choice.get("requires", [])):
-		return "조건이 맞지 않는다"
+	var unmet := first_unmet(state, choice.get("requires", []))
+	if not unmet.is_empty():
+		return requirement_text(state, unmet)
 	for c in choice.get("cost", []):
 		if c.type == "power" and state.power < int(c.amount):
 			return "전력이 모자란다"
@@ -117,43 +226,81 @@ static func choice_tags(state: GameState, choice: Dictionary) -> String:
 			"faction_reputation":
 				tags.append("%s 우호" % state.data.factions[r.faction].name)
 			"companion":
-				tags.append("동승자")
+				var id: String = r.get("companion", "")
+				tags.append(state.data.companions[id].name if id != "" else "동승자")
 			"animal":
 				tags.append("동물")
 	return "" if tags.is_empty() else "[%s] " % ", ".join(tags)
 
 
-## 선택지를 실행한다. 비용을 치르고, 판정하고, 결과 효과를 적용한다.
-## 돌려주는 값: { outcome, text, roll_text, effect_lines }
-static func resolve(state: GameState, choice: Dictionary) -> Dictionary:
+## 선택지 비용을 치른다.
+static func pay_cost(state: GameState, choice: Dictionary) -> void:
 	for c in choice.get("cost", []):
 		if c.type == "power":
 			state.power -= int(c.amount)
 		elif c.type == "cargo":
 			state.remove_cargo(c.good, int(c.amount))
 
+
+## d20 판정. 태운 동료의 bonus_stat이면 보너스를 더한다. { success, text }
+static func roll_check(state: GameState, check: Dictionary) -> Dictionary:
+	var stat: String = check.stat
+	var d20 := state.rng.randi_range(1, 20)
+	var base := int(state.stats[stat])
+	var bonus := state.stat_bonus(stat)
+	var total := d20 + base + bonus
+	var dc := int(check.dc)
+	var ok := total >= dc
+	var bonus_text := ""
+	if bonus != 0:
+		bonus_text = " + %s %d" % [state.data.companions[state.companion].name, bonus]
+	return {
+		"success": ok,
+		"text": "d20 %d + %s %d%s = %d  vs  DC %d  →  %s" % [
+			d20, Defs.STAT_NAMES[stat], base, bonus_text, total, dc, "성공" if ok else "실패"],
+	}
+
+
+## 선택지를 실행한다. 비용을 치르고, 판정하고, 결과 효과를 적용한다.
+## 돌려주는 값: { outcome, text, roll_text, effect_lines }
+static func resolve(state: GameState, choice: Dictionary) -> Dictionary:
+	pay_cost(state, choice)
 	var outcome := "success"
 	var roll_text := ""
 	if choice.has("check"):
-		var stat: String = choice.check.stat
-		var d20 := state.rng.randi_range(1, 20)
-		var total: int = d20 + int(state.stats[stat])
-		var dc := int(choice.check.dc)
-		outcome = "success" if total >= dc else "failure"
-		roll_text = "d20 %d + %s %d = %d  vs  DC %d  →  %s" % [
-			d20, Defs.STAT_NAMES[stat], state.stats[stat], total, dc, "성공" if outcome == "success" else "실패"]
+		var roll := roll_check(state, choice.check)
+		outcome = "success" if roll.success else "failure"
+		roll_text = roll.text
 
 	var result: Dictionary = choice.outcomes.get(outcome, choice.outcomes.success)
-	var lines := []
-	for eff in result.get("effects", []):
-		var line := apply_effect(state, eff)
-		if line != "":
-			lines.append(line)
+	var lines := apply_effects(state, result.get("effects", []))
 	return { "outcome": outcome, "text": result.get("text", ""), "roll_text": roll_text, "effect_lines": lines }
 
 
-## 효과 하나를 적용하고 플레이어에게 보여 줄 한 줄을 돌려준다.
+# --- 효과 ---
+
+## 효과 목록을 차례로 적용하고 보여 줄 줄들을 돌려준다.
+static func apply_effects(state: GameState, effects: Array) -> Array:
+	var lines := []
+	for eff in effects:
+		_apply(state, eff, lines)
+	return lines
+
+
+## 효과 하나를 적용하고 플레이어에게 보여 줄 줄을 돌려준다 (여러 줄이면 줄바꿈으로 잇는다).
 static func apply_effect(state: GameState, eff: Dictionary) -> String:
+	var lines := []
+	_apply(state, eff, lines)
+	return "\n".join(lines)
+
+
+static func _apply(state: GameState, eff: Dictionary, lines: Array) -> void:
+	var line := _apply_one(state, eff, lines)
+	if line != "":
+		lines.append_array(line.split("\n"))
+
+
+static func _apply_one(state: GameState, eff: Dictionary, lines: Array) -> String:
 	var d = state.data
 	match eff.type:
 		"reputation":
@@ -181,6 +328,50 @@ static func apply_effect(state: GameState, eff: Dictionary) -> String:
 		"start_combat":
 			state.pending_combat = eff.encounter
 			return "전투가 벌어진다: %s" % d.combat.encounters[eff.encounter].name
-		"companion_trust":
-			return "동승자 신뢰 변화 (미구현)"
+		"start_dialogue":
+			state.pending_dialogue = eff.dialogue
+		"recruit":
+			return state.recruit(eff.companion)
+		"dismiss":
+			return state.dismiss_companion()
+		"quest_start":
+			if state.quest_state(eff.quest) != "none":
+				return ""
+			state.quests[eff.quest] = "active"
+			return "의뢰 시작: %s" % d.quests[eff.quest].title
+		"quest_complete":
+			if state.quest_state(eff.quest) == "done":
+				return ""
+			var q: Dictionary = d.quests[eff.quest]
+			var obj: Dictionary = q.get("objective", {})
+			if obj.get("type") == "deliver":
+				var n := state.remove_cargo(obj.good, int(obj.qty))
+				if n > 0:
+					lines.append("%s -%d (전달)" % [d.goods[obj.good].name, n])
+			state.quests[eff.quest] = "done"
+			lines.append("의뢰 완료: %s" % q.title)
+			for r in q.get("reward", []):
+				_apply(state, r, lines)
+		"trust", "companion_trust":
+			if state.companion == "":
+				return ""
+			var delta := int(eff.delta)
+			state.trust[state.companion] = state.trust.get(state.companion, 0) + delta
+			return "%s 신뢰 %+d" % [d.companions[state.companion].name, delta]
+		"faction_strength":
+			if not state.politics.strength.has(eff.faction):
+				return ""
+			var delta := float(eff.delta)
+			state.politics.strength[eff.faction] = maxf(0.0, state.politics.strength[eff.faction] + delta)
+			state.pending_news.append_array(state.politics.update_crises())
+			return "%s 세력 %+d" % [d.factions[eff.faction].name, roundi(delta)]
 	return ""
+
+
+## 받침에 따라 조사를 붙인다. josa("이안", "이", "가") -> "이안이"
+static func josa(word: String, with_final: String, without_final: String) -> String:
+	if word.is_empty():
+		return word
+	var code := word.unicode_at(word.length() - 1)
+	var has_final := code >= 0xAC00 and code <= 0xD7A3 and (code - 0xAC00) % 28 != 0
+	return word + (with_final if has_final else without_final)

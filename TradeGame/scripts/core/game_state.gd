@@ -31,17 +31,25 @@ var pending_news: Array = []
 var vehicle_damage: Dictionary = {}
 ## 이벤트가 시작시킨 전투 encounter id. 화면이 전투를 띄우고 비운다.
 var pending_combat: String = ""
-## --- 도시 탐방 (docs/city_spec.md 4절). 틀만 있고 엔진 담당이 채운다 ---
+## --- 도시 탐방 (docs/city_spec.md 4절) ---
 ## 지금 있는 구역, 도시 허브면 ""
 var location: String = ""
-## 태운 동료 id
+## 태운 동료 id. 한 번에 한 명.
 var companion: String = ""
 ## 동료 id -> 신뢰
 var trust: Dictionary = {}
-## 의뢰 id -> "active" | "done"
+## 의뢰 id -> "active" | "done". 없으면 받기 전.
 var quests: Dictionary = {}
+## visit 목표를 채운 의뢰 id -> true
+var quest_visited: Dictionary = {}
 ## 도시 id -> true (첫 도착 대화용)
 var visited_cities: Dictionary = {}
+## 이벤트 결과의 start_dialogue 효과가 남긴 대화 id. 화면이 결과 창을 닫은 뒤 대화를 열고 비운다.
+## (대화 안에서 쓴 start_dialogue는 DialogueRunner가 바로 이어 가므로 여기 남지 않는다.)
+var pending_dialogue: String = ""
+## 아직 화면에 알리지 않은 알림 (정세 알림 pending_news와 별도).
+## 동료 이탈: { type: "companion_left", companion, npc, title, text }
+var pending_notices: Array = []
 ## 주인공 이름 (대화의 {player})
 var player_name: String = "운반꾼"
 ## 도시 id -> 평판으로 바뀌기 전 누적된 거래 실적
@@ -219,6 +227,7 @@ func _advance_day() -> void:
 	market.advance_day()
 	politics.advance_day()
 	pending_news.append_array(politics.update_crises())
+	_check_companion_leave()
 
 
 ## 한 개씩 살 때마다 값이 오르는 것을 반영한 총액. 시세를 바꾸지 않고 계산만 한다.
@@ -288,14 +297,19 @@ func repair() -> String:
 	return ""
 
 
-## 전투에 나갈 분대. 주인공과 임시 용병.
+## 전투에 나갈 분대. 주인공과 동료 (동료가 없으면 임시 용병).
 func battle_squad() -> Array:
 	var c: Dictionary = data.combat
+	var mate: Dictionary = c.mercenary
+	var mate_name: String = c.mercenary.name
+	if companion != "":
+		mate = data.companions[companion].combat
+		mate_name = data.companions[companion].name
 	return [
 		{ "name": "나", "hp": int(c.player.hp_base) + int(c.player.hp_per_survival) * int(stats.survival),
 			"focus": stats.focus, "might": stats.might, "weapon": c.player.weapon, "melee_weapon": c.player.melee_weapon },
-		{ "name": c.mercenary.name, "hp": int(c.mercenary.hp), "focus": int(c.mercenary.focus),
-			"might": int(c.mercenary.might), "weapon": c.mercenary.weapon },
+		{ "name": mate_name, "hp": int(mate.hp), "focus": int(mate.focus),
+			"might": int(mate.might), "weapon": mate.weapon },
 	]
 
 
@@ -337,10 +351,17 @@ func apply_battle(b: Battle) -> Array:
 	return lines
 
 
-# --- 도시 탐방 (틀) ---
+# --- 도시 탐방 ---
 
+## 구역에 들어간다. visit 목표를 채운다. 구역 이벤트는 화면이 EventRunner.pick_location_event로 따로 고른다.
 func enter_location(location_id: String) -> void:
 	location = location_id
+	for q in quests:
+		if quests[q] != "active":
+			continue
+		var obj: Dictionary = data.quests.get(q, {}).get("objective", {})
+		if obj.get("type") == "visit" and obj.get("location") == location_id:
+			quest_visited[q] = true
 
 
 func leave_location() -> void:
@@ -352,11 +373,87 @@ func locations_here() -> Array:
 	return data.locations.values().filter(func(l): return l.city == city)
 
 
-## 그 구역에 지금 나타나는 NPC. 조건(requires)은 엔진 담당이 확인하게 만든다.
+## 그 구역에 지금 나타나는 NPC. requires가 안 맞거나, 동료로 태운 인물이면 {}.
 func npc_at(location_id: String) -> Dictionary:
 	var loc: Dictionary = data.locations.get(location_id, {})
-	return data.npcs.get(loc.get("npc", ""), {})
+	var npc: Dictionary = data.npcs.get(loc.get("npc", ""), {})
+	if npc.is_empty():
+		return {}
+	if companion != "" and npc.get("companion", "") == companion:
+		return {}
+	if not EventRunner.requirements_met(self, npc.get("requires", [])):
+		return {}
+	return npc
 
 
+## "none" | "active" | "done"
+func quest_state(quest_id: String) -> String:
+	return quests.get(quest_id, "none")
+
+
+## 맡은 의뢰의 목표를 지금 채웠는지. deliver는 목표 구역에 있고 화물이 있어야 한다.
 func quest_ready(quest_id: String) -> bool:
+	if quest_state(quest_id) != "active":
+		return false
+	var obj: Dictionary = data.quests.get(quest_id, {}).get("objective", {})
+	match obj.get("type"):
+		"deliver":
+			if obj.has("location") and location != obj.location:
+				return false
+			return cargo.get(obj.good, 0) >= int(obj.qty)
+		"visit":
+			return quest_visited.has(quest_id) or location == obj.get("location")
+		"flag":
+			return flags.has(obj.get("flag"))
 	return false
+
+
+# --- 동료 ---
+
+## 동료를 태운다. 이미 태운 동료가 있으면 내린다. 보여 줄 줄을 돌려준다.
+func recruit(companion_id: String) -> String:
+	if companion == companion_id:
+		return ""
+	var lines := []
+	if companion != "":
+		lines.append(dismiss_companion())
+	companion = companion_id
+	if not trust.has(companion_id):
+		trust[companion_id] = int(data.companions[companion_id].get("trust", 0))
+	lines.append("%s 동료가 되었다" % EventRunner.josa(data.companions[companion_id].name, "이", "가"))
+	return "\n".join(lines)
+
+
+func dismiss_companion() -> String:
+	if companion == "":
+		return ""
+	var name: String = data.companions[companion].name
+	companion = ""
+	return "%s 차에서 내렸다" % EventRunner.josa(name, "이", "가")
+
+
+## 태운 동료가 그 능력치 판정에 더해 주는 값.
+func stat_bonus(stat: String) -> int:
+	if companion == "":
+		return 0
+	var c: Dictionary = data.companions[companion]
+	return int(c.get("bonus", 0)) if c.get("bonus_stat") == stat else 0
+
+
+## 하루가 지날 때 동료의 leave_if를 확인한다. 하나라도 맞으면 떠나고 알림을 남긴다.
+## 떠난 동료는 플래그 companion_left_<id>가 선다 (대화나 NPC requires에서 쓸 수 있다).
+func _check_companion_leave() -> void:
+	if companion == "":
+		return
+	var c: Dictionary = data.companions[companion]
+	for r in c.get("leave_if", []):
+		if not EventRunner.requirements_met(self, [r]):
+			continue
+		var id := companion
+		companion = ""
+		flags["companion_left_" + id] = true
+		pending_notices.append({
+			"type": "companion_left", "companion": id, "npc": c.get("npc", ""),
+			"title": "%s 떠났다" % EventRunner.josa(c.name, "이", "가"), "text": c.get("leave_text", ""),
+		})
+		return
