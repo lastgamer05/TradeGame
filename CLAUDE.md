@@ -5,13 +5,16 @@
 ## 기획
 
 - 기획서: [docs/design.md](docs/design.md). 구현 전 해당 섹션을 먼저 읽고 기획과 맞춰 작업할 것.
-- 원본은 Claude Docs 문서(https://claude.ai/artifact/Wu4G29iTnwik7uW7p2jr8o). 기획이 바뀌면 `docs/design.md`도 같이 갱신한다.
+- `docs/design.md`가 기획의 원본이다. 기획이 바뀌면 여기를 고친다. (처음 기획은 Claude Docs 문서에서 옮겨 왔지만, 그 뒤로는 저장소 쪽이 최신이고 다른 계정에서는 그 문서를 열 수 없다.)
+- 진행 상황, 남은 일, 사용자에게 받을 답은 `docs/handoff.md`에 있다. 새 세션은 이것부터 읽는다.
 - 미정 사항은 `docs/design.md` 마지막 "미정 사항" 체크리스트에 있다. 미정 항목에 걸리는 구현은 임의로 정하지 말고 먼저 물어볼 것.
 
 ## 아트 방향
 
 - 배경, 도시, 캐릭터 모두 픽셀 아트. 황혼·밤의 폐허 도시, 청록·보라회색 하늘에 주황·호박색 불빛, 녹슨 노점, 늘어진 전선, 폐차.
-- 이미지 생성은 바르코(VARCO) 커스텀 워크플로에서 GPT 이미지 모델을 쓴다.
+- 이미지 생성은 바르코(VARCO) 커스텀 워크플로에서 GPT 이미지 모델(`gpt-image-2-medium`)을 쓴다. 사용자가 브라우저에 바르코 커스텀 워크플로를 열어 두면 VARCO MCP 도구로 노드(TextInput → GenerateImage, 수정은 ImageInput + TextInput → EditImage)를 만들어 돌리고, 결과는 `https://3d.varco.ai` + 받은 `/api/objects/...` 주소에서 내려받는다. 여러 장은 한 번에 병렬로 돌린다.
+- 스프라이트·초상화·아이콘은 단색 마젠타(#FF00FF) 배경의 격자 시트로 한 장에 여러 개를 뽑아 `art_src/slice_sheet.py`로 자른다.
+- NPC 초상화는 대화창에 뜨므로 플레이어와 눈을 맞춰야 한다 (얼굴은 살짝 돌아가도 눈동자는 정면). 지금 초상화는 이 기준으로 고친 것이고, 새 초상화도 같은 기준으로 만든다.
 - 에셋 출처와 라이선스는 `TradeGame/assets/CREDITS.md`에 기록한다.
 - 옛날 16비트풍이 아니라 요즘 픽셀 게임(이스트워드, 씨 오브 스타즈) 느낌: 노이즈·디더링 없는 깔끔한 색 단계, 선명한 픽셀 덩어리, 호박색 림라이트와 청록 그림자. 바르코 프롬프트에 "16-bit"를 쓰지 않는다.
 - 픽셀 퍼펙트: 모든 그림은 화면의 절반 해상도(원래 픽셀 크기)로 만들어 두고 정확히 2배, 최근접 필터로 보여 준다. 전투는 640x360 SubViewport, 시장 화면은 `texture_filter = NEAREST`. 부드럽게 늘리거나 줄여서 그리지 않는다.
@@ -21,7 +24,7 @@
 ## 엔진
 
 - Godot 4.7.2, GDScript, 렌더러 GL Compatibility. Godot 프로젝트 루트는 `TradeGame/` 하위 폴더다 (`res://` = `TradeGame/TradeGame/`).
-- 실행 파일: `C:\Users\USER\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe`
+- 실행 파일: `C:\Users\USER\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe` (원래 작업한 PC 기준. 다른 PC면 Godot 4.7.2 콘솔판 경로로 바꿔 쓴다)
 - 테스트 (헤드리스, 종료 코드 0 = 통과):
 
   ```bash
@@ -29,7 +32,8 @@
   ```
 
 - 화면 확인: `--headless` 없이 `--script res://tests/screenshot.gd -- <저장경로.png>`로 메인 화면 스크린샷을 저장한다.
-- 배포: `main`에 push하면 `.github/workflows/deploy-web.yml`이 웹 빌드를 만들어 GitHub Pages(https://lastgamer05.github.io/TradeGame/)에 올린다.- 새 `class_name`을 추가한 뒤에는 같은 명령에 `--import`를 붙여 한 번 돌려 클래스 캐시를 갱신한다.
+- 배포: `main`에 push하면 `.github/workflows/deploy-web.yml`이 웹 빌드를 만들어 GitHub Pages(https://lastgamer05.github.io/TradeGame/)에 올린다.
+- 새 `class_name`을 추가한 뒤에는 같은 명령에 `--import`를 붙여 한 번 돌려 클래스 캐시를 갱신한다.
 - 사용자가 에디터를 열어 둔 상태면 `project.godot`을 직접 고치지 말 것. 에디터가 덮어쓴다.
 
 ## 구조
