@@ -57,7 +57,7 @@
 					"effects": []
 				},
 				"failure": {
-					"text": "아이 하나가 차 앞에 뛰어든다. 급정거. 적재함 문이 열려 짐 일부가 쏟아진다.",
+					"text": "아이 하나가 차 앞에 뛰어든다. 급정거. 적재함 문이 열려 짐이 쏟아진다.",
 					"effects": [
 						{
 							"type": "vehicle_damage",
@@ -69,7 +69,7 @@
 		},
 		{
 			"id": "morae",
-			"text": "모래가 아이들 이름을 부른다",
+			"text": "모래가 아이들을 부른다",
 			"requires": [
 				{
 					"type": "companion",

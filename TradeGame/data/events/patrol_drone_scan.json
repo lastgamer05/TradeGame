@@ -9,11 +9,11 @@
 		],
 		"weight": 10
 	},
-	"text": "헬리오스 순찰 드론이 머리 위에 멈춰 선다. 푸른 스캔 광선이 짐칸을 훑기 시작한다. 해킹 툴이 걸리면 끝이다.",
+	"text": "헬리오스 순찰 드론이 머리 위에 멈춘다. 푸른 스캔 광선이 짐칸을 훑는다. 해킹 툴이 걸리면 끝이다.",
 	"choices": [
 		{
 			"id": "jam",
-			"text": "드론 스캔 신호를 교란한다",
+			"text": "스캔 신호를 교란한다",
 			"check": { "stat": "tech", "dc": 14 },
 			"outcomes": {
 				"success": {
@@ -21,7 +21,7 @@
 					"effects": []
 				},
 				"failure": {
-					"text": "교란 신호가 오히려 드론의 주의를 끈다. 스피커에서 정지 명령이 나온다.",
+					"text": "교란 신호가 오히려 눈에 띈다. 스피커에서 정지 명령이 나온다.",
 					"effects": [
 						{ "type": "cargo_remove", "good": "hacking_tool", "amount": "all" },
 						{ "type": "reputation", "city": "helios", "delta": -10 },
@@ -38,22 +38,22 @@
 			],
 			"outcomes": {
 				"success": {
-					"text": "납판을 덧댄 밀수칸은 스캔에 잡히지 않는다. 드론이 무심하게 떠난다.",
+					"text": "납판 덧댄 밀수칸은 스캔에 안 잡힌다. 드론이 무심하게 떠난다.",
 					"effects": []
 				}
 			}
 		},
 		{
 			"id": "flee",
-			"text": "고가도로 아래로 급히 빠진다",
+			"text": "고가도로 아래로 빠진다",
 			"check": { "stat": "driving", "dc": 15 },
 			"outcomes": {
 				"success": {
-					"text": "드론이 교각 사이를 따라오지 못한다. 번호판도 찍히지 않았다.",
+					"text": "드론이 교각 사이를 못 따라온다. 번호판도 안 찍혔다.",
 					"effects": []
 				},
 				"failure": {
-					"text": "드론이 번호판을 찍고 날아간다. 헬리오스 수배 명단에 이름이 오른다.",
+					"text": "드론이 번호판을 찍고 날아간다. 수배 명단에 이름이 오른다.",
 					"effects": [
 						{ "type": "reputation", "city": "helios", "delta": -8 },
 						{ "type": "reputation", "city": "gate7", "delta": -5 },
@@ -67,7 +67,7 @@
 			"text": "해킹 툴을 창밖으로 버린다",
 			"outcomes": {
 				"success": {
-					"text": "상자가 도랑으로 굴러떨어진다. 스캔은 깨끗하게 끝난다. 아까운 물건이었다.",
+					"text": "상자가 도랑으로 굴러떨어진다. 스캔은 깨끗하다. 아까운 물건이었다.",
 					"effects": [
 						{ "type": "cargo_remove", "good": "hacking_tool", "amount": "all" }
 					]

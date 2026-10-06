@@ -7,11 +7,11 @@
 		"requires": [],
 		"weight": 10
 	},
-	"text": "고가도로 상판이 비스듬히 내려앉아 길을 반쯤 막았다. 끊어진 철근 사이로 전쟁 전 광고판이 아직 희미하게 깜박인다.",
+	"text": "고가도로 상판이 내려앉아 길을 반쯤 막았다. 철근 사이로 전쟁 전 광고판이 희미하게 깜박인다.",
 	"choices": [
 		{
 			"id": "strip_billboard",
-			"text": "광고판을 뜯어 부품을 챙긴다",
+			"text": "광고판에서 부품을 뜯는다",
 			"check": { "stat": "tech", "dc": 13 },
 			"outcomes": {
 				"success": {
@@ -22,22 +22,22 @@
 					]
 				},
 				"failure": {
-					"text": "전선을 잘못 끊었다. 불꽃이 튀고 광고판이 영영 꺼진다. 손에 화상만 남는다.",
+					"text": "전선을 잘못 끊었다. 불꽃이 튀고 손에 화상만 남는다.",
 					"effects": []
 				}
 			}
 		},
 		{
 			"id": "find_path",
-			"text": "잔해 사이 빠져나갈 틈을 찾는다",
+			"text": "빠져나갈 틈을 찾는다",
 			"check": { "stat": "survival", "dc": 12 },
 			"outcomes": {
 				"success": {
-					"text": "상판 아래 기둥 사이로 차 한 대 폭의 길이 있다. 천천히 빠져나간다.",
+					"text": "기둥 사이로 차 한 대 폭의 길이 있다. 천천히 빠져나간다.",
 					"effects": []
 				},
 				"failure": {
-					"text": "틈이 생각보다 좁다. 철근에 긁혀 적재함이 찢어진다.",
+					"text": "틈이 생각보다 좁다. 철근에 적재함이 찢어진다.",
 					"effects": [
 						{ "type": "vehicle_damage", "part": "cargo_bay" }
 					]
@@ -49,7 +49,7 @@
 			"text": "잔해를 치운다",
 			"outcomes": {
 				"success": {
-					"text": "반나절 동안 콘크리트 덩어리를 밀어낸다. 윈치가 전력을 먹지만 길은 열린다. 치운 철근도 챙긴다.",
+					"text": "반나절 동안 콘크리트를 밀어낸다. 윈치가 전력을 먹지만 길은 열린다. 철근도 챙긴다.",
 					"effects": [
 						{ "type": "power", "delta": -8 },
 						{ "type": "cargo_add", "good": "metal", "amount": 2 }

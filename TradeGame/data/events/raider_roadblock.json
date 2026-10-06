@@ -5,10 +5,22 @@
 		"on": "travel",
 		"road_types": ["highway", "wasteland"],
 		"requires": [],
-		"weight": 12
+		"weight": 14
 	},
 	"text": "폐차 세 대를 엮은 바리케이드가 길을 막고 있다. 녹슨 지붕 위에서 약탈자들이 총구를 흔든다. \"짐 절반, 아니면 목숨.\"",
 	"choices": [
+		{
+			"id": "fight",
+			"text": "싸운다",
+			"outcomes": {
+				"success": {
+					"text": "바리케이드 앞에 차를 비스듬히 세우고 내린다.",
+					"effects": [
+						{ "type": "start_combat", "encounter": "raider_roadblock" }
+					]
+				}
+			}
+		},
 		{
 			"id": "intimidate",
 			"text": "차에서 내려 먼저 총을 겨눈다",

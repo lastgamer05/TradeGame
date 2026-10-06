@@ -9,7 +9,7 @@
 		],
 		"weight": 10
 	},
-	"text": "헬리오스 간선도로 검문소에서 병사가 화물칸을 열라고 한다. 짐칸에는 억제제 상자가 있다.",
+	"text": "간선도로 검문소. 병사가 화물칸을 열라고 한다. 짐칸엔 억제제 상자가 있다.",
 	"choices": [
 		{
 			"id": "talk",
@@ -17,11 +17,11 @@
 			"check": { "stat": "negotiation", "dc": 15 },
 			"outcomes": {
 				"success": {
-					"text": "병사가 서류를 대충 훑고 손짓한다. 무사히 통과한다.",
+					"text": "병사가 서류를 대충 훑고 손짓한다. 통과.",
 					"effects": []
 				},
 				"failure": {
-					"text": "병사가 서류의 위조 흔적을 찾아낸다. 억제제를 압수당한다.",
+					"text": "병사가 위조 흔적을 찾아낸다. 억제제를 압수당한다.",
 					"effects": [
 						{ "type": "cargo_remove", "good": "suppressant", "amount": "all" },
 						{ "type": "reputation", "city": "helios", "delta": -10 }
@@ -78,13 +78,13 @@
 		},
 		{
 			"id": "rebel_signal",
-			"text": "동조 병사에게 암호 신호를 보낸다",
+			"text": "동조 병사에게 신호를 보낸다",
 			"requires": [
 				{ "type": "reputation", "city": "undergrid", "min": 30 }
 			],
 			"outcomes": {
 				"success": {
-					"text": "병사 하나가 고개를 끄덕이고 동료를 다른 쪽으로 부른다. 떠나기 전 쪽지를 건넨다.",
+					"text": "병사 하나가 고개를 끄덕이고 동료를 딴 데로 부른다. 떠나기 전 쪽지를 건넨다.",
 					"effects": [
 						{ "type": "flag_set", "flag": "rebel_spy_quest_unlocked" }
 					]
@@ -96,7 +96,7 @@
 			"text": "억제제를 자진 신고한다",
 			"outcomes": {
 				"success": {
-					"text": "병사가 억제제를 거둬 가고 신고 포상금을 쥐여 준다.",
+					"text": "병사가 억제제를 거둬 가고 포상금을 쥐여 준다.",
 					"effects": [
 						{ "type": "cargo_remove", "good": "suppressant", "amount": "all" },
 						{ "type": "power", "delta": 5 },

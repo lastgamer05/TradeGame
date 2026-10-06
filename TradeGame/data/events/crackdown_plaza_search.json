@@ -22,7 +22,7 @@
 			"text": "순순히 짐칸을 연다",
 			"outcomes": {
 				"success": {
-					"text": "금지품은 전부 압수된다. 깨끗한 짐칸이면 하사가 고개를 끄덕인다.",
+					"text": "금지품은 전부 압수. 짐칸이 깨끗하면 하사가 고개를 끄덕인다.",
 					"effects": [
 						{
 							"type": "cargo_remove",
@@ -71,7 +71,7 @@
 		},
 		{
 			"id": "talk",
-			"text": "전력청 납품 영수증을 흔든다",
+			"text": "전력청 영수증을 흔든다",
 			"check": {
 				"stat": "negotiation",
 				"dc": 15

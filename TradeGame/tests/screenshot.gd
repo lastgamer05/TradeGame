@@ -6,7 +6,7 @@ extends SceneTree
 ##   map                 도시 입구에서 연 큰 지도 (갈 수 있는 도시 하나에 마우스를 올린 모습)
 ##   travel:<도시 id>    시작 도시에서 그 도시로 이동한 직후 (이동 이벤트 창이나 도착 장면)
 ##   arrival[:도시 id]   도착 장면 (기본 헬리오스)
-##   hub[:도시 id]       도시 허브 (기본 시작 도시)
+##   hub[:도시 id[:x]]   도시 거리 (기본 시작 도시). x를 주면 주인공이 그 자리에 선다
 ##   location:<구역 id>  구역 화면 (거래 구역이면 시장 표)
 ##   dialogue:<npc id>   그 NPC의 구역에서 대화를 연 모습
 ##   battle:<조우 id>    전투 화면
@@ -60,6 +60,10 @@ func _initialize() -> void:
 			s.city = arg
 		s.vehicle_damage["engine"] = true
 		main._enter_city()
+		if mode.get_slice_count(":") > 2:
+			main._town_pos[s.city] = float(mode.get_slice(":", 2))
+			main._town = null
+			main._refresh()
 	elif mode.begins_with("location:"):
 		s.city = gd.locations[arg].city
 		s.buy(s.market.goods_for_sale(s.city)[0], 3)

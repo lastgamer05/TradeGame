@@ -1,6 +1,6 @@
 extends Control
 ## 게임 화면의 뼈대. 윗줄(날짜, 전력, 화물, 재산)은 늘 보이고, 그 아래 화면을 흐름에 따라 바꾼다.
-## 큰 지도 -> 도착 장면 -> 도시 허브 -> 구역 (docs/city_spec.md 1절). 모달(이벤트, 정세 소식, 전투 결과),
+## 큰 지도 -> 도착 장면 -> 도시 거리 -> 구역 (docs/city_spec.md 1절). 모달(이벤트, 정세 소식, 전투 결과),
 ## 전투, 대화는 모든 화면 위에 뜬다. 상태가 바뀔 때마다 지금 화면을 통째로 다시 만든다.
 ## 픽셀 퍼펙트: 모든 그림은 절반 해상도로 만들어 최근접 필터로 정확히 2배 보여 준다.
 
@@ -9,7 +9,7 @@ const DialogueView := preload("res://scripts/ui/dialogue_view.gd")
 const Kit := preload("res://scripts/ui/ui_kit.gd")
 const WorldMapScreen := preload("res://scripts/ui/world_map_screen.gd")
 const ArrivalView := preload("res://scripts/ui/arrival_view.gd")
-const CityHubView := preload("res://scripts/ui/city_hub_view.gd")
+const TownView := preload("res://scripts/ui/town_view.gd")
 const LocationView := preload("res://scripts/ui/location_view.gd")
 
 const CITY_ART := "res://assets/art/cities/%s.png"
@@ -18,8 +18,10 @@ const LOCATION_ART := "res://assets/art/locations/%s.png"
 const SHADE := { "arrival": 0.0, "hub": 0.15, "location": 0.15, "map": 0.6 }
 
 var state: GameState
-## 지금 화면: "arrival", "hub", "location", "map"
+## 지금 화면: "arrival", "hub"(도시 거리), "location", "map"
 var screen := "arrival"
+## 도시 id -> 거리에서 주인공이 서 있던 자리. 구역이나 대화에서 돌아오면 그 자리에서 시작한다.
+var _town_pos: Dictionary = {}
 var _log: Array[String] = []
 var _event_queue: Array = []
 ## 모달, 전투, 대화가 모두 끝나면 차례로 부를 일 (이동을 마친 뒤 도착 장면 등)
@@ -29,6 +31,9 @@ var _travel_from := ""
 
 var _bg: TextureRect
 var _shade: ColorRect
+## 도시 거리처럼 화면 전체를 쓰는 화면을 넣는 층 (윗줄 아래에 깔린다)
+var _world_layer: Control
+var _town: Control
 var _city_title: Label
 var _companion_label: Label
 var _day_label: Label
@@ -83,13 +88,14 @@ func _show_arrival(roll_event := true) -> void:
 	elif roll_event:
 		var ev := EventRunner.pick_arrival_event(state)
 		if not ev.is_empty():
-			_event_queue.append(ev)
+			_queue_event(ev)
 		_show_next_event()
 
 
 func _enter_city() -> void:
 	state.visited_cities[state.city] = true
 	_travel_from = ""
+	_town_pos.erase(state.city)
 	_enter_hub()
 
 
@@ -106,7 +112,7 @@ func _open_location(location_id: String) -> void:
 	_refresh()
 	var ev := EventRunner.pick_location_event(state, location_id)
 	if not ev.is_empty():
-		_event_queue.append(ev)
+		_queue_event(ev)
 	_show_next_event()
 
 
@@ -127,10 +133,15 @@ func _on_travel(to: String) -> void:
 	_add_log("%s에 도착했다. %d일차." % [Kit.city_name(to), state.day])
 	var ev := EventRunner.pick_travel_event(state)
 	if not ev.is_empty():
-		_event_queue.append(ev)
+		_queue_event(ev)
 	_then.append(_show_arrival)
 	_refresh()
 	_show_next_event()
+
+
+func _queue_event(ev: Dictionary) -> void:
+	EventRunner.mark_shown(state, ev)
+	_event_queue.append(ev)
 
 
 func _on_talk(npc_id: String) -> void:
@@ -299,6 +310,11 @@ func _build_layout() -> void:
 	_shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_shade)
 
+	_world_layer = Control.new()
+	_world_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_world_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_world_layer)
+
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -376,7 +392,7 @@ func _refresh() -> void:
 	_worth_label.text = "재산 %s" % Kit.fmt_power(state.net_worth())
 	_refresh_background()
 	_build_screen()
-	_log_panel.visible = screen in ["hub", "location"]
+	_log_panel.visible = screen == "location"
 	_log_label.text = "\n".join(_log.slice(-2))
 	_check_stranded()
 
@@ -391,20 +407,24 @@ func _refresh_background() -> void:
 		else:
 			shade = 0.45
 	_bg.texture = tex
+	_bg.visible = screen != "hub"
 	_shade.color = Color(0.02, 0.015, 0.03, shade)
 
 
 func _build_screen() -> void:
+	if _town != null and is_instance_valid(_town):
+		_town_pos[state.city] = _town.player_x()
+	_town = null
 	Kit.clear(_body)
+	Kit.clear(_world_layer)
+	if screen == "hub":
+		_build_town()
+		return
 	var view: Control
 	match screen:
 		"arrival":
 			view = ArrivalView.new()
 			view.enter.connect(_enter_city)
-		"hub":
-			view = CityHubView.new()
-			view.open_location.connect(_open_location)
-			view.open_gate.connect(_open_map)
 		"location":
 			view = LocationView.new()
 			view.back.connect(_enter_hub)
@@ -425,6 +445,24 @@ func _build_screen() -> void:
 			view.build(state, _travel_from)
 		_:
 			view.build(state)
+
+
+## 도시 거리. 화면 전체에 깔고 윗줄만 위에 얹는다.
+func _build_town() -> void:
+	_town = TownView.new()
+	_town.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_world_layer.add_child(_town)
+	_town.blocked = _is_busy
+	_town.open_location.connect(_open_location)
+	_town.open_gate.connect(_open_map)
+	_town.talk.connect(_on_talk)
+	_town.moved.connect(func(x): _town_pos[state.city] = x)
+	_town.build(state, _town_pos.get(state.city, -1.0))
+
+
+## 모달, 전투, 대화가 떠 있으면 거리에서 걷거나 누르지 않는다.
+func _is_busy() -> bool:
+	return _overlay.visible or _battle_view != null or _dialogue_view != null
 
 
 func _on_repair() -> void:

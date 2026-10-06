@@ -27,6 +27,7 @@ func _initialize() -> void:
 	test_city_validation()
 	test_all_dialogues_run()
 	test_dialogue_view()
+	test_town_view()
 	print("\n%s" % ("ALL PASSED" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -490,7 +491,27 @@ func test_city_triggers() -> void:
 	for i in 200:
 		if not EventRunner.pick_location_event(s, "greenhouse_market").is_empty():
 			hits += 1
-	_expect(hits > 40 and hits < 120, "location_chance 기본값 0.4 (%d/200)" % hits)
+	_expect(hits > 25 and hits < 100, "location_chance 기본값 0.3 (%d/200)" % hits)
+
+	# 반복 줄이기: 띄운 이벤트는 대기 일수 동안 다시 안 뜨고, 머무는 동안 구역 이벤트는 한 번, 같은 구역 재입장엔 없다.
+	data.economy.events["location_chance"] = 1.0
+	var first := EventRunner.pick_location_event(s, "greenhouse_tower")
+	EventRunner.mark_shown(s, first)
+	_expect(EventRunner.pick_location_event(s, "greenhouse_market").is_empty(), "머무는 동안 구역 이벤트는 한 번")
+	s.stay_location_events = 0
+	seen = {}
+	for i in 30:
+		seen[EventRunner.pick_location_event(s, "greenhouse_tower").get("id", "")] = true
+	_expect(not seen.has(first.id), "띄운 이벤트는 대기 일수 동안 다시 안 뜬다")
+	s.day += int(data.economy.events.cooldown_days)
+	seen = {}
+	for i in 30:
+		seen[EventRunner.pick_location_event(s, "greenhouse_tower").get("id", "")] = true
+	_expect(seen.has(first.id), "대기 일수가 지나면 다시 뜬다")
+	s.enter_location("greenhouse_bunk")
+	s.enter_location("greenhouse_bunk")
+	_expect(EventRunner.pick_location_event(s, "greenhouse_bunk").is_empty(), "같은 구역에 다시 들어가면 이벤트 없음")
+	data.economy.events.erase("location_chance")
 	data.free()
 
 
@@ -714,6 +735,41 @@ func test_dialogue_view() -> void:
 	view._buttons[0].pressed.emit()
 	_expect(done[0], "대화 창: 끝나면 finished")
 	data.free()
+
+
+## 도시 거리: 모든 도시에서 도시 입구, 구역 입구 4곳, 대화할 수 있는 NPC가 거리에 놓이고,
+## 입구 앞에서 E를 누르면 그 구역으로 들어간다.
+func test_town_view() -> void:
+	var gd: Node = root.get_node("GameData")
+	if gd.cities.is_empty():
+		gd.load_all()
+	var s := GameState.new(gd, 32)
+	for city_id in gd.cities:
+		s.city = city_id
+		var view: Control = load("res://scripts/ui/town_view.gd").new()
+		view.size = Vector2(1280, 720)
+		root.add_child(view)
+		view.build(s)
+		var kinds := {}
+		for spot in view._spots:
+			kinds[spot.kind] = kinds.get(spot.kind, 0) + 1
+		_expect(kinds.get("gate", 0) == 1 and kinds.get("door", 0) == 4 and kinds.get("npc", 0) == 4,
+			"거리 %s: 입구 1, 구역 4, NPC 4 (%s)" % [city_id, kinds])
+		_expect(gd.towns.has(city_id) and view._width > 640.0, "거리 %s: 배치와 거리 그림" % city_id)
+		view.queue_free()
+	s.city = "helios"
+	var view: Control = load("res://scripts/ui/town_view.gd").new()
+	root.add_child(view)
+	view.build(s, float(gd.towns.helios.doors.helios_plaza))
+	var opened := [""]
+	view.open_location.connect(func(id): opened[0] = id)
+	view._update_focus()
+	var key := InputEventKey.new()
+	key.keycode = KEY_E
+	key.pressed = true
+	view._unhandled_key_input(key)
+	_expect(opened[0] == "helios_plaza", "거리: 입구 앞에서 E를 누르면 그 구역으로 (%s)" % opened[0])
+	view.queue_free()
 
 
 ## 테스트용 의뢰와 대화. 실제 이야기 데이터와 겹치지 않게 t_ 로 시작한다.

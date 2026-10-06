@@ -1,0 +1,75 @@
+{
+	"id": "raider_ambush",
+	"title": "매복",
+	"trigger": {
+		"on": "travel",
+		"road_types": [
+			"highway",
+			"wasteland"
+		],
+		"requires": [],
+		"weight": 14,
+		"cooldown_days": 3
+	},
+	"text": "총알이 문짝을 때린다. 폐차 뒤에서 약탈자 셋이 튀어나온다. 매복이다.",
+	"choices": [
+		{
+			"id": "fight",
+			"text": "차를 세우고 응사한다",
+			"outcomes": {
+				"success": {
+					"text": "엔진을 끄고 문을 방패 삼아 내린다.",
+					"effects": [
+						{
+							"type": "start_combat",
+							"encounter": "raider_scouts"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "floor_it",
+			"text": "급가속으로 빠진다",
+			"check": {
+				"stat": "driving",
+				"dc": 14
+			},
+			"outcomes": {
+				"success": {
+					"text": "바퀴가 모래를 토하며 튀어 나간다. 총소리가 멀어진다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "바퀴가 모래에 빠진다. 약탈자들이 다가온다.",
+					"effects": [
+						{
+							"type": "vehicle_damage",
+							"part": "engine"
+						},
+						{
+							"type": "start_combat",
+							"encounter": "raider_scouts"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "smoke",
+			"text": "연막을 터뜨린다",
+			"requires": [
+				{
+					"type": "module",
+					"module": "smoke_launcher"
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "연기 속에서 총알이 엉뚱한 데로 날아간다. 그 틈에 빠져나간다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

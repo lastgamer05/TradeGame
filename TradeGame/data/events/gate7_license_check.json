@@ -74,7 +74,7 @@
 		},
 		{
 			"id": "bram",
-			"text": "식당 브람의 친구라고 한다",
+			"text": "브람의 친구라고 한다",
 			"requires": [
 				{
 					"type": "flag",

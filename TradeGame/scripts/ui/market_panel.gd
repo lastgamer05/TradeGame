@@ -11,11 +11,7 @@ const ICON_SIZE := Vector2(36, 36)
 func build(state: GameState) -> void:
 	add_theme_constant_override("separation", 8)
 	var city: Dictionary = GameData.cities[state.city]
-	var info := Kit.label("특산 ▼ %s\n수요 ▲ %s" % [Kit.goods_names(city.specialties), Kit.goods_names(city.demands)],
-		PixelTheme.TEXT_DIM)
-	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	add_child(info)
-
+	# 특산(▼)과 수요(▲)는 물품 이름 옆 표시로 보여 준다.
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

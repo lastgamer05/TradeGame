@@ -14,7 +14,7 @@
 		"name": "아우렐 벡",
 		"city": "helios",
 		"location": "helios_hq",
-		"role": "전력청장 (세력 대표)",
+		"role": "전력청장",
 		"faction": "victor",
 		"dialogue": "aurel_beck",
 		"companion": ""
@@ -34,7 +34,7 @@
 		"name": "리나",
 		"city": "helios",
 		"location": "helios_outskirts",
-		"role": "배급에서 밀려난 주민",
+		"role": "판자촌 주민",
 		"faction": "victor",
 		"dialogue": "lina",
 		"companion": ""
@@ -44,7 +44,7 @@
 		"name": "로 보급관",
 		"city": "gate7",
 		"location": "gate7_market",
-		"role": "게이트 7 보급관",
+		"role": "보급관",
 		"faction": "victor",
 		"dialogue": "quartermaster_ro",
 		"companion": ""
@@ -54,7 +54,7 @@
 		"name": "정비사 주노",
 		"city": "gate7",
 		"location": "gate7_garage",
-		"role": "정비고 정비사",
+		"role": "정비사",
 		"faction": "victor",
 		"dialogue": "mechanic_juno",
 		"companion": ""
@@ -64,7 +64,7 @@
 		"name": "취사병 브람",
 		"city": "gate7",
 		"location": "gate7_canteen",
-		"role": "막사 식당 취사병",
+		"role": "취사병",
 		"faction": "victor",
 		"dialogue": "cook_bram",
 		"companion": ""
@@ -74,7 +74,7 @@
 		"name": "보스 지휘관",
 		"city": "gate7",
 		"location": "gate7_command",
-		"role": "게이트 7 지휘관",
+		"role": "지휘관",
 		"faction": "victor",
 		"dialogue": "commander_voss",
 		"companion": ""
@@ -84,7 +84,7 @@
 		"name": "암거래상 벡스",
 		"city": "undergrid",
 		"location": "undergrid_market",
-		"role": "암시장 거래상",
+		"role": "암거래상",
 		"faction": "rebel",
 		"dialogue": "dealer_vex",
 		"companion": ""
@@ -94,7 +94,7 @@
 		"name": "노바",
 		"city": "undergrid",
 		"location": "undergrid_ops",
-		"role": "반란 지도자 (세력 대표)",
+		"role": "반란 지도자",
 		"faction": "rebel",
 		"dialogue": "nova",
 		"companion": ""
@@ -104,7 +104,7 @@
 		"name": "피스",
 		"city": "undergrid",
 		"location": "undergrid_den",
-		"role": "해커 (동료 후보)",
+		"role": "해커",
 		"faction": "rebel",
 		"dialogue": "piece",
 		"companion": "piece"
@@ -114,7 +114,7 @@
 		"name": "달 공장장",
 		"city": "undergrid",
 		"location": "undergrid_factory",
-		"role": "조립 공장장",
+		"role": "공장장",
 		"faction": "rebel",
 		"dialogue": "foreman_dal",
 		"companion": ""
@@ -124,7 +124,7 @@
 		"name": "탄약상 솔",
 		"city": "red_mesa",
 		"location": "red_mesa_market",
-		"role": "탄약 교역상",
+		"role": "탄약상",
 		"faction": "rebel",
 		"dialogue": "ammo_trader_sol",
 		"companion": ""
@@ -134,7 +134,7 @@
 		"name": "한",
 		"city": "red_mesa",
 		"location": "red_mesa_camp",
-		"role": "용병 (동료 후보)",
+		"role": "용병",
 		"faction": "rebel",
 		"dialogue": "han",
 		"companion": "han"
@@ -144,7 +144,7 @@
 		"name": "물지기 웬",
 		"city": "red_mesa",
 		"location": "red_mesa_cistern",
-		"role": "저수조 물지기",
+		"role": "물지기",
 		"faction": "rebel",
 		"dialogue": "keeper_wen",
 		"companion": ""
@@ -154,7 +154,7 @@
 		"name": "타르 원로",
 		"city": "red_mesa",
 		"location": "red_mesa_hall",
-		"role": "레드 메사 원로",
+		"role": "원로",
 		"faction": "rebel",
 		"dialogue": "elder_tarr",
 		"companion": ""
@@ -164,7 +164,7 @@
 		"name": "고물상 핌",
 		"city": "rustbelt",
 		"location": "rustbelt_market",
-		"role": "고물 장터 상인",
+		"role": "고물상",
 		"faction": "displaced",
 		"dialogue": "scrap_trader_pim",
 		"companion": ""
@@ -174,7 +174,7 @@
 		"name": "게일",
 		"city": "rustbelt",
 		"location": "rustbelt_guild",
-		"role": "고물상 조합장 (세력 대표)",
+		"role": "고물상 조합장",
 		"faction": "displaced",
 		"dialogue": "gale",
 		"companion": ""
@@ -184,7 +184,7 @@
 		"name": "모래",
 		"city": "rustbelt",
 		"location": "rustbelt_shanty",
-		"role": "고물꾼 (동료 후보)",
+		"role": "고물꾼",
 		"faction": "displaced",
 		"dialogue": "morae",
 		"companion": "morae"
@@ -204,7 +204,7 @@
 		"name": "창고지기 메이",
 		"city": "greenhouse",
 		"location": "greenhouse_market",
-		"role": "수확물 창고지기",
+		"role": "창고지기",
 		"faction": "displaced",
 		"dialogue": "produce_trader_mei",
 		"companion": ""
@@ -214,7 +214,7 @@
 		"name": "소하",
 		"city": "greenhouse",
 		"location": "greenhouse_elder",
-		"role": "농장 공동체 원로 (세력 대표)",
+		"role": "공동체 원로",
 		"faction": "displaced",
 		"dialogue": "soha",
 		"companion": ""
@@ -224,7 +224,7 @@
 		"name": "이안",
 		"city": "greenhouse",
 		"location": "greenhouse_tower",
-		"role": "떠돌이 기술자 (동료 후보)",
+		"role": "떠돌이 기술자",
 		"faction": "displaced",
 		"dialogue": "ian",
 		"companion": "ian"
@@ -254,7 +254,7 @@
 		"name": "미터",
 		"city": "swapmeet",
 		"location": "swapmeet_booth",
-		"role": "정보상 (세력 대표, 중립)",
+		"role": "정보상",
 		"faction": "neutral",
 		"dialogue": "meter",
 		"companion": ""
@@ -264,7 +264,7 @@
 		"name": "여관 주인 모스",
 		"city": "swapmeet",
 		"location": "swapmeet_inn",
-		"role": "운반꾼 여관 주인",
+		"role": "여관 주인",
 		"faction": "neutral",
 		"dialogue": "innkeeper_moss",
 		"companion": ""
@@ -274,7 +274,7 @@
 		"name": "경매인 핀",
 		"city": "swapmeet",
 		"location": "swapmeet_auction",
-		"role": "주차장 경매인",
+		"role": "경매인",
 		"faction": "neutral",
 		"dialogue": "auctioneer_fin",
 		"companion": ""
@@ -294,7 +294,7 @@
 		"name": "크랭크",
 		"city": "scrapyard",
 		"location": "scrapyard_fort",
-		"role": "약탈자 두목 (세력 대표)",
+		"role": "약탈자 두목",
 		"faction": "lawless",
 		"dialogue": "crank",
 		"companion": ""
@@ -314,7 +314,7 @@
 		"name": "넝마주이 님",
 		"city": "scrapyard",
 		"location": "scrapyard_graveyard",
-		"role": "전쟁 기계 무덤 넝마주이",
+		"role": "넝마주이",
 		"faction": "lawless",
 		"dialogue": "scavenger_nim",
 		"companion": ""

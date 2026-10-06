@@ -1,5 +1,5 @@
 extends HBoxContainer
-## 구역 화면. 왼쪽은 구역 소개와 NPC, 오른쪽은 서비스(거래 표, 정비, 소문, 고용).
+## 구역 화면. 왼쪽은 구역 이름과 NPC, 오른쪽은 서비스(거래 표, 정비, 소문, 고용).
 ## 거래 구역이 아니면 오른쪽 위를 비워 구역 그림이 보이게 한다.
 
 signal back
@@ -23,21 +23,13 @@ func build(state: GameState, location_id: String) -> void:
 
 	var info := Kit.panel()
 	left.add_child(info)
-	var icol := Kit.vbox(4)
-	info.add_child(icol)
-	icol.add_child(Kit.title(loc.name))
-	var tags: Array = [Kit.KIND_NAMES.get(loc.kind, loc.kind)]
-	for s in loc.services:
-		tags.append(Kit.SERVICE_NAMES.get(s, s))
-	icol.add_child(Kit.label(" · ".join(tags), PixelTheme.TEXT_DIM))
-	if str(loc.get("description", "")) != "":
-		icol.add_child(Kit.wrap(loc.description, PixelTheme.TEXT, LEFT_WIDTH - 28))
+	info.add_child(Kit.title(loc.name))
 
 	var npc := state.npc_at(location_id)
 	if not npc.is_empty():
 		left.add_child(_npc_panel(state, npc))
 	left.add_child(Kit.spacer())
-	left.add_child(Kit.button("도시 허브로 돌아가기", true, func(): back.emit()))
+	left.add_child(Kit.button("거리로 나간다", true, func(): back.emit()))
 
 	var right := Kit.vbox(12)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -60,8 +52,7 @@ func build(state: GameState, location_id: String) -> void:
 			"rumors":
 				right.add_child(_rumor_panel(state))
 			"recruit":
-				right.add_child(_service_panel("용병 고용", ["고용할 용병 명단은 아직 준비 중이다.",
-					"동료는 이야기를 나눠 영입한다."]))
+				right.add_child(_service_panel("용병 고용", ["아직 고용할 용병이 없다."]))
 
 
 func _npc_panel(state: GameState, npc: Dictionary) -> Control:
@@ -73,10 +64,6 @@ func _npc_panel(state: GameState, npc: Dictionary) -> Control:
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(col)
 	col.add_child(Kit.label(npc.name))
-	col.add_child(Kit.wrap(npc.get("role", ""), PixelTheme.TEXT_DIM, LEFT_WIDTH - 152))
-	var faction: String = npc.get("faction", "")
-	if GameData.factions.has(faction):
-		col.add_child(Kit.label(GameData.factions[faction].name, Kit.faction_color(faction)))
 	var dlg: String = npc.get("dialogue", "")
 	var can_talk := dlg != "" and GameData.dialogues.has(dlg)
 	var b := Kit.button("대화", can_talk, func(): talk.emit(npc.id))
@@ -125,7 +112,7 @@ static func rumor_lines(state: GameState) -> Array:
 		lines.append("「%s」 %s" % [c.name, sentences[sentences.size() - 1].trim_suffix(".") + "."])
 	var best := _best_deal(state, state.market.goods_for_sale(state.city))
 	if not best.is_empty():
-		lines.append("%s: 여기서 %d셀, %s에서는 %d셀에 팔린다더라." % [
+		lines.append("%s: 여기 %d셀, %s %d셀." % [
 			GameData.goods[best.good].name, best.buy, Kit.city_name(best.city), best.sell])
 	for good_id in state.cargo:
 		if not best.is_empty() and good_id == best.good:
@@ -136,12 +123,12 @@ static func rumor_lines(state: GameState) -> Array:
 					or state.market.sell_price(city_id, good_id) > state.market.sell_price(top_city, good_id)):
 				top_city = city_id
 		if top_city != "" and top_city != state.city:
-			lines.append("싣고 있는 %s: %s에서 %d셀에 사 간다더라." % [
+			lines.append("싣고 있는 %s: %s에서 %d셀." % [
 				GameData.goods[good_id].name, Kit.city_name(top_city), state.market.sell_price(top_city, good_id)])
 			break
 	if lines.is_empty():
-		lines.append("요즘은 큰 소문이 없다. 길이 조용하다.")
-	return lines.slice(0, 3)
+		lines.append("요즘은 조용하다.")
+	return lines.slice(0, 2)
 
 
 ## 주어진 물품 중 다른 도시에 팔 때 가장 많이 남는 것. { good, buy, city, sell }

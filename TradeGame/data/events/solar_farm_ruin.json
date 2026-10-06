@@ -7,21 +7,21 @@
 		"requires": [],
 		"weight": 5
 	},
-	"text": "모래에 반쯤 묻힌 패널이 끝없이 늘어서 있다. 대부분 깨졌지만, 가운데 변전함에서 아직 윙윙 소리가 난다. 누가 먼저 다녀간 흔적은 없다.",
+	"text": "모래에 반쯤 묻힌 패널이 끝없이 늘어서 있다. 대부분 깨졌지만 가운데 변전함에서 아직 윙윙 소리가 난다.",
 	"choices": [
 		{
 			"id": "tap_substation",
-			"text": "변전함에 케이블을 물려 충전한다",
+			"text": "변전함에 케이블을 물린다",
 			"check": { "stat": "tech", "dc": 14 },
 			"outcomes": {
 				"success": {
-					"text": "전압을 맞추자 배터리 게이지가 천천히 오른다. 황무지에서 공짜 전력을 얻는 일은 드물다.",
+					"text": "전압을 맞추자 배터리 게이지가 천천히 오른다. 황무지에서 공짜 전력은 드물다.",
 					"effects": [
 						{ "type": "power", "delta": 25 }
 					]
 				},
 				"failure": {
-					"text": "역전류가 흘러 퓨즈가 나간다. 변전함도 조용해진다.",
+					"text": "역전류에 퓨즈가 나간다. 변전함도 조용해진다.",
 					"effects": [
 						{ "type": "power", "delta": -5 },
 						{ "type": "vehicle_damage", "part": "battery" }
@@ -31,28 +31,28 @@
 		},
 		{
 			"id": "salvage_panels",
-			"text": "멀쩡한 패널을 골라 뜯는다",
+			"text": "멀쩡한 패널을 뜯는다",
 			"check": { "stat": "survival", "dc": 11 },
 			"outcomes": {
 				"success": {
-					"text": "모래 아래서 깨지지 않은 패널 몇 장과 배선을 건진다.",
+					"text": "깨지지 않은 패널 몇 장과 배선을 건진다.",
 					"effects": [
 						{ "type": "cargo_add", "good": "scrap_electronics", "amount": 3 },
 						{ "type": "cargo_add", "good": "metal", "amount": 2 }
 					]
 				},
 				"failure": {
-					"text": "패널 밑에 모래 전갈 둥지가 있다. 물린 곳이 부어 오른다. 빈손으로 차에 돌아온다.",
+					"text": "패널 밑에 모래 전갈 둥지가 있다. 물린 데가 붓는다. 빈손으로 돌아온다.",
 					"effects": []
 				}
 			}
 		},
 		{
 			"id": "report_location",
-			"text": "위치를 기록해 두고 떠난다",
+			"text": "위치만 적어 두고 간다",
 			"outcomes": {
 				"success": {
-					"text": "좌표를 수첩에 적는다. 그린하우스라면 이 위치에 값을 쳐 줄지도 모른다.",
+					"text": "좌표를 수첩에 적는다. 그린하우스라면 값을 쳐 줄지도 모른다.",
 					"effects": [
 						{ "type": "flag_set", "flag": "found_solar_farm" }
 					]

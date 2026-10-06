@@ -42,6 +42,13 @@
 			"loot": { "power": [10, 30], "goods": { "ammo": [2, 5], "weapon_parts": [1, 2] } },
 			"surrender": true
 		},
+		"raider_scouts": {
+			"name": "약탈자 정찰대",
+			"location": "gas_station",
+			"enemies": { "raider": 2, "raider_gunner": 1 },
+			"loot": { "power": [5, 20], "goods": { "ammo": [1, 3], "scrap_electronics": [0, 2] } },
+			"surrender": true
+		},
 		"refugee_ambush": {
 			"name": "난민 습격", "location": "alley",
 			"enemies": { "refugee": 4 },

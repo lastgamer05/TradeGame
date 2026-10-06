@@ -50,6 +50,11 @@ var pending_dialogue: String = ""
 ## 아직 화면에 알리지 않은 알림 (정세 알림 pending_news와 별도).
 ## 동료 이탈: { type: "companion_left", companion, npc, title, text }
 var pending_notices: Array = []
+## 이벤트 id -> 마지막으로 띄운 날. 같은 이벤트가 economy.events.cooldown_days 안에 다시 뜨지 않게 한다.
+var event_last_day: Dictionary = {}
+## 이번에 도시에 머무는 동안 구역 id -> 들어간 횟수, 띄운 구역 이벤트 수. 도시를 떠나면 비운다.
+var stay_visits: Dictionary = {}
+var stay_location_events: int = 0
 ## 주인공 이름 (대화의 {player})
 var player_name: String = "운반꾼"
 ## 도시 id -> 평판으로 바뀌기 전 누적된 거래 실적
@@ -207,6 +212,8 @@ func travel(to: String) -> String:
 			_advance_day()
 		city = to
 		last_road = r.road
+		stay_visits.clear()
+		stay_location_events = 0
 		return ""
 	return "이어진 길이 없다"
 
@@ -356,6 +363,7 @@ func apply_battle(b: Battle) -> Array:
 ## 구역에 들어간다. visit 목표를 채운다. 구역 이벤트는 화면이 EventRunner.pick_location_event로 따로 고른다.
 func enter_location(location_id: String) -> void:
 	location = location_id
+	stay_visits[location_id] = int(stay_visits.get(location_id, 0)) + 1
 	for q in quests:
 		if quests[q] != "active":
 			continue

@@ -29,11 +29,17 @@ static func pick_arrival_event(state: GameState) -> Dictionary:
 
 
 ## 구역에 들어갈 때 호출. locations나 kinds 중 하나에 맞으면 후보, 둘 다 비면 모든 구역.
+## 한 도시에 머무는 동안 구역 이벤트는 location_events_per_stay번까지, 같은 구역에 다시 들어가면 뜨지 않는다.
 static func pick_location_event(state: GameState, location_id: String) -> Dictionary:
 	var loc: Dictionary = state.data.locations.get(location_id, {})
 	if loc.is_empty():
 		return {}
-	if state.rng.randf() >= float(state.data.economy.events.get("location_chance", 0.4)):
+	var cfg: Dictionary = state.data.economy.events
+	if int(state.stay_visits.get(location_id, 0)) > 1:
+		return {}
+	if state.stay_location_events >= int(cfg.get("location_events_per_stay", 1)):
+		return {}
+	if state.rng.randf() >= float(cfg.get("location_chance", 0.3)):
 		return {}
 	return _pick(state, func(t: Dictionary):
 		if t.get("on") != "location":
@@ -45,12 +51,31 @@ static func pick_location_event(state: GameState, location_id: String) -> Dictio
 		return location_id in ids or loc.kind in kinds)
 
 
+## 이벤트를 실제로 띄울 때 화면이 부른다. 재등장 대기와 머무는 동안의 구역 이벤트 수를 센다.
+static func mark_shown(state: GameState, ev: Dictionary) -> void:
+	state.event_last_day[ev.id] = state.day
+	if ev.get("trigger", {}).get("on") == "location":
+		state.stay_location_events += 1
+
+
+## 최근 cooldown_days(이벤트의 trigger.cooldown_days가 있으면 그 값) 안에 띄운 이벤트인지. trigger.once면 한 번 뜬 뒤로 다시 뜨지 않는다.
+static func on_cooldown(state: GameState, ev: Dictionary) -> bool:
+	if not state.event_last_day.has(ev.id):
+		return false
+	if ev.get("trigger", {}).get("once", false):
+		return true
+	var days := int(ev.get("trigger", {}).get("cooldown_days", state.data.economy.events.get("cooldown_days", 10)))
+	return state.day - int(state.event_last_day[ev.id]) < days
+
+
 static func _pick(state: GameState, match_trigger: Callable) -> Dictionary:
 	var pool := []
 	var total := 0
 	for ev in state.data.events.values():
 		var t: Dictionary = ev.get("trigger", {})
 		if not match_trigger.call(t) or not requirements_met(state, t.get("requires", [])):
+			continue
+		if on_cooldown(state, ev):
 			continue
 		var w := int(t.get("weight", 1))
 		pool.append([ev, w])

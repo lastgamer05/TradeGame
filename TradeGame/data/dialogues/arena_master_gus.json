@@ -4,7 +4,7 @@
 	"nodes": {
 		"greet": {
 			"speaker": "arena_master_gus",
-			"text": "피! 땀! 배터리! 거스의 투기장에 온 걸 환영한다! 구경은 공짜, 판돈은 유료, 링은 목숨값! 넌 어느 쪽이야?",
+			"text": "피! 땀! 배터리! 거스의 투기장이다! 구경은 공짜, 판돈은 유료, 링은 목숨값! 넌 뭐 할래?",
 			"effects": [
 				{
 					"type": "flag_set",
@@ -27,14 +27,14 @@
 					"next": "fight"
 				},
 				{
-					"text": "대화를 끝낸다",
+					"text": "그만 간다",
 					"next": ""
 				}
 			]
 		},
 		"again": {
 			"speaker": "arena_master_gus",
-			"text": "돌아왔군! 오늘 대진표가 끝내준다!",
+			"text": "또 왔네! 오늘 대진 끝내준다!",
 			"choices": [
 				{
 					"text": "[전력 20셀] 판돈을 건다",
@@ -51,14 +51,14 @@
 					"next": "fight"
 				},
 				{
-					"text": "대화를 끝낸다",
+					"text": "그만 간다",
 					"next": ""
 				}
 			]
 		},
 		"again_raiders": {
 			"speaker": "arena_master_gus",
-			"text": "약탈자 천지라 도전자도 천지야! 오늘은 판돈 두 배! 크랭크 형님도 보러 오신대!",
+			"text": "약탈자 천지라 도전자도 천지야! 오늘은 판돈 두 배!",
 			"choices": [
 				{
 					"text": "[전력 20셀] 판돈을 건다",
@@ -75,7 +75,7 @@
 					"next": "fight"
 				},
 				{
-					"text": "대화를 끝낸다",
+					"text": "그만 간다",
 					"next": ""
 				}
 			]
@@ -85,7 +85,7 @@
 			"text": "누구한테 걸래? 외팔이 벤, 아니면 불곰 도라?",
 			"choices": [
 				{
-					"text": "선수들 움직임을 보고 고른다",
+					"text": "선수들을 보고 고른다",
 					"check": {
 						"stat": "focus",
 						"dc": 13
@@ -103,27 +103,27 @@
 		},
 		"bet_win": {
 			"speaker": "arena_master_gus",
-			"text": "맞혔어! 눈이 좋네! 판돈 두 배 반! 다음에도 와!",
+			"text": "맞혔다! 눈 좋네! 두 배 반이다!",
 			"choices": [
 				{
-					"text": "대화를 끝낸다",
+					"text": "그만 간다",
 					"next": ""
 				}
 			]
 		},
 		"bet_lose": {
 			"speaker": "arena_master_gus",
-			"text": "아이고! 판돈은 투기장이 잘 먹겠다! 다음 판이 기다린다!",
+			"text": "아이고! 판돈은 잘 먹을게!",
 			"choices": [
 				{
-					"text": "대화를 끝낸다",
+					"text": "그만 간다",
 					"next": ""
 				}
 			]
 		},
 		"fight": {
 			"speaker": "arena_master_gus",
-			"text": "진짜로? 좋아! 약탈자 넷이랑 붙는다. 살아서 나가면 전리품은 네 거, 스크랩야드는 네 이름을 외치지!",
+			"text": "진짜? 좋아! 약탈자 넷이랑 붙는다. 살아 나가면 전리품은 네 거야!",
 			"choices": [
 				{
 					"text": "링에 오른다",

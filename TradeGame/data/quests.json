@@ -3,7 +3,7 @@
 		"id": "beck_first_job",
 		"giver": "aurel_beck",
 		"title": "전력청의 첫 의뢰",
-		"summary": "생식량 10개를 헬리오스 전력청에 넘긴다. 그린하우스에서 싸게 살 수 있다.",
+		"summary": "생식량 10개를 헬리오스 전력청에. 그린하우스가 싸다.",
 		"objective": {
 			"type": "deliver",
 			"good": "raw_food",
@@ -31,7 +31,7 @@
 		"id": "nova_first_job",
 		"giver": "nova",
 		"title": "첫 번째 신호",
-		"summary": "저급 칩 6개를 언더그리드 작전실에 넘긴다. 러스트벨 고물 장터에 흔하다.",
+		"summary": "저급 칩 6개를 언더그리드 작전실에. 러스트벨에 흔하다.",
 		"objective": {
 			"type": "deliver",
 			"good": "chip_low",
@@ -59,7 +59,7 @@
 		"id": "soha_first_job",
 		"giver": "soha",
 		"title": "성벽 안의 곳간",
-		"summary": "헬리오스 배급 시장에서 식량 재고가 얼마나 남았는지 알아 온다.",
+		"summary": "헬리오스 배급 시장의 식량 재고를 알아 온다.",
 		"objective": {
 			"type": "flag",
 			"flag": "counted_helios_granary"
@@ -85,7 +85,7 @@
 		"id": "gale_first_job",
 		"giver": "gale",
 		"title": "조합의 견본",
-		"summary": "조합이 맡긴 고물 전자부품 8개를 스왑밋 대시장의 상인 아다에게 넘긴다.",
+		"summary": "고물 전자부품 8개를 스왑밋의 아다에게.",
 		"objective": {
 			"type": "deliver",
 			"good": "scrap_electronics",
@@ -118,7 +118,7 @@
 		"id": "crank_first_job",
 		"giver": "crank",
 		"title": "요새의 탄창",
-		"summary": "탄약 8개를 스크랩야드 크랭크의 요새에 넘긴다. 레드 메사 탄약이 싸다.",
+		"summary": "탄약 8개를 크랭크의 요새에. 레드 메사가 싸다.",
 		"objective": {
 			"type": "deliver",
 			"good": "ammo",
@@ -151,7 +151,7 @@
 		"id": "meter_first_job",
 		"giver": "meter",
 		"title": "죽은 기계의 심장",
-		"summary": "스크랩야드 전쟁 기계 무덤에서 전쟁 기계의 발전로가 어떤 상태인지 보고 온다.",
+		"summary": "전쟁 기계 무덤에서 발전로 상태를 보고 온다.",
 		"objective": {
 			"type": "flag",
 			"flag": "inspected_dead_reactor"
@@ -172,7 +172,7 @@
 		"id": "voss_first_job",
 		"giver": "commander_voss",
 		"title": "전초기지 탄약 보급",
-		"summary": "탄약 10개를 게이트 7 지휘소에 넘긴다. 끝내면 인가 상인으로 등록된다.",
+		"summary": "탄약 10개를 게이트 7 지휘소에. 끝내면 인가 상인이 된다.",
 		"objective": {
 			"type": "deliver",
 			"good": "ammo",
@@ -204,7 +204,7 @@
 		"id": "tarr_first_job",
 		"giver": "elder_tarr",
 		"title": "절벽의 물",
-		"summary": "정수된 물 10개를 레드 메사 절벽 저수조의 물지기 웬에게 넘긴다.",
+		"summary": "정수된 물 10개를 레드 메사의 물지기 웬에게.",
 		"objective": {
 			"type": "deliver",
 			"good": "water",

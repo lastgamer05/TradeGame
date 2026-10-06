@@ -32,8 +32,11 @@
 		"max_stat": 5
 	},
 	"events": {
-		"travel_chance": 0.6,
-		"city_chance": 0.5
+		"travel_chance": 0.65,
+		"city_chance": 0.3,
+		"location_chance": 0.3,
+		"location_events_per_stay": 1,
+		"cooldown_days": 10
 	},
 	"reputation": {
 		"trade_cells_per_point": 100,

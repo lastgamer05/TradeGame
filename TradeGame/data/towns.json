@@ -1,0 +1,146 @@
+[
+	{
+		"id": "helios",
+		"gate": 95,
+		"ground": 334,
+		"npc_offset": 34,
+		"doors": {
+			"helios_market": 280,
+			"helios_plaza": 450,
+			"helios_hq": 628,
+			"helios_outskirts": 796
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "gate7",
+		"gate": 120,
+		"ground": 336,
+		"npc_offset": 34,
+		"doors": {
+			"gate7_market": 280,
+			"gate7_garage": 430,
+			"gate7_canteen": 600,
+			"gate7_command": 740
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "undergrid",
+		"gate": 90,
+		"ground": 334,
+		"npc_offset": 34,
+		"doors": {
+			"undergrid_market": 250,
+			"undergrid_ops": 435,
+			"undergrid_den": 580,
+			"undergrid_factory": 750
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "red_mesa",
+		"gate": 90,
+		"ground": 332,
+		"npc_offset": 34,
+		"doors": {
+			"red_mesa_market": 240,
+			"red_mesa_camp": 390,
+			"red_mesa_cistern": 580,
+			"red_mesa_hall": 755
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "rustbelt",
+		"gate": 70,
+		"ground": 340,
+		"npc_offset": 34,
+		"doors": {
+			"rustbelt_market": 230,
+			"rustbelt_guild": 400,
+			"rustbelt_shanty": 570,
+			"rustbelt_crane": 760
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "greenhouse",
+		"gate": 70,
+		"ground": 326,
+		"npc_offset": 34,
+		"doors": {
+			"greenhouse_market": 280,
+			"greenhouse_elder": 470,
+			"greenhouse_tower": 630,
+			"greenhouse_bunk": 745
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "swapmeet",
+		"gate": 70,
+		"ground": 333,
+		"npc_offset": 34,
+		"doors": {
+			"swapmeet_bazaar": 250,
+			"swapmeet_booth": 395,
+			"swapmeet_inn": 565,
+			"swapmeet_auction": 730
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	},
+	{
+		"id": "scrapyard",
+		"gate": 65,
+		"ground": 330,
+		"npc_offset": 34,
+		"doors": {
+			"scrapyard_market": 230,
+			"scrapyard_fort": 410,
+			"scrapyard_arena": 615,
+			"scrapyard_graveyard": 770
+		},
+		"folk": [
+			"porter",
+			"old_woman",
+			"kid",
+			"worker"
+		]
+	}
+]

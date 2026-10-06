@@ -18,6 +18,8 @@ var npcs: Dictionary = {}
 var companions: Dictionary = {}
 var quests: Dictionary = {}
 var dialogues: Dictionary = {}
+## 도시 id -> 거리 배치 { id, gate, ground, npc_offset, doors: { 구역 id: x }, folk: [...] }
+var towns: Dictionary = {}
 ## 도시 간 도로. { a, b, road, days }
 var routes: Array = []
 ## 도시 id -> Vector2 (0~100 지도 좌표)
@@ -49,6 +51,7 @@ func load_all() -> void:
 	npcs = _index(_read_json(DATA_DIR + "/npcs.json"), "npcs")
 	companions = _index(_read_json(DATA_DIR + "/companions.json"), "companions")
 	quests = _index(_read_json(DATA_DIR + "/quests.json"), "quests")
+	towns = _index(_read_json(DATA_DIR + "/towns.json"), "towns")
 	dialogues = {}
 	for file in DirAccess.get_files_at(DIALOGUES_DIR):
 		if not file.ends_with(".json"):
@@ -142,6 +145,13 @@ func validate() -> void:
 
 ## 구역, NPC, 동료, 의뢰, 대화 (docs/city_spec.md 2절).
 func _validate_city_content() -> void:
+	for t in towns.values():
+		var where: String = "towns/" + t.id
+		_check_ref(where, "id", t.id, cities)
+		for loc_id in t.get("doors", {}):
+			_check_ref(where, "doors", loc_id, locations)
+			if locations.get(loc_id, {}).get("city", t.id) != t.id:
+				errors.append("%s: 구역 '%s'은 이 도시에 없다" % [where, loc_id])
 	var markets := {}
 	for loc in locations.values():
 		var where: String = "locations/" + loc.id

@@ -1,0 +1,70 @@
+{
+	"id": "gas_station_raid",
+	"title": "폐주유소의 손님",
+	"trigger": {
+		"on": "travel",
+		"road_types": [
+			"wasteland"
+		],
+		"requires": [],
+		"weight": 8,
+		"cooldown_days": 4
+	},
+	"text": "폐주유소에서 배터리를 식히는데 오토바이 소리가 다가온다. 약탈자 정찰대다. 아직 이쪽을 못 봤다.",
+	"choices": [
+		{
+			"id": "strike",
+			"text": "먼저 친다",
+			"outcomes": {
+				"success": {
+					"text": "주유기 뒤에 자리를 잡고 첫 발을 쏜다.",
+					"effects": [
+						{
+							"type": "start_combat",
+							"encounter": "raider_scouts"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "hide",
+			"text": "차를 숨기고 기다린다",
+			"check": {
+				"stat": "survival",
+				"dc": 13
+			},
+			"outcomes": {
+				"success": {
+					"text": "정찰대가 주유소를 한 바퀴 돌고 그냥 지나간다.",
+					"effects": []
+				},
+				"failure": {
+					"text": "누군가 바큇자국을 발견하고 휘파람을 분다.",
+					"effects": [
+						{
+							"type": "start_combat",
+							"encounter": "raider_scouts"
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": "pay",
+			"text": "셀을 던져 주고 보낸다",
+			"cost": [
+				{
+					"type": "power",
+					"amount": 15
+				}
+			],
+			"outcomes": {
+				"success": {
+					"text": "정찰대가 셀을 주워 들고 낄낄대며 떠난다.",
+					"effects": []
+				}
+			}
+		}
+	]
+}

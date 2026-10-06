@@ -6,13 +6,15 @@
 
 ```
 큰 지도(WorldMapScreen) --이동--> 이동 이벤트 --> 도시 도착 장면(CityArrival)
-  --> 도착 대화/이벤트 --> 도시 허브(CityHub): 구역 4곳 + 도시 입구
+  --> 도착 대화/이벤트 --> 도시 거리(TownView): 옆에서 본 거리를 걸어 다닌다
+      왼쪽 끝 도시 입구, 구역 입구 4곳, 입구마다 그 구역 NPC가 서 있다 (다가가서 E: 들어가기·말 걸기)
   구역(LocationView): 배경, NPC와 대화, 서비스(거래·정비·소문), 구역 랜덤 이벤트
   도시 입구 --> 큰 지도(전체 화면)로 다음 목적지 선택
 ```
 
 - 모든 도시에는 거래 구역(`kind: "market"`)이 반드시 하나 있다. 기존 시장 표(사고팔기)가 여기로 옮겨 간다.
-- 구역에 들어갈 때마다 확률로 그 구역 이벤트가 뜬다. 정세 사건과 진영 점유율에 따라 뜨는 이벤트가 달라진다.
+- 구역에 처음 들어갈 때 확률로 그 구역 이벤트가 뜬다. 정세 사건과 진영 점유율에 따라 뜨는 이벤트가 달라진다.
+- 반복 줄이기 (`economy.json`의 `events`): 한 도시에 머무는 동안 구역 이벤트는 `location_events_per_stay`번까지, 같은 구역에 다시 들어가면 뜨지 않는다. 한 번 뜬 이벤트는 `cooldown_days`일 동안 다시 뜨지 않고, `trigger.once`가 참이면 다시는 안 뜬다.
 - 구역마다 NPC가 1명 있다. 대화할 수 있고, 일부는 동료로 영입하거나 의뢰(퀘스트)를 준다.
 - 도시에 처음 도착하면 도착 대화 `data/dialogues/arrival_<도시 id>.json`(그 도시 소개)이 나오고, 이후 도착에는 도착 이벤트가 확률로 뜬다. 화면 담당은 `state.visited_cities`로 첫 방문을 판단하고 도착 장면이 끝날 때 기록한다.
 - 하루 규칙: 구역 이동은 시간을 쓰지 않는다. 도시를 떠날 때만 날이 흐른다 (이동 일수만큼).
@@ -31,6 +33,18 @@
 - `kind`: market, hq, workshop, tavern, slum, plaza, special 중 하나.
 - `services`: `trade`(시장 표), `repair`(정비), `rumors`(소문 듣기), `recruit`(용병 고용) 중 0개 이상.
 - 배경 그림: `res://assets/art/locations/<location id>.png` (640x360). 없으면 도시 배경을 쓴다.
+
+### 2.1.1 `data/towns.json` (도시 거리 배치)
+
+```json
+{ "id": "helios", "gate": 95, "ground": 334, "npc_offset": 34,
+  "doors": { "helios_market": 280, "helios_plaza": 450, "helios_hq": 628, "helios_outskirts": 796 },
+  "folk": ["porter", "old_woman", "kid", "worker"] }
+```
+
+- 좌표는 거리 그림의 원래 픽셀. `gate`: 도시 입구 x, `ground`: 발이 닿는 y, `doors`: 구역 입구 x, `npc_offset`: NPC가 입구에서 떨어져 서는 거리.
+- 거리 그림: `res://assets/art/towns/<도시 id>.png` (높이 360, 폭 약 850. 없으면 도시 배경을 쓴다).
+- 인물: 주인공 걷기 `assets/town/player_0~3.png`, NPC `assets/town/npcs/<npc id>.png`, 행인 `assets/town/folk/<이름>.png` (키 약 48). 원본과 변환은 `art_src/build_town_art.py`.
 
 ### 2.2 `data/npcs.json` (명단은 3절, 이미 작성됨)
 
@@ -193,7 +207,7 @@ signal finished
 func start(state: GameState, dialogue_id: String) -> void   # 전체 화면 위에 떠서 대화를 진행, 끝나면 finished
 
 # scripts/core/game_state.gd  (엔진 담당이 추가)
-var location: String = ""           # 지금 있는 구역, 도시 허브면 ""
+var location: String = ""           # 지금 있는 구역, 도시 거리면 ""
 var companion: String = ""          # 태운 동료 id
 var trust: Dictionary = {}          # 동료 id -> 신뢰
 var quests: Dictionary = {}         # 의뢰 id -> "active" | "done"
@@ -210,7 +224,7 @@ func quest_ready(quest_id: String) -> bool
 | 담당 | 파일 |
 | --- | --- |
 | 엔진 (대화·의뢰·동료·이벤트 확장) | `scripts/core/*`, `scripts/autoload/game_data.gd`, `scripts/ui/dialogue_view.gd`, `data/companions.json`, `tests/run_tests.gd` |
-| 화면 (도착·허브·구역·큰 지도) | `scripts/ui/*` (dialogue_view.gd 제외), `scenes/*`, `tests/screenshot.gd` |
+| 화면 (도착·거리·구역·큰 지도) | `scripts/ui/*` (dialogue_view.gd 제외), `scenes/*`, `tests/screenshot.gd` |
 | 이야기 (대화·이벤트·의뢰 내용) | `data/dialogues/*`, `data/events/*`, `data/quests.json`, `data/npcs.json`과 `data/locations.json`의 설명·대사 필드, `docs/story.md` |
 | 그림 (구역 배경·초상화) | `assets/art/locations/*`, `assets/portraits/*`, `art_src/*`, `assets/CREDITS.md` |
 
