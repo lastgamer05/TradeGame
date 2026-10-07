@@ -31,6 +31,7 @@
   "/c/Users/USER/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe" --headless --path "D:/github_repo/TradeGame/TradeGame" --script res://tests/run_tests.gd
   ```
 
+- 창 비율은 16:9 고정(`window/stretch/aspect="keep"`)이다. 넓은 창에서는 양옆이 검은 띠가 된다 (expand면 그림 밖 회색이 보였다).
 - 화면 확인: `--headless` 없이 `--script res://tests/screenshot.gd -- <저장경로.png>`로 메인 화면 스크린샷을 저장한다.
 - 배포: `main`에 push하면 `.github/workflows/deploy-web.yml`이 웹 빌드를 만들어 GitHub Pages(https://lastgamer05.github.io/TradeGame/)에 올린다.
 - 새 `class_name`을 추가한 뒤에는 같은 명령에 `--import`를 붙여 한 번 돌려 클래스 캐시를 갱신한다.
@@ -53,6 +54,7 @@
 - `scripts/ui/cutscene_view.gd`, `data/cutscenes/*.json`: 컷신. 샷마다 그림(`assets/art/cutscenes/`, 768x432)을 천천히 훑고(from→to, 정수 픽셀 팬), 위아래 검은 띠 사이 자막을 타자기처럼 찍는다. 선택지(효과 적용), 제목 샷, 플래시를 지원한다. Space 다음, Esc 건너뛰기. 원본 변환은 `art_src/build_cutscene_art.py`. 대화창(`dialogue_view.gd`)도 대사를 타자기처럼 찍고 다 찍힌 뒤 선택지를 보인다.
 - `scripts/core/dialogue_runner.gd`, `scripts/ui/dialogue_view.gd`: 대화 진행과 대화창. 데이터는 `data/dialogues/`, `data/npcs.json`, `data/locations.json`, `data/quests.json`, `data/companions.json`.
 - `data/routes.json`: 임시 지도 (도시 좌표, 도로). 월드맵 초안이 정해지면 교체한다.
+- `tools/text_sheet.py`: 게임 글 전체를 엑셀 시트로 뽑고(`export`), "고칠 문장" 칸을 채운 줄만 데이터에 되돌려 넣는다(`import`, JSON 서식 유지). 사용자가 대사를 직접 고칠 때 쓴다.
 - `tests/run_tests.gd`: 헤드리스 테스트 실행기. 데이터를 고치면 테스트를 돌려 검증 오류가 없는지 확인한다.
 
 ## 데이터 규칙
