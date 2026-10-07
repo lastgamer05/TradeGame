@@ -792,7 +792,7 @@ func test_guide() -> void:
 	var data := _load_data()
 	if data == null:
 		return
-	_expect(data.guide.size() >= 5 and data.dialogues.has("prologue"), "안내 단계와 프롤로그 데이터")
+	_expect(data.guide.size() >= 5 and data.cutscenes.has("prologue"), "안내 단계와 프롤로그 컷신 데이터")
 	var s := GameState.new(data, 33)
 	s.update_guide()
 	_expect(s.pending_notices.is_empty(), "도시에 들어서기 전엔 안내 없음")

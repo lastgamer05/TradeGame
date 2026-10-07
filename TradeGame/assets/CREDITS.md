@@ -10,6 +10,7 @@ All art was generated in a modern clean pixel style (Eastward / Sea of Stars loo
 - `icons/goods/*.png`, `icons/ui/*.png`: cut from one 5x5 icon sheet, 18x18.
 - `art/towns/*.png`: 8 side-view town streets for walking (height 360, about 850 wide, 64 colors), cut from a horizontal band of 1536x864 originals in `art_src/modern/towns/`.
 - `town/npcs/*.png`: 32 full-body NPC sprites (about 48px tall, 24 colors, 1px outline) from four 4x2 magenta sheets in `art_src/modern/town_sprites/` (same order as the portrait sheets, portraits used as references). `town/player_0~3.png`: courier walk cycle, `town/folk/*.png`: 4 passers-by (`town_sprites/player.png`). Rebuild with `python art_src/build_town_art.py`.
+- `art/cutscenes/*.png`: 6 prologue cutscene illustrations (768x432, 64 colors, a little larger than the screen so cutscenes can pan). Originals in `art_src/modern/cutscenes/`, rebuild with `python art_src/build_cutscene_art.py`.
 - `combat/units/*.png`: 8 unit sprites (about 34px tall), `combat/props/*.png`: 16 props and the truck, `combat/ground/*.png`: 5 battlefield grounds (640x360).
 - Originals and sheets: `art_src/modern/` and `art_src/combat/modern/`. Sheets are cut with `art_src/slice_sheet.py`.
 

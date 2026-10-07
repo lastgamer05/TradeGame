@@ -49,7 +49,8 @@
 - `scripts/ui/main.gd`: 화면 흐름 제어 (큰 지도 → 도착 → 도시 거리 → 구역, 모달 대기열: 정세 알림·동료 알림·전투·대화·이벤트). 화면별 스크립트는 `world_map_screen.gd`, `arrival_view.gd`, `town_view.gd`, `location_view.gd`, `market_panel.gd`, 공용 도우미는 `ui_kit.gd`. UI는 코드로 만든다.
 - `scripts/ui/town_view.gd`, `data/towns.json`: 도시 거리. 옆에서 본 거리(640x360 SubViewport, 2배)를 주인공이 ←→/클릭으로 걷고, 구역 입구와 그 앞 NPC에 다가가 E로 들어가거나 말을 건다. Tab은 도시 정보. 그림은 `assets/art/towns/`, `assets/town/`, 원본 변환은 `art_src/build_town_art.py`.
 - `scripts/ui/dice_roll_view.gd`: 능력치 판정 연출. 이벤트·대화에서 판정이 있는 선택지를 고르면 난이도와 보정치, 성공 확률을 보여 주고 d20이 굴러가다 멈춘 뒤 합계와 성공·실패를 띄운다. 판정 값은 `EventRunner.roll_check`가 미리 정하고, 연출은 보여 주기만 한다.
-- `data/guide.json`, `GameState.update_guide()`: 초반 안내 목표 단계. 조건(`done`)을 채우면 다음 목표를 알림 창으로 띄우고, 윗줄 아래에 지금 목표를 쓴다. `target`(구역 id 또는 "gate")이 있으면 거리에서 그 입구 위에 ▼를 띄운다. 새 게임은 프롤로그 대화(`data/dialogues/prologue.json`)로 시작한다.
+- `data/guide.json`, `GameState.update_guide()`: 초반 안내 목표 단계. 조건(`done`)을 채우면 다음 목표를 알림 창으로 띄우고, 윗줄 아래에 지금 목표를 쓴다. `target`(구역 id 또는 "gate")이 있으면 거리에서 그 입구 위에 ▼를 띄운다. 새 게임은 프롤로그 컷신으로 시작한다.
+- `scripts/ui/cutscene_view.gd`, `data/cutscenes/*.json`: 컷신. 샷마다 그림(`assets/art/cutscenes/`, 768x432)을 천천히 훑고(from→to, 정수 픽셀 팬), 위아래 검은 띠 사이 자막을 타자기처럼 찍는다. 선택지(효과 적용), 제목 샷, 플래시를 지원한다. Space 다음, Esc 건너뛰기. 원본 변환은 `art_src/build_cutscene_art.py`. 대화창(`dialogue_view.gd`)도 대사를 타자기처럼 찍고 다 찍힌 뒤 선택지를 보인다.
 - `scripts/core/dialogue_runner.gd`, `scripts/ui/dialogue_view.gd`: 대화 진행과 대화창. 데이터는 `data/dialogues/`, `data/npcs.json`, `data/locations.json`, `data/quests.json`, `data/companions.json`.
 - `data/routes.json`: 임시 지도 (도시 좌표, 도로). 월드맵 초안이 정해지면 교체한다.
 - `tests/run_tests.gd`: 헤드리스 테스트 실행기. 데이터를 고치면 테스트를 돌려 검증 오류가 없는지 확인한다.

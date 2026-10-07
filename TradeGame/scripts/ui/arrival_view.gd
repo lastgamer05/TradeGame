@@ -42,3 +42,12 @@ func build(state: GameState) -> void:
 	var go := Kit.button("도시로 들어간다", true, func(): enter.emit())
 	go.custom_minimum_size = Vector2(288, 48)
 	bottom.add_child(go)
+
+	# 등장 연출: 이름 띠가 위에서 내려오며 나타나고, 버튼은 조금 늦게 뜬다.
+	banner.modulate.a = 0.0
+	go.modulate.a = 0.0
+	top.offset_top = 0
+	var tw := create_tween().set_parallel()
+	tw.tween_property(top, "offset_top", 36, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(banner, "modulate:a", 1.0, 0.7)
+	tw.tween_property(go, "modulate:a", 1.0, 0.5).set_delay(0.6)

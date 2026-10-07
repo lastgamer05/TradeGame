@@ -11,6 +11,7 @@ extends SceneTree
 ##   dialogue:<npc id>   그 NPC의 구역에서 대화를 연 모습
 ##   battle:<조우 id>    전투 화면
 ##   dice[:ready|roll|done]  판정 주사위 연출 (기본 done)
+##   cutscene:<id>[:샷 번호]  컷신 (그 샷의 마지막 줄까지 찍힌 모습)
 ##   <이벤트 id>         그 이벤트 창
 
 
@@ -79,6 +80,27 @@ func _initialize() -> void:
 		main._open_location(loc)
 		_clear_popups(main)
 		main._on_talk(arg)
+	elif mode.begins_with("cutscene:"):
+		var cs: Control = load("res://scripts/ui/cutscene_view.gd").new()
+		main.add_child(cs)
+		cs.play(s, arg)
+		var shot := int(mode.get_slice(":", 2)) if mode.get_slice_count(":") > 2 else 0
+		for i in 60:
+			await process_frame
+		if shot > 0:
+			cs._shot = shot - 1
+			cs._next_shot()
+			for i in 90:
+				await process_frame
+		# 마지막 줄까지 찍힌 모습
+		while cs._line + 1 < cs._shot_data().get("lines", []).size():
+			cs._typing = false
+			cs._advance()
+		for i in 240:
+			await process_frame
+		if not cs._shot_data().get("choices", []).is_empty():
+			cs._end_of_shot()
+			await process_frame
 	elif mode.begins_with("dice"):
 		main._enter_city()
 		var dice: Control = load("res://scripts/ui/dice_roll_view.gd").new()

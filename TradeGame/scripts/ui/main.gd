@@ -12,6 +12,7 @@ const ArrivalView := preload("res://scripts/ui/arrival_view.gd")
 const TownView := preload("res://scripts/ui/town_view.gd")
 const LocationView := preload("res://scripts/ui/location_view.gd")
 const DiceRollView := preload("res://scripts/ui/dice_roll_view.gd")
+const CutsceneView := preload("res://scripts/ui/cutscene_view.gd")
 
 const CITY_ART := "res://assets/art/cities/%s.png"
 const LOCATION_ART := "res://assets/art/locations/%s.png"
@@ -73,8 +74,8 @@ func _new_game() -> void:
 	screen = "arrival"
 	_add_log("%s에서 출발한다. 전력 %s, 짐칸 %d칸." % [Kit.city_name(state.city), Kit.fmt_power(state.power), state.cargo_capacity])
 	# 프롤로그(세계와 주인공) 뒤 시작 도시 안에서 시작한다: 짐칸이 빈 채로 큰 지도부터 보면 할 일이 없다.
-	if GameData.dialogues.has("prologue"):
-		_then.append(_open_dialogue.bind("prologue"))
+	if GameData.cutscenes.has("prologue"):
+		_then.append(_play_cutscene.bind("prologue"))
 	_then.append(_show_arrival.bind(false))
 	_refresh()
 	_show_character_creation()
@@ -306,6 +307,17 @@ func _on_choice(ev: Dictionary, ch: Dictionary) -> void:
 		_modal_text("· " + line, PixelTheme.TEXT_DIM)
 		_add_log("  " + line)
 	_modal.add_child(Kit.button("계속", true, _close_modal))
+
+
+## 컷신을 띄운다. 끝나면 밀린 일을 이어 간다 (대화처럼 _dialogue_view 자리를 쓴다).
+func _play_cutscene(cutscene_id: String) -> void:
+	var cs := CutsceneView.new()
+	add_child(cs)
+	_dialogue_view = cs
+	cs.finished.connect(func():
+		state.flags["seen_" + cutscene_id] = true
+		_on_dialogue_finished())
+	cs.play(state, cutscene_id)
 
 
 ## 판정 주사위 연출을 띄우고 끝날 때까지 기다린다.

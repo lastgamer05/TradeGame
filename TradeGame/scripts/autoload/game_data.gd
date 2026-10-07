@@ -4,6 +4,7 @@ extends Node
 const DATA_DIR := "res://data"
 const EVENTS_DIR := "res://data/events"
 const DIALOGUES_DIR := "res://data/dialogues"
+const CUTSCENES_DIR := "res://data/cutscenes"
 
 var factions: Dictionary = {}
 var goods: Dictionary = {}
@@ -18,6 +19,8 @@ var npcs: Dictionary = {}
 var companions: Dictionary = {}
 var quests: Dictionary = {}
 var dialogues: Dictionary = {}
+## 컷신 id -> { id, shots } (data/cutscenes/*.json)
+var cutscenes: Dictionary = {}
 ## 초반 안내 목표 단계 (data/guide.json). [{ id, title, where, hint, done: [요구 조건] }]
 var guide: Array = []
 ## 도시 id -> 거리 배치 { id, gate, ground, npc_offset, doors: { 구역 id: x }, folk: [...] }
@@ -54,6 +57,12 @@ func load_all() -> void:
 	companions = _index(_read_json(DATA_DIR + "/companions.json"), "companions")
 	quests = _index(_read_json(DATA_DIR + "/quests.json"), "quests")
 	towns = _index(_read_json(DATA_DIR + "/towns.json"), "towns")
+	cutscenes = {}
+	for file in DirAccess.get_files_at(CUTSCENES_DIR):
+		if file.ends_with(".json"):
+			var cs = _read_json(CUTSCENES_DIR + "/" + file)
+			if cs is Dictionary and cs.has("id"):
+				cutscenes[cs.id] = cs
 	var g = _read_json(DATA_DIR + "/guide.json")
 	guide = g.get("steps", []) if g is Dictionary else []
 	dialogues = {}
@@ -149,6 +158,15 @@ func validate() -> void:
 
 ## 구역, NPC, 동료, 의뢰, 대화 (docs/city_spec.md 2절).
 func _validate_city_content() -> void:
+	for cs in cutscenes.values():
+		for i in cs.get("shots", []).size():
+			var shot: Dictionary = cs.shots[i]
+			var where := "cutscenes/%s/%d" % [cs.id, i]
+			if not ResourceLoader.exists("res://assets/art/cutscenes/%s.png" % shot.get("image", "")):
+				errors.append("%s: 그림이 없다 '%s'" % [where, shot.get("image", "")])
+			for ch in shot.get("choices", []):
+				for eff in ch.get("effects", []):
+					_validate_effect(where, eff)
 	for step in guide:
 		for r in step.get("done", []):
 			_validate_requirement("guide/" + str(step.get("id")), r)

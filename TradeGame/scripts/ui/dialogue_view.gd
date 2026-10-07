@@ -1,6 +1,7 @@
 extends Control
 ## 대화 창 (docs/city_spec.md 4절). 전체 화면 위에 떠서 대화를 진행하고, 끝나면 finished를 내고 사라진다.
 ## 화면 담당은 start()와 finished만 쓴다. 숫자 키 1~9로 선택지, Enter/Space로 "계속".
+## 대사는 타자기처럼 한 글자씩 찍히고, 다 찍힌 뒤 선택지가 나온다. 찍히는 중에 누르면 바로 다 보인다.
 ## 대화 중 생긴 start_combat 등은 state에 남으므로 finished 뒤에 화면이 처리한다.
 
 signal finished
@@ -22,6 +23,9 @@ var _choice_box: VBoxContainer
 ## 지금 눌 수 있는 버튼 (키보드 선택용)
 var _buttons: Array = []
 var _done := false
+const CHARS_PER_SEC := 40.0
+var _typing := false
+var _chars := 0.0
 
 
 func start(state: GameState, dialogue_id: String) -> void:
@@ -42,7 +46,7 @@ func _build() -> void:
 	var dim := ColorRect.new()
 	dim.color = Color(0.02, 0.02, 0.04, 0.55)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	dim.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(dim)
 
 	var panel := PanelContainer.new()
@@ -102,6 +106,10 @@ func _show_node(lines: Array = []) -> void:
 	var cur := _runner.current()
 	_set_speaker(cur.speaker, cur.speaker_name)
 	_text_label.text = cur.text
+	_text_label.visible_characters = 0
+	_chars = 0.0
+	_typing = true
+	_choice_box.visible = false
 	var narrator: bool = cur.speaker == "narrator"
 	_text_label.add_theme_color_override("font_color", PixelTheme.TEXT_DIM if narrator else PixelTheme.TEXT)
 	for line in lines:
@@ -149,6 +157,27 @@ func _on_choice(index: int) -> void:
 	for line in r.effect_lines:
 		_result_line(line, PixelTheme.ACCENT)
 	_add_button("계속", true, "", _show_node)
+
+
+func _process(delta: float) -> void:
+	if not _typing:
+		return
+	_chars += delta * CHARS_PER_SEC
+	_text_label.visible_characters = int(_chars)
+	if _chars >= _text_label.text.length():
+		_finish_typing()
+
+
+func _finish_typing() -> void:
+	_typing = false
+	_text_label.visible_characters = -1
+	_choice_box.visible = true
+
+
+func _gui_input(event: InputEvent) -> void:
+	if _typing and event is InputEventMouseButton and event.pressed:
+		accept_event()
+		_finish_typing()
 
 
 func _set_speaker(speaker: String, speaker_name: String) -> void:
@@ -205,6 +234,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if _done or not event is InputEventKey or not event.pressed or event.echo:
 		return
 	var key: int = event.keycode
+	if _typing and (key in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] or (key >= KEY_1 and key <= KEY_9)):
+		get_viewport().set_input_as_handled()
+		_finish_typing()
+		return
 	var index := -1
 	if key >= KEY_1 and key <= KEY_9:
 		index = key - KEY_1
