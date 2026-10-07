@@ -55,6 +55,9 @@ var event_last_day: Dictionary = {}
 ## 이번에 도시에 머무는 동안 구역 id -> 들어간 횟수, 띄운 구역 이벤트 수. 도시를 떠나면 비운다.
 var stay_visits: Dictionary = {}
 var stay_location_events: int = 0
+## 초반 안내 (data/guide.json): 지금 목표 단계, 첫 목표를 알렸는지
+var guide_step: int = 0
+var guide_announced: bool = false
 ## 주인공 이름 (대화의 {player})
 var player_name: String = "운반꾼"
 ## 도시 id -> 평판으로 바뀌기 전 누적된 거래 실적
@@ -81,6 +84,35 @@ func _init(game_data, seed_value: int = -1) -> void:
 		stats[s] = int(data.economy.character.base_stat)
 	for id in data.cities:
 		reputation[id] = 0
+
+
+## 지금 목표. 다 끝냈으면 {}.
+func current_goal() -> Dictionary:
+	var steps: Array = data.guide
+	return steps[guide_step] if guide_step < steps.size() else {}
+
+
+## 목표를 채웠는지 보고 다음 단계로 넘긴다. 알릴 내용은 pending_notices에 { type: "guide" }로 쌓는다.
+## 첫 목표는 도시에 처음 들어선 뒤(visited_cities가 생긴 뒤)에 알린다.
+func update_guide() -> void:
+	var steps: Array = data.guide
+	if steps.is_empty() or visited_cities.is_empty():
+		return
+	if not guide_announced:
+		guide_announced = true
+		var first: Dictionary = steps[0]
+		pending_notices.append({ "type": "guide", "title": "목표: " + first.title,
+			"text": "%s\n\n%s" % [first.where, first.hint] })
+	while guide_step < steps.size() and EventRunner.requirements_met(self, steps[guide_step].get("done", [])):
+		var done: Dictionary = steps[guide_step]
+		guide_step += 1
+		var text := "달성: %s" % done.title
+		var nxt := current_goal()
+		if nxt.is_empty():
+			text += "\n\n1막의 길은 여기까지다. 2막은 아직 쓰는 중이다. 교역은 계속할 수 있다."
+		else:
+			text += "\n\n다음 목표: %s\n%s\n\n%s" % [nxt.title, nxt.where, nxt.hint]
+		pending_notices.append({ "type": "guide", "title": "목표 달성", "text": text })
 
 
 func add_reputation(city_id: String, delta: int) -> void:

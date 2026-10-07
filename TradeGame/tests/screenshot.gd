@@ -10,6 +10,7 @@ extends SceneTree
 ##   location:<구역 id>  구역 화면 (거래 구역이면 시장 표)
 ##   dialogue:<npc id>   그 NPC의 구역에서 대화를 연 모습
 ##   battle:<조우 id>    전투 화면
+##   dice[:ready|roll|done]  판정 주사위 연출 (기본 done)
 ##   <이벤트 id>         그 이벤트 창
 
 
@@ -64,6 +65,7 @@ func _initialize() -> void:
 			main._town_pos[s.city] = float(mode.get_slice(":", 2))
 			main._town = null
 			main._refresh()
+			_clear_popups(main)
 	elif mode.begins_with("location:"):
 		s.city = gd.locations[arg].city
 		s.buy(s.market.goods_for_sale(s.city)[0], 3)
@@ -77,6 +79,20 @@ func _initialize() -> void:
 		main._open_location(loc)
 		_clear_popups(main)
 		main._on_talk(arg)
+	elif mode.begins_with("dice"):
+		main._enter_city()
+		var dice: Control = load("res://scripts/ui/dice_roll_view.gd").new()
+		main.add_child(dice)
+		dice.play({ "d20": 14, "stat_name": "교섭", "base": 2, "bonus": 2, "bonus_name": "이안",
+			"total": 18, "dc": 15, "success": true })
+		if arg != "ready":
+			dice._advance()
+			for i in 20:
+				await process_frame
+			if arg != "roll":
+				dice._advance()
+				for i in 20:
+					await process_frame
 	elif mode.begins_with("battle:"):
 		main._start_battle(arg)
 		await process_frame

@@ -18,6 +18,8 @@ var npcs: Dictionary = {}
 var companions: Dictionary = {}
 var quests: Dictionary = {}
 var dialogues: Dictionary = {}
+## 초반 안내 목표 단계 (data/guide.json). [{ id, title, where, hint, done: [요구 조건] }]
+var guide: Array = []
 ## 도시 id -> 거리 배치 { id, gate, ground, npc_offset, doors: { 구역 id: x }, folk: [...] }
 var towns: Dictionary = {}
 ## 도시 간 도로. { a, b, road, days }
@@ -52,6 +54,8 @@ func load_all() -> void:
 	companions = _index(_read_json(DATA_DIR + "/companions.json"), "companions")
 	quests = _index(_read_json(DATA_DIR + "/quests.json"), "quests")
 	towns = _index(_read_json(DATA_DIR + "/towns.json"), "towns")
+	var g = _read_json(DATA_DIR + "/guide.json")
+	guide = g.get("steps", []) if g is Dictionary else []
 	dialogues = {}
 	for file in DirAccess.get_files_at(DIALOGUES_DIR):
 		if not file.ends_with(".json"):
@@ -145,6 +149,9 @@ func validate() -> void:
 
 ## 구역, NPC, 동료, 의뢰, 대화 (docs/city_spec.md 2절).
 func _validate_city_content() -> void:
+	for step in guide:
+		for r in step.get("done", []):
+			_validate_requirement("guide/" + str(step.get("id")), r)
 	for t in towns.values():
 		var where: String = "towns/" + t.id
 		_check_ref(where, "id", t.id, cities)
@@ -378,8 +385,13 @@ func _validate_requirement(where: String, req: Dictionary) -> void:
 			_check_ref(where, "requires.quest", req.get("quest"), quests)
 			if t == "quest" and str(req.get("state", "active")) not in Defs.QUEST_STATES:
 				errors.append("%s: 알 수 없는 quest state '%s'" % [where, req.get("state")])
-		"day", "power", "animal":
+		"day", "power", "animal", "any_crisis":
 			pass
+		"city":
+			_check_ref(where, "requires.city", req.get("city"), cities)
+		"quest_count":
+			for q in req.get("quests", []):
+				_check_ref(where, "requires.quests", q, quests)
 		_:
 			errors.append("%s: 알 수 없는 requirement '%s'" % [where, t])
 			return

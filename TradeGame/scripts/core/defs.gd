@@ -20,6 +20,7 @@ const EVENT_TRIGGERS := ["travel", "city", "ruin", "arrival", "location"]
 const REQUIREMENT_TYPES := [
 	"cargo", "module", "reputation", "faction_reputation", "flag", "companion", "animal",
 	"crisis", "faction_share", "quest", "quest_ready", "day", "power",
+	"city", "quest_count", "any_crisis",
 ]
 
 ## quest 조건의 state. ready는 맡고 있고 목표를 채운 상태 (quest_ready 조건과 같다).

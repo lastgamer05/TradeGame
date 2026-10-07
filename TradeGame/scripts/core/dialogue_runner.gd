@@ -45,7 +45,7 @@ func current() -> Dictionary:
 
 
 ## current().choices의 index번째를 고른다. 막힌 선택지면 아무 일도 하지 않는다.
-## { roll_text, effect_lines, success }. effect_lines에는 다음 노드에 들어서며 생긴 효과도 들어간다.
+## { roll_text, roll, effect_lines, success } (roll은 판정이 없으면 {}). effect_lines에는 다음 노드에 들어서며 생긴 효과도 들어간다.
 func choose(index: int) -> Dictionary:
 	var visible := _visible_choices()
 	if is_finished():
@@ -63,8 +63,9 @@ func choose(index: int) -> Dictionary:
 	EventRunner.pay_cost(state, ch)
 	var success := true
 	var roll_text := ""
+	var roll := {}
 	if ch.has("check"):
-		var roll := EventRunner.roll_check(state, ch.check)
+		roll = EventRunner.roll_check(state, ch.check)
 		success = roll.success
 		roll_text = roll.text
 	var next: String = ch.get("next", "")
@@ -81,7 +82,7 @@ func choose(index: int) -> Dictionary:
 	else:
 		_enter(next)
 	lines.append_array(entry_lines)
-	return { "roll_text": roll_text, "effect_lines": lines, "success": success }
+	return { "roll_text": roll_text, "roll": roll, "effect_lines": lines, "success": success }
 
 
 func is_finished() -> bool:

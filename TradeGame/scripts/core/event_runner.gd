@@ -135,6 +135,22 @@ static func _requirement_met(state: GameState, r: Dictionary) -> bool:
 			return _in_range(state.day, r)
 		"power":
 			return _in_range(state.power, r)
+		"city":
+			return state.city == r.city
+		"quest_count":
+			# quests가 비면 모든 의뢰. state "done"이면 끝낸 것만, 아니면 받은 것(진행 중 + 끝냄)을 센다.
+			var ids: Array = r.get("quests", [])
+			if ids.is_empty():
+				ids = state.data.quests.keys()
+			var want_done := str(r.get("state", "started")) == "done"
+			var n := 0
+			for q in ids:
+				var st := state.quest_state(q)
+				if st == "done" or (not want_done and st == "active"):
+					n += 1
+			return n >= int(r.get("min", 1))
+		"any_crisis":
+			return state.politics.active.is_empty() != bool(r.get("active", true))
 	# 동물은 아직 없다.
 	return false
 
@@ -195,6 +211,12 @@ static func requirement_text(state: GameState, r: Dictionary) -> String:
 			return "날짜가 %s" % _range_text(r)
 		"power":
 			return "전력 %s" % _range_text(r)
+		"city":
+			return "%s에 있어야 한다" % d.cities[r.city].name
+		"quest_count":
+			return "의뢰 %d개를 %s" % [int(r.get("min", 1)), "끝내야 한다" if str(r.get("state", "")) == "done" else "받아야 한다"]
+		"any_crisis":
+			return "정세 사건이 진행 중이어야 한다"
 		"flag":
 			return "아직 때가 아니다"
 	return "조건이 맞지 않는다"
@@ -268,7 +290,8 @@ static func pay_cost(state: GameState, choice: Dictionary) -> void:
 			state.remove_cargo(c.good, int(c.amount))
 
 
-## d20 판정. 태운 동료의 bonus_stat이면 보너스를 더한다. { success, text }
+## d20 판정. 태운 동료의 bonus_stat이면 보너스를 더한다.
+## { success, text, d20, stat, stat_name, base, bonus, bonus_name, total, dc } (주사위 연출이 쓴다)
 static func roll_check(state: GameState, check: Dictionary) -> Dictionary:
 	var stat: String = check.stat
 	var d20 := state.rng.randi_range(1, 20)
@@ -284,23 +307,27 @@ static func roll_check(state: GameState, check: Dictionary) -> Dictionary:
 		"success": ok,
 		"text": "d20 %d + %s %d%s = %d  vs  DC %d  →  %s" % [
 			d20, Defs.STAT_NAMES[stat], base, bonus_text, total, dc, "성공" if ok else "실패"],
+		"d20": d20, "stat": stat, "stat_name": Defs.STAT_NAMES[stat], "base": base, "bonus": bonus,
+		"bonus_name": state.data.companions[state.companion].name if bonus != 0 else "",
+		"total": total, "dc": dc,
 	}
 
 
 ## 선택지를 실행한다. 비용을 치르고, 판정하고, 결과 효과를 적용한다.
-## 돌려주는 값: { outcome, text, roll_text, effect_lines }
+## 돌려주는 값: { outcome, text, roll_text, roll, effect_lines } (roll은 판정이 없으면 {})
 static func resolve(state: GameState, choice: Dictionary) -> Dictionary:
 	pay_cost(state, choice)
 	var outcome := "success"
 	var roll_text := ""
+	var roll := {}
 	if choice.has("check"):
-		var roll := roll_check(state, choice.check)
+		roll = roll_check(state, choice.check)
 		outcome = "success" if roll.success else "failure"
 		roll_text = roll.text
 
 	var result: Dictionary = choice.outcomes.get(outcome, choice.outcomes.success)
 	var lines := apply_effects(state, result.get("effects", []))
-	return { "outcome": outcome, "text": result.get("text", ""), "roll_text": roll_text, "effect_lines": lines }
+	return { "outcome": outcome, "text": result.get("text", ""), "roll_text": roll_text, "roll": roll, "effect_lines": lines }
 
 
 # --- 효과 ---

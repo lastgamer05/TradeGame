@@ -45,6 +45,10 @@ var _tag_name: Label
 var _tag_sub: Label
 var _info: Control
 var _was_moving := false
+## 지금 목표가 가리키는 지점 위에 띄우는 ▼ (guide.json의 target: 구역 id 또는 "gate")
+var _marker: Label
+var _marker_x := -1.0
+var _marker_t := 0.0
 ## 참이면 걷기와 입력을 멈춘다 (main이 모달·대화·전투 중에 참을 돌려주는 함수를 넣는다)
 var blocked: Callable = func(): return false
 
@@ -215,6 +219,17 @@ func _build_overlay() -> void:
 	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(hint)
 
+	var target: String = _state.current_goal().get("target", "")
+	for s in _spots:
+		if (target == "gate" and s.kind == "gate") or (s.kind == "door" and s.id == target):
+			_marker_x = s.x
+	_marker = Kit.title("▼", 36)
+	_marker.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	_marker.add_theme_constant_override("shadow_offset_y", 2)
+	_marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_marker.visible = _marker_x >= 0.0 and _state.guide_announced
+	add_child(_marker)
+
 	_info = _city_info()
 	_info.visible = false
 	add_child(_info)
@@ -224,7 +239,7 @@ func _build_overlay() -> void:
 func _city_info() -> Control:
 	var city: Dictionary = GameData.cities[_state.city]
 	var p := Kit.panel(0.92)
-	p.position = Vector2(16, 92)
+	p.position = Vector2(16, 128)
 	p.custom_minimum_size = Vector2(380, 0)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var col := Kit.vbox(6)
@@ -250,6 +265,7 @@ func _process(delta: float) -> void:
 		_target_x = -1.0
 		_pending = {}
 		_move_folk(delta)
+		_place_marker(delta)
 		return
 	var dir := 0.0
 	if Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A):
@@ -285,6 +301,16 @@ func _process(delta: float) -> void:
 	_place_player()
 	_move_folk(delta)
 	_update_focus()
+	_place_marker(delta)
+
+
+func _place_marker(delta: float) -> void:
+	if not _marker.visible:
+		return
+	_marker_t += delta
+	var bob := roundf(absf(sin(_marker_t * 3.0)) * 4.0) * PX
+	_marker.position = Vector2(roundf((_marker_x - _cam.position.x) * PX - _marker.size.x / 2.0),
+		roundf((_ground - 92.0) * PX - bob))
 
 
 func _place_player() -> void:

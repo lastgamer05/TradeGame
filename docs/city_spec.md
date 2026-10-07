@@ -97,6 +97,9 @@
 | `companion` | `companion` (id, ""이면 아무나) | 지금 태운 동료 |
 | `day` | `min`/`max` | 날짜 |
 | `power` | `min` | 전력 보유량 |
+| `city` | `city` | 지금 있는 도시 |
+| `quest_count` | `quests`(비면 전체), `state`(`started`/`done`), `min` | 받은(또는 끝낸) 의뢰 수 |
+| `any_crisis` | `active` (bool, 기본 true) | 정세 사건이 하나라도 진행 중 |
 
 기존: `cargo`, `module`, `reputation`, `faction_reputation`, `flag`. `flag`는 `"set": false`를 주면 플래그가 없을 때 참이다.
 

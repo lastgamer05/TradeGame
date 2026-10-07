@@ -11,6 +11,7 @@ const WorldMapScreen := preload("res://scripts/ui/world_map_screen.gd")
 const ArrivalView := preload("res://scripts/ui/arrival_view.gd")
 const TownView := preload("res://scripts/ui/town_view.gd")
 const LocationView := preload("res://scripts/ui/location_view.gd")
+const DiceRollView := preload("res://scripts/ui/dice_roll_view.gd")
 
 const CITY_ART := "res://assets/art/cities/%s.png"
 const LOCATION_ART := "res://assets/art/locations/%s.png"
@@ -41,6 +42,8 @@ var _power_label: Label
 var _cargo_label: Label
 var _worth_label: Label
 var _body: Control
+## 윗줄 아래 지금 목표 한 줄 (data/guide.json)
+var _goal_label: Label
 var _log_panel: PanelContainer
 var _log_label: Label
 var _overlay: Control
@@ -69,7 +72,9 @@ func _new_game() -> void:
 	_travel_from = ""
 	screen = "arrival"
 	_add_log("%s에서 출발한다. 전력 %s, 짐칸 %d칸." % [Kit.city_name(state.city), Kit.fmt_power(state.power), state.cargo_capacity])
-	# 시작 도시 안에서 시작한다: 짐칸이 빈 채로 큰 지도부터 보면 할 일이 없다.
+	# 프롤로그(세계와 주인공) 뒤 시작 도시 안에서 시작한다: 짐칸이 빈 채로 큰 지도부터 보면 할 일이 없다.
+	if GameData.dialogues.has("prologue"):
+		_then.append(_open_dialogue.bind("prologue"))
 	_then.append(_show_arrival.bind(false))
 	_refresh()
 	_show_character_creation()
@@ -97,6 +102,7 @@ func _enter_city() -> void:
 	_travel_from = ""
 	_town_pos.erase(state.city)
 	_enter_hub()
+	_show_next_event()
 
 
 func _enter_hub() -> void:
@@ -239,6 +245,8 @@ func _close_modal() -> void:
 func _show_next_event() -> void:
 	if _overlay.visible or _battle_view != null or _dialogue_view != null:
 		return
+	state.update_guide()
+	_refresh_goal()
 	if not state.pending_news.is_empty():
 		var news: Dictionary = state.pending_news.pop_front()
 		var c: Dictionary = news.crisis
@@ -285,14 +293,27 @@ func _show_next_event() -> void:
 func _on_choice(ev: Dictionary, ch: Dictionary) -> void:
 	var r := EventRunner.resolve(state, ch)
 	_add_log("[%s] %s" % [ev.title, ch.text])
+	if not r.roll.is_empty():
+		_overlay.visible = false
+		await _play_dice(r.roll)
+		_overlay.visible = true
 	_open_modal(ev.title)
-	if r.roll_text != "":
-		_modal_text(r.roll_text, PixelTheme.ACCENT if r.outcome == "success" else Kit.BAD)
+	if not r.roll.is_empty():
+		_modal_text("%s 판정 %s  (%d / 난이도 %d)" % [r.roll.stat_name, "성공" if r.roll.success else "실패", r.roll.total, r.roll.dc],
+			PixelTheme.ACCENT if r.outcome == "success" else Kit.BAD)
 	_modal_text(r.text)
 	for line in r.effect_lines:
 		_modal_text("· " + line, PixelTheme.TEXT_DIM)
 		_add_log("  " + line)
 	_modal.add_child(Kit.button("계속", true, _close_modal))
+
+
+## 판정 주사위 연출을 띄우고 끝날 때까지 기다린다.
+func _play_dice(roll: Dictionary) -> void:
+	var dice := DiceRollView.new()
+	add_child(dice)
+	dice.play(roll)
+	await dice.finished
 
 
 # --- 틀 ---
@@ -326,6 +347,12 @@ func _build_layout() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(root)
 	root.add_child(_build_top_bar())
+	_goal_label = Kit.label("", PixelTheme.TEXT)
+	_goal_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	_goal_label.add_theme_constant_override("shadow_offset_x", 2)
+	_goal_label.add_theme_constant_override("shadow_offset_y", 2)
+	_goal_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	root.add_child(_goal_label)
 
 	_body = Control.new()
 	_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -393,8 +420,17 @@ func _refresh() -> void:
 	_refresh_background()
 	_build_screen()
 	_log_panel.visible = screen == "location"
+	_refresh_goal()
 	_log_label.text = "\n".join(_log.slice(-2))
 	_check_stranded()
+
+
+func _refresh_goal() -> void:
+	var goal := state.current_goal()
+	_goal_label.visible = not goal.is_empty() and state.guide_announced and screen in ["hub", "location", "map"]
+	if not goal.is_empty():
+		_goal_label.text = "목표  %s  ·  %s" % [goal.title, goal.where]
+		_goal_label.tooltip_text = goal.hint
 
 
 func _refresh_background() -> void:

@@ -28,6 +28,7 @@ func _initialize() -> void:
 	test_all_dialogues_run()
 	test_dialogue_view()
 	test_town_view()
+	test_guide()
 	print("\n%s" % ("ALL PASSED" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -729,6 +730,20 @@ func test_dialogue_view() -> void:
 	_expect(view._result_box.get_child_count() == 1, "대화 창: 첫 노드 효과 줄")
 	s.stats.negotiation = 30
 	view._buttons[0].pressed.emit()
+	# 판정이 있으면 주사위 연출이 뜬다: 굴리기 -> (바로) 결과 -> 계속
+	var dice: Node = null
+	for c in view.get_children():
+		if c.has_method("play"):
+			dice = c
+	_expect(dice != null and view._buttons.is_empty(), "대화 창: 판정은 주사위 연출로, 그동안 선택지 없음")
+	if dice != null:
+		_expect(dice._chance() == 100 and dice._roll.dc == 15, "주사위: 난이도와 성공 확률 (%d%%)" % dice._chance())
+		dice._advance()
+		_expect(dice._phase == "rolling", "주사위: 굴리기 시작")
+		dice._advance()
+		_expect(dice._phase == "done" and dice._verdict.text.begins_with("대성공") or dice._verdict.text == "성공",
+			"주사위: 결과 (%s)" % dice._verdict.text)
+		dice._advance()
 	_expect(view._buttons.size() == 1 and view._result_box.get_child_count() >= 2, "대화 창: 판정 뒤 결과와 계속 버튼")
 	view._buttons[0].pressed.emit()
 	_expect(view._text_label.text == "좋아.", "대화 창: 계속하면 다음 노드")
@@ -770,6 +785,36 @@ func test_town_view() -> void:
 	view._unhandled_key_input(key)
 	_expect(opened[0] == "helios_plaza", "거리: 입구 앞에서 E를 누르면 그 구역으로 (%s)" % opened[0])
 	view.queue_free()
+
+
+## 초반 안내: 도시에 들어서면 첫 목표를 알리고, 조건을 채우면 다음 목표로 넘어가며 알린다.
+func test_guide() -> void:
+	var data := _load_data()
+	if data == null:
+		return
+	_expect(data.guide.size() >= 5 and data.dialogues.has("prologue"), "안내 단계와 프롤로그 데이터")
+	var s := GameState.new(data, 33)
+	s.update_guide()
+	_expect(s.pending_notices.is_empty(), "도시에 들어서기 전엔 안내 없음")
+	s.visited_cities[s.city] = true
+	s.update_guide()
+	_expect(s.pending_notices.size() == 1 and s.guide_step == 0, "첫 목표 안내")
+	s.add_cargo("raw_food", 6)
+	s.update_guide()
+	_expect(s.guide_step == 1 and s.pending_notices.back().title == "목표 달성", "생식량을 사면 다음 목표")
+	s.city = "helios"
+	s.flags["met_aurel_beck"] = true
+	s.update_guide()
+	_expect(s.guide_step == 3, "여러 목표를 한 번에 넘긴다 (%d)" % s.guide_step)
+	s.quests["beck_first_job"] = "done"
+	s.quests["nova_first_job"] = "active"
+	s.quests["soha_first_job"] = "active"
+	s.update_guide()
+	_expect(s.guide_step == 5, "의뢰 수 조건 (quest_count) (%d)" % s.guide_step)
+	_expect(EventRunner.requirements_met(s, [{ "type": "quest_count", "state": "done", "min": 1 }])
+		and not EventRunner.requirements_met(s, [{ "type": "quest_count", "state": "done", "min": 2 }]), "끝낸 의뢰만 센다")
+	_expect(not EventRunner.requirements_met(s, [{ "type": "any_crisis" }]), "정세 사건 없음")
+	data.free()
 
 
 ## 테스트용 의뢰와 대화. 실제 이야기 데이터와 겹치지 않게 t_ 로 시작한다.

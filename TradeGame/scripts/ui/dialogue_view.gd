@@ -8,6 +8,7 @@ signal finished
 const PORTRAIT_DIR := "res://assets/portraits/"
 ## 초상화 원본 48x48을 2배로
 const PORTRAIT_SIZE := 96
+const DiceRollView := preload("res://scripts/ui/dice_roll_view.gd")
 const SUCCESS := Color(0.56, 0.84, 0.5)
 const FAILURE := Color(0.95, 0.45, 0.38)
 
@@ -124,6 +125,15 @@ func _on_choice(index: int) -> void:
 	if index < cur.get("choices", []).size():
 		picked = cur.choices[index].text
 	var r := _runner.choose(index)
+	var roll: Dictionary = r.get("roll", {})
+	if not roll.is_empty():
+		# 판정은 주사위 연출로 보여 준다. 끝날 때까지 선택지를 막는다.
+		_clear(_choice_box)
+		_buttons.clear()
+		var dice := DiceRollView.new()
+		add_child(dice)
+		dice.play(roll)
+		await dice.finished
 	if r.roll_text == "" and r.effect_lines.is_empty():
 		_show_node()
 		return
@@ -133,8 +143,9 @@ func _on_choice(index: int) -> void:
 	_buttons.clear()
 	if picked != "":
 		_result_line("> " + picked, PixelTheme.TEXT_DIM)
-	if r.roll_text != "":
-		_result_line(r.roll_text, SUCCESS if r.success else FAILURE)
+	if not roll.is_empty():
+		_result_line("%s 판정 %s  (%d / 난이도 %d)" % [roll.stat_name, "성공" if roll.success else "실패", roll.total, roll.dc],
+			SUCCESS if r.success else FAILURE)
 	for line in r.effect_lines:
 		_result_line(line, PixelTheme.ACCENT)
 	_add_button("계속", true, "", _show_node)
